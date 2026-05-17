@@ -23,6 +23,7 @@ PolicyTreeBuilder-replication/
 |-- v10_simulation/                 # Additional reference-normalization simulation materials
 |-- requirements.txt                # Lightweight dependency list
 |-- requirements-lock.txt           # Exact package versions from the author's Python 3.12.7 environment
+|-- TECHNICAL_README.md             # Detailed Round C v4 technical workflow
 |-- replication_package.md          # File index and replication notes
 `-- run_v4_pipeline.ps1             # PowerShell pipeline entrypoint, path-normalized for this repo
 ```
@@ -78,10 +79,12 @@ data/final_tree/v4_tree_levels.csv
 data/final_tree/v4_final_audit.json
 ```
 
+For the detailed technical workflow, see `TECHNICAL_README.md`.
+
 To rerun after configuring API credentials, review and run:
 
 ```powershell
-.un_v4_pipeline.ps1
+.\run_v4_pipeline.ps1
 ```
 
 Some commands are intentionally commented in the pipeline file so reviewers can run stages selectively.

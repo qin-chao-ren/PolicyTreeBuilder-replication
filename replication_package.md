@@ -19,6 +19,7 @@ This file describes the public review package for PolicyTreeBuilder.
 - `scripts/`: Round C v4 processing scripts and utility modules.
 - `run_v4_pipeline.ps1`: path-normalized PowerShell entrypoint for staged reruns.
 - `v10_simulation/`: supplementary reference-normalization simulation materials.
+- `TECHNICAL_README.md`: cleaned technical workflow adapted from the original Round C v4 technical README.
 
 ## 4. Intermediate Outputs
 
