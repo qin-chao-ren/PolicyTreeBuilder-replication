@@ -1,0 +1,3394 @@
+{
+  "meta": {
+    "version": "v9.1",
+    "date": "2026-03-10",
+    "description": "V5 Step 2 v9.1 full simulation output",
+    "spec_files": [
+      "v5_step2_refactor_plan_v9_1.md",
+      "v5_pau_split_standard_v3.md",
+      "v5_leaf_granularity_standard_v3.md"
+    ],
+    "dictionary_versions": {
+      "domain_dictionary": "v5_domain_dictionary_v4.json (v4.0-draft)",
+      "verb_dictionary": "v5_verb_dictionary_v3.json (v3.0)"
+    },
+    "framework_version": "TrackC_Monetary_Framework_v9.1",
+    "input_docs": ["DF0459", "DF0009", "ZY0150", "DF0403", "DF0217", "DF0191"],
+    "log": [
+      "Track A: PAU化规划类标题，按v9.1重构规则生成pau_final",
+      "Track B: GOAL/DIRECTION/ACTION判定 → leaf提取 → PAU → pau_final",
+      "Track C: 噪音八分类 → monetary/non_monetary分流 → 框架匹配 → PAU → pau_final",
+      "pau_final严格按slots重构→归一化→稳定表达恢复",
+      "固定搭配优先：空空中转、一次安检、稳定运行等保留完整",
+      "对象限定优先：不压缩为泛主题词"
+    ]
+  },
+
+  "track_a": [
+    {
+      "doc_id": "DF0459",
+      "semantic_block_id": "DF0459_B019",
+      "block_text": "二、重点任务",
+      "is_noise": true,
+      "noise_reason": "结构性标题，无实质政策内容",
+      "components": null,
+      "pau_final": null
+    },
+    {
+      "doc_id": "DF0459",
+      "semantic_block_id": "DF0459_B020",
+      "block_text": "（一）提升货运设施保障能力。",
+      "is_noise": false,
+      "components": {
+        "M": ["提升"],
+        "A": "提升",
+        "A_type": "direction",
+        "O": "货运设施保障能力",
+        "S_scope": [],
+        "S_focus": [],
+        "S_stage": [],
+        "S_type": []
+      },
+      "pau_final": "货运设施保障能力",
+      "cleaning_log": "M='提升'为direction修饰词，不进入final；O保留完整"
+    },
+    {
+      "doc_id": "DF0459",
+      "semantic_block_id": "DF0459_B021",
+      "block_text": "1.加强基础设施建设。",
+      "is_noise": false,
+      "components": {
+        "M": ["加强"],
+        "A": "建设",
+        "A_type": "substantive",
+        "O": "基础设施",
+        "S_scope": [],
+        "S_focus": [],
+        "S_stage": [],
+        "S_type": []
+      },
+      "pau_final": "基础设施建设",
+      "cleaning_log": "M='加强'为direction修饰词，不进入final；A='建设'为substantive保留在final中"
+    },
+    {
+      "doc_id": "DF0459",
+      "semantic_block_id": "DF0459_B023",
+      "block_text": "2.提升装备专业化水平。",
+      "is_noise": false,
+      "components": {
+        "M": ["提升"],
+        "A": "提升",
+        "A_type": "direction",
+        "O": "装备专业化水平",
+        "S_scope": [],
+        "S_focus": [],
+        "S_stage": [],
+        "S_type": []
+      },
+      "pau_final": "装备专业化水平",
+      "cleaning_log": "M='提升'为direction，不进入final"
+    },
+    {
+      "doc_id": "DF0459",
+      "semantic_block_id": "DF0459_B025",
+      "block_text": "（二）构建全球航空货运网络。",
+      "is_noise": false,
+      "components": {
+        "M": [],
+        "A": "构建",
+        "A_type": "substantive",
+        "O": "航空货运网络",
+        "S_scope": ["全球"],
+        "S_focus": [],
+        "S_stage": [],
+        "S_type": []
+      },
+      "pau_final": "全球航空货运网络",
+      "cleaning_log": "S_scope='全球'+O='航空货运网络'；A='构建'为substantive但标题级别direction化处理"
+    },
+    {
+      "doc_id": "DF0459",
+      "semantic_block_id": "DF0459_B026",
+      "block_text": "1.打造精品航线网络。",
+      "is_noise": false,
+      "components": {
+        "M": [],
+        "A": "打造",
+        "A_type": "substantive",
+        "O": "航线网络",
+        "S_scope": [],
+        "S_focus": [],
+        "S_stage": ["精品"],
+        "S_type": []
+      },
+      "pau_final": "精品航线网络",
+      "cleaning_log": "S_stage='精品'+O='航线网络'"
+    },
+    {
+      "doc_id": "DF0459",
+      "semantic_block_id": "DF0459_B028",
+      "block_text": "2.提升中转联运功能。",
+      "is_noise": false,
+      "components": {
+        "M": ["提升"],
+        "A": "提升",
+        "A_type": "direction",
+        "O": "中转联运功能",
+        "S_scope": [],
+        "S_focus": [],
+        "S_stage": [],
+        "S_type": []
+      },
+      "pau_final": "中转联运功能",
+      "cleaning_log": "'中转联运'作为稳定业务词块保留在O中，不拆分到S_focus/S_type"
+    },
+    {
+      "doc_id": "DF0459",
+      "semantic_block_id": "DF0459_B030",
+      "block_text": "3.强化行业资源供给。",
+      "is_noise": false,
+      "components": {
+        "M": ["强化"],
+        "A": "强化",
+        "A_type": "direction",
+        "O": "行业资源供给",
+        "S_scope": [],
+        "S_focus": [],
+        "S_stage": [],
+        "S_type": []
+      },
+      "pau_final": "行业资源供给",
+      "cleaning_log": "M='强化'为direction；O完整保留"
+    },
+    {
+      "doc_id": "DF0459",
+      "semantic_block_id": "DF0459_B032",
+      "block_text": "（三）增强市场培育组织能力。",
+      "is_noise": false,
+      "components": {
+        "M": ["增强"],
+        "A": "增强",
+        "A_type": "direction",
+        "O": "市场培育组织能力",
+        "S_scope": [],
+        "S_focus": [],
+        "S_stage": [],
+        "S_type": []
+      },
+      "pau_final": "市场培育组织能力",
+      "cleaning_log": "M='增强'为direction"
+    },
+    {
+      "doc_id": "DF0459",
+      "semantic_block_id": "DF0459_B033",
+      "block_text": "1.提升运力供给水平。",
+      "is_noise": false,
+      "components": {
+        "M": ["提升"],
+        "A": "提升",
+        "A_type": "direction",
+        "O": "运力供给水平",
+        "S_scope": [],
+        "S_focus": [],
+        "S_stage": [],
+        "S_type": []
+      },
+      "pau_final": "运力供给水平",
+      "cleaning_log": "M='提升'为direction"
+    },
+    {
+      "doc_id": "DF0459",
+      "semantic_block_id": "DF0459_B035",
+      "block_text": "2.培育物流龙头企业。",
+      "is_noise": false,
+      "components": {
+        "M": [],
+        "A": "培育",
+        "A_type": "direction",
+        "O": "物流龙头企业",
+        "S_scope": [],
+        "S_focus": [],
+        "S_stage": [],
+        "S_type": []
+      },
+      "pau_final": "物流龙头企业",
+      "cleaning_log": "A='培育'为direction"
+    },
+    {
+      "doc_id": "DF0459",
+      "semantic_block_id": "DF0459_B037",
+      "block_text": "3.提升货源组织能力。",
+      "is_noise": false,
+      "components": {
+        "M": ["提升"],
+        "A": "提升",
+        "A_type": "direction",
+        "O": "货源组织能力",
+        "S_scope": [],
+        "S_focus": [],
+        "S_stage": [],
+        "S_type": []
+      },
+      "pau_final": "货源组织能力",
+      "cleaning_log": "M='提升'为direction"
+    },
+    {
+      "doc_id": "DF0459",
+      "semantic_block_id": "DF0459_B039",
+      "block_text": "4.推进临空经济发展。",
+      "is_noise": false,
+      "components": {
+        "M": ["推进"],
+        "A": "推进",
+        "A_type": "direction",
+        "O": "临空经济发展",
+        "S_scope": [],
+        "S_focus": [],
+        "S_stage": [],
+        "S_type": []
+      },
+      "pau_final": "临空经济发展",
+      "cleaning_log": "M='推进'为direction"
+    },
+    {
+      "doc_id": "DF0459",
+      "semantic_block_id": "DF0459_B041",
+      "block_text": "（四）提高物流服务保障效率。",
+      "is_noise": false,
+      "components": {
+        "M": ["提高"],
+        "A": "提高",
+        "A_type": "direction",
+        "O": "物流服务保障效率",
+        "S_scope": [],
+        "S_focus": [],
+        "S_stage": [],
+        "S_type": []
+      },
+      "pau_final": "物流服务保障效率",
+      "cleaning_log": "M='提高'为direction"
+    },
+    {
+      "doc_id": "DF0459",
+      "semantic_block_id": "DF0459_B042",
+      "block_text": "1.强化服务保障能力。",
+      "is_noise": false,
+      "components": {
+        "M": ["强化"],
+        "A": "强化",
+        "A_type": "direction",
+        "O": "服务保障能力",
+        "S_scope": [],
+        "S_focus": [],
+        "S_stage": [],
+        "S_type": []
+      },
+      "pau_final": "服务保障能力",
+      "cleaning_log": "M='强化'为direction"
+    },
+    {
+      "doc_id": "DF0459",
+      "semantic_block_id": "DF0459_B044",
+      "block_text": "2.优化简化安检流程。",
+      "is_noise": false,
+      "components": {
+        "M": [],
+        "A": "优化",
+        "A_type": "direction",
+        "O": "安检流程",
+        "S_scope": [],
+        "S_focus": [],
+        "S_stage": [],
+        "S_type": []
+      },
+      "pau_final": "安检流程",
+      "cleaning_log": "A='优化'为direction；'简化'为附加修饰不进入final"
+    },
+    {
+      "doc_id": "DF0459",
+      "semantic_block_id": "DF0459_B046",
+      "block_text": "3.提升口岸通关效率。",
+      "is_noise": false,
+      "components": {
+        "M": ["提升"],
+        "A": "提升",
+        "A_type": "direction",
+        "O": "口岸通关效率",
+        "S_scope": [],
+        "S_focus": [],
+        "S_stage": [],
+        "S_type": []
+      },
+      "pau_final": "口岸通关效率",
+      "cleaning_log": "'口岸通关'为稳定业务词块保留在O"
+    },
+    {
+      "doc_id": "DF0459",
+      "semantic_block_id": "DF0459_B048",
+      "block_text": "4.推进智慧物流建设。",
+      "is_noise": false,
+      "components": {
+        "M": ["推进"],
+        "A": "建设",
+        "A_type": "substantive",
+        "O": "智慧物流",
+        "S_scope": [],
+        "S_focus": [],
+        "S_stage": [],
+        "S_type": []
+      },
+      "pau_final": "智慧物流建设",
+      "cleaning_log": "M='推进'为direction；A='建设'为substantive保留"
+    },
+    {
+      "doc_id": "DF0009",
+      "semantic_block_id": "DF0009_B001",
+      "block_text": "一、科学统筹推进枢纽建设",
+      "is_noise": false,
+      "components": {
+        "M": ["科学", "统筹", "推进"],
+        "A": "建设",
+        "A_type": "substantive",
+        "O": "枢纽",
+        "S_scope": [],
+        "S_focus": [],
+        "S_stage": [],
+        "S_type": []
+      },
+      "pau_final": "枢纽建设",
+      "cleaning_log": "M='科学/统筹/推进'为噪声/direction修饰词"
+    },
+    {
+      "doc_id": "DF0009",
+      "semantic_block_id": "DF0009_B004",
+      "block_text": "二、加快完善枢纽规划布局",
+      "is_noise": false,
+      "components": {
+        "M": ["加快"],
+        "A": "完善",
+        "A_type": "direction",
+        "O": "枢纽规划布局",
+        "S_scope": [],
+        "S_focus": [],
+        "S_stage": [],
+        "S_type": []
+      },
+      "pau_final": "枢纽规划布局",
+      "cleaning_log": "M='加快'为tempo修饰词"
+    },
+    {
+      "doc_id": "DF0009",
+      "semantic_block_id": "DF0009_B007",
+      "block_text": "三、加快推进基础设施建设",
+      "is_noise": false,
+      "components": {
+        "M": ["加快", "推进"],
+        "A": "建设",
+        "A_type": "substantive",
+        "O": "基础设施",
+        "S_scope": [],
+        "S_focus": [],
+        "S_stage": [],
+        "S_type": []
+      },
+      "pau_final": "基础设施建设",
+      "cleaning_log": "M='加快/推进'为tempo+direction修饰词"
+    },
+    {
+      "doc_id": "DF0009",
+      "semantic_block_id": "DF0009_B012",
+      "block_text": "四、积极培育多元经营主体",
+      "is_noise": false,
+      "components": {
+        "M": ["积极"],
+        "A": "培育",
+        "A_type": "direction",
+        "O": "多元经营主体",
+        "S_scope": [],
+        "S_focus": [],
+        "S_stage": [],
+        "S_type": []
+      },
+      "pau_final": "多元经营主体",
+      "cleaning_log": "M='积极'为噪声修饰词"
+    },
+    {
+      "doc_id": "DF0009",
+      "semantic_block_id": "DF0009_B015",
+      "block_text": "五、大力拓展增量市场业务",
+      "is_noise": false,
+      "components": {
+        "M": ["大力"],
+        "A": "拓展",
+        "A_type": "direction",
+        "O": "增量市场业务",
+        "S_scope": [],
+        "S_focus": [],
+        "S_stage": [],
+        "S_type": []
+      },
+      "pau_final": "增量市场业务",
+      "cleaning_log": "M='大力'为噪声修饰词"
+    },
+    {
+      "doc_id": "DF0009",
+      "semantic_block_id": "DF0009_B018",
+      "block_text": "六、扎实做好货物运输保障",
+      "is_noise": false,
+      "components": {
+        "M": ["扎实"],
+        "A": "做好",
+        "A_type": "direction",
+        "O": "货物运输保障",
+        "S_scope": [],
+        "S_focus": [],
+        "S_stage": [],
+        "S_type": []
+      },
+      "pau_final": "货物运输保障",
+      "cleaning_log": "M='扎实'为噪声；A='做好'为空动词"
+    },
+    {
+      "doc_id": "DF0009",
+      "semantic_block_id": "DF0009_B022",
+      "block_text": "七、提升枢纽智慧绿色水平",
+      "is_noise": false,
+      "components": {
+        "M": ["提升"],
+        "A": "提升",
+        "A_type": "direction",
+        "O": "枢纽智慧绿色水平",
+        "S_scope": [],
+        "S_focus": [],
+        "S_stage": [],
+        "S_type": []
+      },
+      "pau_final": "枢纽智慧绿色水平",
+      "cleaning_log": "M='提升'为direction；'智慧绿色'作为复合修饰保留在O中不拆分"
+    },
+    {
+      "doc_id": "DF0009",
+      "semantic_block_id": "DF0009_B026",
+      "block_text": "八、继续做好航空资源保障",
+      "is_noise": false,
+      "components": {
+        "M": ["继续"],
+        "A": "做好",
+        "A_type": "direction",
+        "O": "航空资源保障",
+        "S_scope": [],
+        "S_focus": [],
+        "S_stage": [],
+        "S_type": []
+      },
+      "pau_final": "航空资源保障",
+      "cleaning_log": "M='继续'为continuation修饰词；A='做好'为空动词"
+    },
+    {
+      "doc_id": "DF0009",
+      "semantic_block_id": "DF0009_B029",
+      "block_text": "九、全面改善枢纽运营环境",
+      "is_noise": false,
+      "components": {
+        "M": ["全面"],
+        "A": "改善",
+        "A_type": "direction",
+        "O": "枢纽运营环境",
+        "S_scope": [],
+        "S_focus": [],
+        "S_stage": [],
+        "S_type": []
+      },
+      "pau_final": "枢纽运营环境",
+      "cleaning_log": "M='全面'为噪声修饰词"
+    }
+  ],
+
+  "track_b": [
+    {
+      "doc_id": "DF0459",
+      "semantic_block_id": "DF0459_B022",
+      "parent_title": "（一）提升货运设施保障能力 > 1.加强基础设施建设",
+      "block_type": "ACTION_BLOCK",
+      "leaves": [
+        {
+          "leaf_name": "机场货运区工程建设",
+          "components": {
+            "M": [],
+            "A": "建设",
+            "A_type": "substantive",
+            "O": "机场货运区工程",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "机场货运区工程建设",
+          "cleaning_log": "覆盖南京禄口三期、无锡硕放改扩建等具体项目，leaf取共性语义"
+        },
+        {
+          "leaf_name": "国际快件与跨境电商处理中心建设",
+          "components": {
+            "M": [],
+            "A": "建设",
+            "A_type": "substantive",
+            "O": "处理中心",
+            "S_scope": ["国际"],
+            "S_focus": ["跨境电商"],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "国际快件与跨境电商处理中心建设",
+          "cleaning_log": "base_final='国际跨境电商处理中心建设'；恢复'快件与跨境电商'稳定表达，保留对象限定完整性",
+          "self_check": {
+            "reconstructed_pau_final": "国际跨境电商处理中心建设",
+            "match_before_overwrite": false,
+            "note": "恢复'快件与'以保留完整对象限定"
+          }
+        },
+        {
+          "leaf_name": "货邮综合核心口岸建设",
+          "components": {
+            "M": [],
+            "A": "建设",
+            "A_type": "substantive",
+            "O": "货邮综合核心口岸",
+            "S_scope": ["国际"],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "国际货邮综合核心口岸建设",
+          "cleaning_log": "保留国际scope限定"
+        },
+        {
+          "leaf_name": "货运集疏运体系完善",
+          "components": {
+            "M": [],
+            "A": "完善",
+            "A_type": "direction",
+            "O": "货运集疏运体系",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "货运集疏运体系",
+          "cleaning_log": "A='完善'为direction不进入final"
+        },
+        {
+          "leaf_name": "航空异地货站基础设施建设",
+          "components": {
+            "M": [],
+            "A": "建设",
+            "A_type": "substantive",
+            "O": "异地货站基础设施",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "异地货站基础设施建设",
+          "cleaning_log": "'异地货站'为稳定对象限定词块，不压缩为泛词"
+        }
+      ]
+    },
+    {
+      "doc_id": "DF0459",
+      "semantic_block_id": "DF0459_B024",
+      "parent_title": "（一）提升货运设施保障能力 > 2.提升装备专业化水平",
+      "block_type": "ACTION_BLOCK",
+      "leaves": [
+        {
+          "leaf_name": "货站设施及指定监管场地完善",
+          "components": {
+            "M": [],
+            "A": "完善",
+            "A_type": "direction",
+            "O": "货站设施及指定监管场地",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "货站设施及指定监管场地",
+          "cleaning_log": "覆盖冷链/医药/活体/危险品/空空联运中转场地等；A='完善'为direction"
+        },
+        {
+          "leaf_name": "口岸检疫查验设施设备投入",
+          "components": {
+            "M": [],
+            "A": "投入",
+            "A_type": "substantive",
+            "O": "检疫查验设施设备",
+            "S_scope": [],
+            "S_focus": ["查验"],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "口岸检疫查验设施设备",
+          "cleaning_log": "'口岸'保留在O前作为限定；'查验'已在O内出现，S_focus去重后删除"
+        }
+      ]
+    },
+    {
+      "doc_id": "DF0459",
+      "semantic_block_id": "DF0459_B027",
+      "parent_title": "（二）构建全球航空货运网络 > 1.打造精品航线网络",
+      "block_type": "ACTION_BLOCK",
+      "leaves": [
+        {
+          "leaf_name": "洲际货运航线拓展",
+          "components": {
+            "M": [],
+            "A": "拓展",
+            "A_type": "direction",
+            "O": "货运航线",
+            "S_scope": ["洲际"],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "洲际货运航线",
+          "cleaning_log": "A='拓展'为direction"
+        },
+        {
+          "leaf_name": "亚洲及一带一路货运航线开辟",
+          "components": {
+            "M": [],
+            "A": "开辟",
+            "A_type": "substantive",
+            "O": "货运航线",
+            "S_scope": ["亚洲"],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "亚洲货运航线",
+          "cleaning_log": "'一带一路'为政策语境限定，不稳定归入S_scope，简化保留'亚洲'"
+        },
+        {
+          "leaf_name": "腹舱带货国际货运业务拓展",
+          "components": {
+            "M": [],
+            "A": "拓展",
+            "A_type": "direction",
+            "O": "货运业务",
+            "S_scope": ["国际"],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": ["腹舱"]
+          },
+          "pau_final": "国际腹舱货运业务",
+          "cleaning_log": "A='拓展'为direction"
+        }
+      ]
+    },
+    {
+      "doc_id": "DF0459",
+      "semantic_block_id": "DF0459_B029",
+      "parent_title": "（二）构建全球航空货运网络 > 2.提升中转联运功能",
+      "block_type": "ACTION_BLOCK",
+      "leaves": [
+        {
+          "leaf_name": "海外货站建设运营",
+          "components": {
+            "M": [],
+            "A": "建设",
+            "A_type": "substantive",
+            "O": "海外货站",
+            "S_scope": ["境外"],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "海外货站建设运营",
+          "cleaning_log": "'海外货站'为领域稳定词块；S_scope='境外'已含在'海外'中，去重保留O"
+        },
+        {
+          "leaf_name": "空空中转业务拓展",
+          "components": {
+            "M": [],
+            "A": "拓展",
+            "A_type": "direction",
+            "O": "空空中转业务",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "空空中转业务",
+          "cleaning_log": "'空空中转'为固定搭配保留在O中，不拆分到S_type/S_focus"
+        },
+        {
+          "leaf_name": "卡车航班网络构建",
+          "components": {
+            "M": [],
+            "A": "构建",
+            "A_type": "substantive",
+            "O": "卡车航班网络",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "卡车航班网络",
+          "cleaning_log": "'卡车航班'为领域稳定词块"
+        },
+        {
+          "leaf_name": "空陆联运网络构建",
+          "components": {
+            "M": [],
+            "A": "构建",
+            "A_type": "substantive",
+            "O": "联运网络",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": ["空地"]
+          },
+          "pau_final": "空地联运网络",
+          "cleaning_log": "原文'空陆'归一化为领域标准词'空地'"
+        },
+        {
+          "leaf_name": "空铁联运与低空货运模式探索",
+          "components": {
+            "M": [],
+            "A": "探索",
+            "A_type": "substantive",
+            "O": "联运新模式",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": ["空铁"]
+          },
+          "pau_final": "空铁联运新模式",
+          "cleaning_log": "含低空无人机配送等新兴模式"
+        }
+      ]
+    },
+    {
+      "doc_id": "DF0459",
+      "semantic_block_id": "DF0459_B031",
+      "parent_title": "（二）构建全球航空货运网络 > 3.强化行业资源供给",
+      "block_type": "ACTION_BLOCK",
+      "leaves": [
+        {
+          "leaf_name": "空域精细化管理改革",
+          "components": {
+            "M": [],
+            "A": "改革",
+            "A_type": "substantive",
+            "O": "空域精细化管理",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "空域精细化管理",
+          "cleaning_log": "A='改革'可附带但O保留完整"
+        },
+        {
+          "leaf_name": "货运航班时刻容量供给",
+          "components": {
+            "M": [],
+            "A": "供给",
+            "A_type": "substantive",
+            "O": "货运航班时刻容量",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "货运航班时刻容量供给",
+          "cleaning_log": "含放宽高峰时段国际货运航班时刻限制"
+        },
+        {
+          "leaf_name": "国际货运航权扩大与第五航权利用",
+          "components": {
+            "M": [],
+            "A": "扩大",
+            "A_type": "direction",
+            "O": "货运航权",
+            "S_scope": ["国际"],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": ["第五航权"]
+          },
+          "pau_final": "国际货运航权与第五航权",
+          "cleaning_log": "保留'第五航权'为具体权益形态"
+        }
+      ]
+    },
+    {
+      "doc_id": "DF0459",
+      "semantic_block_id": "DF0459_B034",
+      "parent_title": "（三）增强市场培育组织能力 > 1.提升运力供给水平",
+      "block_type": "ACTION_BLOCK",
+      "leaves": [
+        {
+          "leaf_name": "骨干航空公司运力引进",
+          "components": {
+            "M": [],
+            "A": "引进",
+            "A_type": "substantive",
+            "O": "骨干航空公司运力",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "骨干航空公司运力引进",
+          "cleaning_log": "保留'骨干航空公司'对象限定"
+        },
+        {
+          "leaf_name": "基地货运航空公司机队扩大",
+          "components": {
+            "M": [],
+            "A": "扩大",
+            "A_type": "direction",
+            "O": "基地货运航空公司机队",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "基地货运航空公司机队",
+          "cleaning_log": "'基地货运航空公司'为主体限定保留"
+        },
+        {
+          "leaf_name": "中转集拼业务拓展",
+          "components": {
+            "M": [],
+            "A": "拓展",
+            "A_type": "direction",
+            "O": "中转集拼业务",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "中转集拼业务",
+          "cleaning_log": "'中转集拼'为稳定业务词块保留在O"
+        },
+        {
+          "leaf_name": "货运包机虚拟承运人运营",
+          "components": {
+            "M": [],
+            "A": "运营",
+            "A_type": "substantive",
+            "O": "虚拟承运人",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": ["包机"]
+          },
+          "pau_final": "包机虚拟承运人运营",
+          "cleaning_log": "保留'虚拟承运人'作为新兴业态对象"
+        },
+        {
+          "leaf_name": "货运航空公司资本合作",
+          "components": {
+            "M": [],
+            "A": "合作",
+            "A_type": "substantive",
+            "O": "运力自主可控",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "货运航空公司资本合作",
+          "cleaning_log": "含股权投资/飞机湿租/托管等方式；leaf_name更有区分度保留"
+        }
+      ]
+    },
+    {
+      "doc_id": "DF0459",
+      "semantic_block_id": "DF0459_B036",
+      "parent_title": "（三）增强市场培育组织能力 > 2.培育物流龙头企业",
+      "block_type": "ACTION_BLOCK",
+      "leaves": [
+        {
+          "leaf_name": "全球航空货运代理企业与电商头部企业引进落户",
+          "components": {
+            "M": [],
+            "A": "引进",
+            "A_type": "substantive",
+            "O": "航空货运代理企业与电商头部企业落户",
+            "S_scope": ["全球"],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "全球航空货运代理企业与电商头部企业引进落户",
+          "cleaning_log": "保留主体限定完整性"
+        },
+        {
+          "leaf_name": "国际航空物流供应链综合集成能力提升",
+          "components": {
+            "M": [],
+            "A": "提升",
+            "A_type": "direction",
+            "O": "航空物流供应链综合集成能力",
+            "S_scope": ["国际"],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "国际航空物流供应链综合集成能力",
+          "cleaning_log": "A='提升'为direction"
+        },
+        {
+          "leaf_name": "龙头企业参与货站与物流园区建设运营",
+          "components": {
+            "M": [],
+            "A": "参与",
+            "A_type": "substantive",
+            "O": "货站与物流园区建设运营",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "龙头企业参与货站与物流园区建设运营",
+          "cleaning_log": "保留主体限定'龙头企业'"
+        }
+      ]
+    },
+    {
+      "doc_id": "DF0459",
+      "semantic_block_id": "DF0459_B038",
+      "parent_title": "（三）增强市场培育组织能力 > 3.提升货源组织能力",
+      "block_type": "ACTION_BLOCK",
+      "leaves": [
+        {
+          "leaf_name": "航空物流供需服务对接机制",
+          "components": {
+            "M": [],
+            "A": "建立",
+            "A_type": "substantive",
+            "O": "航空物流供需服务对接机制",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "航空物流供需服务对接机制",
+          "cleaning_log": "O完整保留，不拆分'供需服务对接'；围绕先进制造业集群"
+        },
+        {
+          "leaf_name": "异地货站建设与货站功能前置",
+          "components": {
+            "M": [],
+            "A": "建设",
+            "A_type": "substantive",
+            "O": "异地货站与货站功能前置",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "异地货站建设与货站功能前置",
+          "cleaning_log": "'异地货站'为稳定对象限定词块；含属地交货/安检/报关/放行创新模式"
+        }
+      ]
+    },
+    {
+      "doc_id": "DF0459",
+      "semantic_block_id": "DF0459_B040",
+      "parent_title": "（三）增强市场培育组织能力 > 4.推进临空经济发展",
+      "block_type": "ACTION_BLOCK",
+      "leaves": [
+        {
+          "leaf_name": "临空经济示范区建设",
+          "components": {
+            "M": [],
+            "A": "建设",
+            "A_type": "substantive",
+            "O": "临空经济示范区",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": ["示范"],
+            "S_type": []
+          },
+          "pau_final": "临空经济示范区建设",
+          "cleaning_log": "S_stage='示范'已含在O中'示范区'，去重保留O完整"
+        },
+        {
+          "leaf_name": "国际分拨中心与进口贸易中心建设",
+          "components": {
+            "M": [],
+            "A": "建设",
+            "A_type": "substantive",
+            "O": "国际分拨中心与进口贸易中心",
+            "S_scope": ["国际"],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "国际分拨中心与进口贸易中心建设",
+          "cleaning_log": "S_scope='国际'已含在O前导，去重后保留O完整"
+        },
+        {
+          "leaf_name": "临空物流产业园规划建设",
+          "components": {
+            "M": [],
+            "A": "建设",
+            "A_type": "substantive",
+            "O": "临空物流产业园",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "临空物流产业园建设",
+          "cleaning_log": "保留完整"
+        }
+      ]
+    },
+    {
+      "doc_id": "DF0459",
+      "semantic_block_id": "DF0459_B043",
+      "parent_title": "（四）提高物流服务保障效率 > 1.强化服务保障能力",
+      "block_type": "ACTION_BLOCK",
+      "leaves": [
+        {
+          "leaf_name": "货运设施空侧陆侧运输流线优化",
+          "components": {
+            "M": [],
+            "A": "优化",
+            "A_type": "direction",
+            "O": "货运设施空侧陆侧运输流线",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "货运设施空侧陆侧运输流线",
+          "cleaning_log": "A='优化'为direction"
+        },
+        {
+          "leaf_name": "跨境电商产业园区与货站一体监管空侧直连",
+          "components": {
+            "M": [],
+            "A": "实现",
+            "A_type": "substantive",
+            "O": "产业园区与货站一体监管空侧直连",
+            "S_scope": [],
+            "S_focus": ["跨境电商"],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "跨境电商产业园区与货站一体监管空侧直连",
+          "cleaning_log": "保留完整对象限定"
+        },
+        {
+          "leaf_name": "货站专业化服务水平提升",
+          "components": {
+            "M": [],
+            "A": "提升",
+            "A_type": "direction",
+            "O": "货站专业化服务水平",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "货站专业化服务水平",
+          "cleaning_log": "含服务承诺公布与履行"
+        }
+      ]
+    },
+    {
+      "doc_id": "DF0459",
+      "semantic_block_id": "DF0459_B045",
+      "parent_title": "（四）提高物流服务保障效率 > 2.优化简化安检流程",
+      "block_type": "ACTION_BLOCK",
+      "leaves": [
+        {
+          "leaf_name": "托运人白名单信用管理制度",
+          "components": {
+            "M": [],
+            "A": "建立",
+            "A_type": "substantive",
+            "O": "托运人白名单信用管理制度",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "托运人白名单信用管理制度",
+          "cleaning_log": "O完整保留"
+        },
+        {
+          "leaf_name": "异地货站一次安检机制",
+          "components": {
+            "M": [],
+            "A": "实行",
+            "A_type": "substantive",
+            "O": "异地货站一次安检机制",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "异地货站一次安检机制",
+          "cleaning_log": "'一次安检'为固定搭配保留；'异地货站'为稳定对象限定保留；不拆分为'安保一次安检'"
+        },
+        {
+          "leaf_name": "跨境电商货物便利化运输",
+          "components": {
+            "M": [],
+            "A": "开展",
+            "A_type": "substantive",
+            "O": "货物便利化运输",
+            "S_scope": ["跨境"],
+            "S_focus": ["跨境电商"],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "跨境电商货物便利化运输",
+          "cleaning_log": "S_scope='跨境'已含在S_focus='跨境电商'中，去重；'便利化运输'保留在O"
+        },
+        {
+          "leaf_name": "特货敏货便利化运输准入机制",
+          "components": {
+            "M": [],
+            "A": "建立",
+            "A_type": "substantive",
+            "O": "特货敏货便利化运输准入机制",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "特货敏货便利化运输准入机制",
+          "cleaning_log": "保留'特货敏货'具体对象限定，不压缩为泛词'特货'"
+        }
+      ]
+    },
+    {
+      "doc_id": "DF0459",
+      "semantic_block_id": "DF0459_B047",
+      "parent_title": "（四）提高物流服务保障效率 > 3.提升口岸通关效率",
+      "block_type": "ACTION_BLOCK",
+      "leaves": [
+        {
+          "leaf_name": "7×24小时无障碍预约通关",
+          "components": {
+            "M": [],
+            "A": "实施",
+            "A_type": "substantive",
+            "O": "7×24小时无障碍预约通关",
+            "S_scope": [],
+            "S_focus": ["通关"],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "7×24小时无障碍预约通关",
+          "cleaning_log": "S_focus='通关'已含在O中，去重保留O完整"
+        },
+        {
+          "leaf_name": "通关绿色通道设置",
+          "components": {
+            "M": [],
+            "A": "设置",
+            "A_type": "substantive",
+            "O": "通关绿色通道",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "通关绿色通道",
+          "cleaning_log": "含邮件快件/跨境电商/转关货物通关绿色通道"
+        },
+        {
+          "leaf_name": "卡车航班与机坪直提模式推广",
+          "components": {
+            "M": [],
+            "A": "推广",
+            "A_type": "substantive",
+            "O": "卡车航班与机坪直提模式",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "卡车航班与机坪直提模式",
+          "cleaning_log": "'机坪直提'为政策工具稳定词块"
+        },
+        {
+          "leaf_name": "通关查验便利化措施",
+          "components": {
+            "M": [],
+            "A": "实施",
+            "A_type": "substantive",
+            "O": "通关查验便利化措施",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "通关查验便利化措施",
+          "cleaning_log": "含提前申报/两步申报/两段准入等政策工具"
+        }
+      ]
+    },
+    {
+      "doc_id": "DF0459",
+      "semantic_block_id": "DF0459_B049",
+      "parent_title": "（四）提高物流服务保障效率 > 4.推进智慧物流建设",
+      "block_type": "ACTION_BLOCK",
+      "leaves": [
+        {
+          "leaf_name": "航空物流数据互联共享",
+          "components": {
+            "M": [],
+            "A": "推动",
+            "A_type": "direction",
+            "O": "航空物流数据互联共享",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "航空物流数据互联共享",
+          "cleaning_log": "'航空物流数据'为业务域对象，不压缩为'数字化数据互联共享'"
+        },
+        {
+          "leaf_name": "航空电子运单操作流程推广",
+          "components": {
+            "M": [],
+            "A": "推广",
+            "A_type": "substantive",
+            "O": "航空电子运单操作流程",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "航空电子运单操作流程",
+          "cleaning_log": "含单证无纸化流转"
+        },
+        {
+          "leaf_name": "高附加值货物全流程追踪服务体系",
+          "components": {
+            "M": [],
+            "A": "构建",
+            "A_type": "substantive",
+            "O": "全流程追踪服务体系",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "高附加值货物全流程追踪服务体系",
+          "cleaning_log": "保留'高附加值货物'对象限定，不压缩为'特货'"
+        },
+        {
+          "leaf_name": "航空物流公共服务平台建设",
+          "components": {
+            "M": [],
+            "A": "建设",
+            "A_type": "substantive",
+            "O": "航空物流公共服务平台",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "航空物流公共服务平台建设",
+          "cleaning_log": "为航司/机场/货代/货主/海关提供一体化信息服务"
+        },
+        {
+          "leaf_name": "智能审图AI技术应用",
+          "components": {
+            "M": [],
+            "A": "应用",
+            "A_type": "substantive",
+            "O": "智能审图AI技术",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "智能审图AI技术应用",
+          "cleaning_log": "替代人工审图提升安检通关效率"
+        }
+      ]
+    },
+    {
+      "doc_id": "DF0009",
+      "semantic_block_id": "DF0009_B002",
+      "parent_title": "一、科学统筹推进枢纽建设",
+      "block_type": "GOAL_BLOCK",
+      "leaves": [],
+      "cleaning_log": "以深化高质量发展为主线…全力推进空港型国家物流枢纽建设→GOAL语句，不提取leaf"
+    },
+    {
+      "doc_id": "DF0009",
+      "semantic_block_id": "DF0009_B003",
+      "parent_title": "一、科学统筹推进枢纽建设",
+      "block_type": "GOAL_BLOCK",
+      "leaves": [],
+      "cleaning_log": "到2025年/到2030年…数字指标→GOAL语句，不提取leaf"
+    },
+    {
+      "doc_id": "DF0009",
+      "semantic_block_id": "DF0009_B005",
+      "parent_title": "二、加快完善枢纽规划布局",
+      "block_type": "ACTION_BLOCK",
+      "leaves": [
+        {
+          "leaf_name": "国际航空枢纽战略规划修编",
+          "components": {
+            "M": [],
+            "A": "修编",
+            "A_type": "substantive",
+            "O": "国际航空枢纽战略规划",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "国际航空枢纽战略规划修编",
+          "cleaning_log": "保留完整"
+        }
+      ]
+    },
+    {
+      "doc_id": "DF0009",
+      "semantic_block_id": "DF0009_B006",
+      "parent_title": "二、加快完善枢纽规划布局",
+      "block_type": "ACTION_BLOCK",
+      "leaves": [
+        {
+          "leaf_name": "机场总体规划修编与货站布局规划完善",
+          "components": {
+            "M": [],
+            "A": "完善",
+            "A_type": "direction",
+            "O": "机场总体规划与货站布局规划",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "机场总体规划与货站布局规划",
+          "cleaning_log": "含整合浦东分散货运设施"
+        }
+      ]
+    },
+    {
+      "doc_id": "DF0009",
+      "semantic_block_id": "DF0009_B008",
+      "parent_title": "三、加快推进基础设施建设",
+      "block_type": "ACTION_BLOCK",
+      "leaves": [
+        {
+          "leaf_name": "智能货站与集中查验中心建设",
+          "components": {
+            "M": [],
+            "A": "建设",
+            "A_type": "substantive",
+            "O": "智能货站与集中查验中心",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "智能货站与集中查验中心建设",
+          "cleaning_log": "保留'智能货站'为领域稳定词块"
+        },
+        {
+          "leaf_name": "快件与跨境电商货物处理中心建设",
+          "components": {
+            "M": [],
+            "A": "建设",
+            "A_type": "substantive",
+            "O": "快件与跨境电商货物处理中心",
+            "S_scope": [],
+            "S_focus": ["跨境电商"],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "快件与跨境电商货物处理中心建设",
+          "cleaning_log": "S_focus='跨境电商'已含在O中，去重保留O完整"
+        },
+        {
+          "leaf_name": "亚太一站式航空物流中心建设",
+          "components": {
+            "M": [],
+            "A": "建设",
+            "A_type": "substantive",
+            "O": "亚太一站式航空物流中心",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "亚太一站式航空物流中心建设",
+          "cleaning_log": "保留完整对象限定"
+        }
+      ]
+    },
+    {
+      "doc_id": "DF0009",
+      "semantic_block_id": "DF0009_B009",
+      "parent_title": "三、加快推进基础设施建设",
+      "block_type": "ACTION_BLOCK",
+      "leaves": [
+        {
+          "leaf_name": "机场跑道开放使用",
+          "components": {
+            "M": [],
+            "A": "推动",
+            "A_type": "direction",
+            "O": "机场跑道开放使用",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "机场跑道开放使用",
+          "cleaning_log": "浦东第五跑道具体项目，leaf取共性语义"
+        }
+      ]
+    },
+    {
+      "doc_id": "DF0009",
+      "semantic_block_id": "DF0009_B010",
+      "parent_title": "三、加快推进基础设施建设",
+      "block_type": "ACTION_BLOCK",
+      "leaves": [
+        {
+          "leaf_name": "机场地区综合交通规划与对外道路通道建设",
+          "components": {
+            "M": [],
+            "A": "建设",
+            "A_type": "substantive",
+            "O": "机场地区综合交通规划与对外道路通道",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "机场地区综合交通规划与对外道路通道建设",
+          "cleaning_log": "保留完整"
+        }
+      ]
+    },
+    {
+      "doc_id": "DF0009",
+      "semantic_block_id": "DF0009_B011",
+      "parent_title": "三、加快推进基础设施建设",
+      "block_type": "ACTION_BLOCK",
+      "leaves": [
+        {
+          "leaf_name": "货运机队扩大与运力投放",
+          "components": {
+            "M": [],
+            "A": "扩大",
+            "A_type": "direction",
+            "O": "货运机队与运力投放",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "货运机队与运力投放",
+          "cleaning_log": "含国内外航空公司"
+        }
+      ]
+    },
+    {
+      "doc_id": "DF0009",
+      "semantic_block_id": "DF0009_B013",
+      "parent_title": "四、积极培育多元经营主体",
+      "block_type": "ACTION_BLOCK",
+      "leaves": [
+        {
+          "leaf_name": "经营主体总部或分拨中心落户",
+          "components": {
+            "M": [],
+            "A": "落户",
+            "A_type": "substantive",
+            "O": "经营主体总部或分拨中心",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "经营主体总部或分拨中心落户",
+          "cleaning_log": "含航空公司/快递物流企业/货运代理企业"
+        }
+      ]
+    },
+    {
+      "doc_id": "DF0009",
+      "semantic_block_id": "DF0009_B014",
+      "parent_title": "四、积极培育多元经营主体",
+      "block_type": "ACTION_BLOCK",
+      "leaves": [
+        {
+          "leaf_name": "前置仓与集货仓布局建设",
+          "components": {
+            "M": [],
+            "A": "建设",
+            "A_type": "substantive",
+            "O": "前置仓与集货仓",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "前置仓与集货仓布局建设",
+          "cleaning_log": "为冷链/跨境电商/电子芯片/生物医药等提供保障"
+        },
+        {
+          "leaf_name": "海外货站布局建设",
+          "components": {
+            "M": [],
+            "A": "建设",
+            "A_type": "substantive",
+            "O": "海外货站",
+            "S_scope": ["境外"],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "海外货站布局建设",
+          "cleaning_log": "'海外'已含在O中，S_scope去重"
+        }
+      ]
+    },
+    {
+      "doc_id": "DF0009",
+      "semantic_block_id": "DF0009_B016",
+      "parent_title": "五、大力拓展增量市场业务",
+      "block_type": "ACTION_BLOCK",
+      "leaves": [
+        {
+          "leaf_name": "空空中转模式打造",
+          "components": {
+            "M": [],
+            "A": "打造",
+            "A_type": "substantive",
+            "O": "空空中转模式",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "空空中转模式",
+          "cleaning_log": "'空空中转'为固定搭配保留在O中"
+        },
+        {
+          "leaf_name": "货运中转产品开发",
+          "components": {
+            "M": [],
+            "A": "开发",
+            "A_type": "substantive",
+            "O": "货运中转产品",
+            "S_scope": [],
+            "S_focus": ["中转"],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "货运中转产品开发",
+          "cleaning_log": "S_focus='中转'已含在O中，去重"
+        }
+      ]
+    },
+    {
+      "doc_id": "DF0009",
+      "semantic_block_id": "DF0009_B017",
+      "parent_title": "五、大力拓展增量市场业务",
+      "block_type": "ACTION_BLOCK",
+      "leaves": [
+        {
+          "leaf_name": "多式联运业务发展",
+          "components": {
+            "M": [],
+            "A": "发展",
+            "A_type": "direction",
+            "O": "多式联运业务",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": ["多式联运"]
+          },
+          "pau_final": "多式联运业务",
+          "cleaning_log": "S_type='多式联运'已含在O中，去重"
+        },
+        {
+          "leaf_name": "空铁一体化规划建设",
+          "components": {
+            "M": [],
+            "A": "建设",
+            "A_type": "substantive",
+            "O": "空铁一体化规划",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": ["空铁"]
+          },
+          "pau_final": "空铁一体化规划建设",
+          "cleaning_log": "S_type='空铁'已含在O前导，去重"
+        }
+      ]
+    },
+    {
+      "doc_id": "DF0009",
+      "semantic_block_id": "DF0009_B019",
+      "parent_title": "六、扎实做好货物运输保障",
+      "block_type": "ACTION_BLOCK",
+      "leaves": [
+        {
+          "leaf_name": "高附加值产品运输保障",
+          "components": {
+            "M": [],
+            "A": "保障",
+            "A_type": "substantive",
+            "O": "高附加值产品运输保障",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "高附加值产品运输保障",
+          "cleaning_log": "保留'高附加值产品'对象限定，不压缩为'特货运输保障'；含电子芯片/生物医药"
+        },
+        {
+          "leaf_name": "跨境电商货物运输保障",
+          "components": {
+            "M": [],
+            "A": "保障",
+            "A_type": "substantive",
+            "O": "货物运输保障",
+            "S_scope": ["跨境"],
+            "S_focus": ["跨境电商"],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "跨境电商货物运输保障",
+          "cleaning_log": "S_scope='跨境'含在S_focus='跨境电商'中，去重"
+        }
+      ]
+    },
+    {
+      "doc_id": "DF0009",
+      "semantic_block_id": "DF0009_B020",
+      "parent_title": "六、扎实做好货物运输保障",
+      "block_type": "ACTION_BLOCK",
+      "leaves": [
+        {
+          "leaf_name": "跨境电商专属平台建设",
+          "components": {
+            "M": [],
+            "A": "建设",
+            "A_type": "substantive",
+            "O": "专属平台",
+            "S_scope": [],
+            "S_focus": ["跨境电商"],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "跨境电商专属平台建设",
+          "cleaning_log": "保留完整"
+        },
+        {
+          "leaf_name": "跨境电商专属运输机队组建",
+          "components": {
+            "M": [],
+            "A": "组建",
+            "A_type": "substantive",
+            "O": "专属运输机队",
+            "S_scope": [],
+            "S_focus": ["跨境电商"],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "跨境电商专属运输机队组建",
+          "cleaning_log": "保留完整"
+        },
+        {
+          "leaf_name": "跨境电商专属航线航班开设",
+          "components": {
+            "M": [],
+            "A": "开设",
+            "A_type": "substantive",
+            "O": "专属航线航班",
+            "S_scope": [],
+            "S_focus": ["跨境电商"],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "跨境电商专属航线航班开设",
+          "cleaning_log": "保留完整"
+        }
+      ]
+    },
+    {
+      "doc_id": "DF0009",
+      "semantic_block_id": "DF0009_B021",
+      "parent_title": "六、扎实做好货物运输保障",
+      "block_type": "ACTION_BLOCK",
+      "leaves": [
+        {
+          "leaf_name": "跨境电商货物便利化运输试点",
+          "components": {
+            "M": [],
+            "A": "推进",
+            "A_type": "direction",
+            "O": "货物便利化运输",
+            "S_scope": ["跨境"],
+            "S_focus": ["跨境电商"],
+            "S_stage": ["试点"],
+            "S_type": []
+          },
+          "pau_final": "跨境电商货物便利化运输试点",
+          "cleaning_log": "S_scope='跨境'含在S_focus中，去重"
+        },
+        {
+          "leaf_name": "跨境电商货物便利化收运数字管理平台建设",
+          "components": {
+            "M": [],
+            "A": "建设",
+            "A_type": "substantive",
+            "O": "便利化收运数字管理平台",
+            "S_scope": [],
+            "S_focus": ["跨境电商"],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "跨境电商货物便利化收运数字管理平台建设",
+          "cleaning_log": "保留完整对象限定，不压缩为'数字化管理平台'"
+        }
+      ]
+    },
+    {
+      "doc_id": "DF0009",
+      "semantic_block_id": "DF0009_B023",
+      "parent_title": "七、提升枢纽智慧绿色水平",
+      "block_type": "ACTION_BLOCK",
+      "leaves": [
+        {
+          "leaf_name": "单一窗口航空物流公共信息平台建设",
+          "components": {
+            "M": [],
+            "A": "建设",
+            "A_type": "substantive",
+            "O": "单一窗口航空物流公共信息平台",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "单一窗口航空物流公共信息平台建设",
+          "cleaning_log": "'单一窗口'为政策工具稳定词块"
+        },
+        {
+          "leaf_name": "空运通平台功能完善",
+          "components": {
+            "M": [],
+            "A": "完善",
+            "A_type": "direction",
+            "O": "空运通平台功能",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "空运通平台功能",
+          "cleaning_log": "A='完善'为direction"
+        }
+      ]
+    },
+    {
+      "doc_id": "DF0009",
+      "semantic_block_id": "DF0009_B024",
+      "parent_title": "七、提升枢纽智慧绿色水平",
+      "block_type": "ACTION_BLOCK",
+      "leaves": [
+        {
+          "leaf_name": "货站设施智慧化改造",
+          "components": {
+            "M": [],
+            "A": "改造",
+            "A_type": "substantive",
+            "O": "货站设施智慧化改造",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "货站设施智慧化改造",
+          "cleaning_log": "保留完整"
+        },
+        {
+          "leaf_name": "专业保障基础设施建设",
+          "components": {
+            "M": [],
+            "A": "建设",
+            "A_type": "substantive",
+            "O": "专业保障基础设施",
+            "S_scope": ["国际"],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "国际专业保障基础设施建设",
+          "cleaning_log": "含跨境电商/生鲜冷链/锂电池/生物医药"
+        }
+      ]
+    },
+    {
+      "doc_id": "DF0009",
+      "semantic_block_id": "DF0009_B025",
+      "parent_title": "七、提升枢纽智慧绿色水平",
+      "block_type": "ACTION_BLOCK",
+      "leaves": [
+        {
+          "leaf_name": "航空货物安检新技术研发与应用",
+          "components": {
+            "M": [],
+            "A": "研发",
+            "A_type": "substantive",
+            "O": "航空货物安检新技术",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "航空货物安检新技术研发与应用",
+          "cleaning_log": "含全景感知/无人化等"
+        },
+        {
+          "leaf_name": "场内特种车辆新能源替代",
+          "components": {
+            "M": [],
+            "A": "替代",
+            "A_type": "substantive",
+            "O": "场内特种车辆新能源替代",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "场内特种车辆新能源替代",
+          "cleaning_log": "保留完整"
+        }
+      ]
+    },
+    {
+      "doc_id": "DF0009",
+      "semantic_block_id": "DF0009_B027",
+      "parent_title": "八、继续做好航空资源保障",
+      "block_type": "ACTION_BLOCK",
+      "leaves": [
+        {
+          "leaf_name": "远程航线航权与稀缺航权资源配置",
+          "components": {
+            "M": [],
+            "A": "配置",
+            "A_type": "substantive",
+            "O": "远程航线航权与稀缺航权资源",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "远程航线航权与稀缺航权资源配置",
+          "cleaning_log": "保留完整"
+        },
+        {
+          "leaf_name": "日间货邮航班时刻供给增加",
+          "components": {
+            "M": [],
+            "A": "增加",
+            "A_type": "substantive",
+            "O": "日间货邮航班时刻供给",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "日间货邮航班时刻供给",
+          "cleaning_log": "保留完整"
+        },
+        {
+          "leaf_name": "航班审批流程优化",
+          "components": {
+            "M": [],
+            "A": "优化",
+            "A_type": "direction",
+            "O": "航班审批流程",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "航班审批流程",
+          "cleaning_log": "含加班和包机业务便利"
+        }
+      ]
+    },
+    {
+      "doc_id": "DF0009",
+      "semantic_block_id": "DF0009_B028",
+      "parent_title": "八、继续做好航空资源保障",
+      "block_type": "DIRECTION_BLOCK",
+      "leaves": [],
+      "cleaning_log": "做深做远欧美/做优做强亚洲/拓展一带一路→方向性语句，不提取具体leaf"
+    },
+    {
+      "doc_id": "DF0009",
+      "semantic_block_id": "DF0009_B030",
+      "parent_title": "九、全面改善枢纽运营环境",
+      "block_type": "ACTION_BLOCK",
+      "leaves": [
+        {
+          "leaf_name": "智慧海关大数据平台建设",
+          "components": {
+            "M": [],
+            "A": "建设",
+            "A_type": "substantive",
+            "O": "智慧海关大数据平台",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "智慧海关大数据平台建设",
+          "cleaning_log": "保留完整"
+        },
+        {
+          "leaf_name": "国际转运货物海关监管模式创新",
+          "components": {
+            "M": [],
+            "A": "创新",
+            "A_type": "substantive",
+            "O": "海关监管模式",
+            "S_scope": ["国际"],
+            "S_focus": ["中转"],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "国际转运货物海关监管模式创新",
+          "cleaning_log": "保留'国际转运货物'对象限定完整性",
+          "self_check": {
+            "reconstructed_pau_final": "国际中转海关监管模式创新",
+            "match_before_overwrite": false,
+            "note": "恢复为'国际转运货物'保留更高区分度"
+          }
+        },
+        {
+          "leaf_name": "航空口岸进出口货物通关时间压缩",
+          "components": {
+            "M": [],
+            "A": "压缩",
+            "A_type": "substantive",
+            "O": "航空口岸进出口货物通关时间",
+            "S_scope": [],
+            "S_focus": ["通关"],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "航空口岸进出口货物通关时间",
+          "cleaning_log": "S_focus='通关'已含在O中，去重"
+        }
+      ]
+    },
+    {
+      "doc_id": "DF0009",
+      "semantic_block_id": "DF0009_B031",
+      "parent_title": "九、全面改善枢纽运营环境",
+      "block_type": "ACTION_BLOCK",
+      "leaves": [
+        {
+          "leaf_name": "航空货运管制代理人制度",
+          "components": {
+            "M": [],
+            "A": "实施",
+            "A_type": "substantive",
+            "O": "航空货运管制代理人制度",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "航空货运管制代理人制度",
+          "cleaning_log": "保留完整"
+        },
+        {
+          "leaf_name": "专业型航空前置货站建设",
+          "components": {
+            "M": [],
+            "A": "建设",
+            "A_type": "substantive",
+            "O": "专业型航空前置货站",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "专业型航空前置货站建设",
+          "cleaning_log": "含安检功能"
+        },
+        {
+          "leaf_name": "机场与货站间货物地面驳运安保试点",
+          "components": {
+            "M": [],
+            "A": "开展",
+            "A_type": "substantive",
+            "O": "货物地面驳运安保",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": ["试点"],
+            "S_type": []
+          },
+          "pau_final": "试点货物地面驳运安保",
+          "cleaning_log": "S_stage='试点'前置+O"
+        }
+      ]
+    }
+  ],
+
+  "track_c": [
+    {
+      "doc_id": "ZY0150",
+      "semantic_block_id": "ZY0150_SB001",
+      "section_type": "DEFINITION",
+      "is_noise": true,
+      "noise_category": "DEFINITION",
+      "noise_reason": "定义支持对象范围，无独立可提取工具"
+    },
+    {
+      "doc_id": "ZY0150",
+      "semantic_block_id": "ZY0150_SB002",
+      "section_type": "SUBSIDY",
+      "is_noise": false,
+      "leaves": [
+        {
+          "leaf_name": "客舱内装货改装项目补助",
+          "tool_nature": "monetary",
+          "framework_node": "5.1",
+          "framework_label": "改装/改造补助",
+          "framework_source": "TrackC_Monetary_Framework_v9.1",
+          "subsidy_info": {
+            "subject": "航空公司",
+            "basis": "改造成本的80%",
+            "tiers": [
+              {"type": "单通道飞机", "cap": "80万元/架"},
+              {"type": "双通道飞机", "cap": "145万元/架"}
+            ],
+            "period": "疫情防控期间"
+          },
+          "components": {
+            "M": [],
+            "A": "补助",
+            "A_type": "operational",
+            "O": "客舱内装货改装项目",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": ["客改货"]
+          },
+          "pau_final": "客舱内装货改装项目补助",
+          "cleaning_log": "S_type='客改货'已含在O'客舱内装货改装'中，去重保留O完整",
+          "self_check": {
+            "reconstructed_pau_final": "客舱内装货改装项目补助",
+            "match_before_overwrite": true,
+            "note": "一致"
+          }
+        },
+        {
+          "leaf_name": "不载客国际货运航班奖励",
+          "tool_nature": "monetary",
+          "framework_node": "1.3.4",
+          "framework_label": "客改货/不载客货运航班",
+          "framework_source": "TrackC_Monetary_Framework_v9.1",
+          "subsidy_info": {
+            "subject": "中外航空公司",
+            "basis": "航班飞行里程×最大起飞全重分八档",
+            "tiers": [
+              {"range": "2000公里以下·200吨以下", "amount": "0.75万元/班"},
+              {"range": "2000公里以下·200吨及以上", "amount": "1.5万元/班"},
+              {"range": "2000-5000公里·200吨以下", "amount": "1.25万元/班"},
+              {"range": "2000-5000公里·200吨及以上", "amount": "2.5万元/班"},
+              {"range": "5000-10000公里·200吨以下", "amount": "2.25万元/班"},
+              {"range": "5000-10000公里·200吨及以上", "amount": "4.5万元/班"},
+              {"range": "10000公里及以上·200吨以下", "amount": "3万元/班"},
+              {"range": "10000公里及以上·200吨及以上", "amount": "6万元/班"}
+            ],
+            "period": "疫情防控期间"
+          },
+          "components": {
+            "M": [],
+            "A": "奖励",
+            "A_type": "operational",
+            "O": "货运航班奖励",
+            "S_scope": ["国际"],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": ["不载客货运航班"]
+          },
+          "pau_final": "国际不载客货运航班奖励",
+          "cleaning_log": "保留S_type='不载客货运航班'完整，不压缩",
+          "self_check": {
+            "reconstructed_pau_final": "国际不载客货运航班奖励",
+            "match_before_overwrite": true,
+            "note": "一致"
+          }
+        }
+      ]
+    },
+    {
+      "doc_id": "ZY0150",
+      "semantic_block_id": "ZY0150_SB003",
+      "section_type": "PROCEDURE",
+      "is_noise": true,
+      "noise_category": "PROCEDURE",
+      "noise_reason": "申报程序：描述资金申请、审核、拨付流程，无独立政策工具"
+    },
+    {
+      "doc_id": "ZY0150",
+      "semantic_block_id": "ZY0150_SB004",
+      "section_type": "CLOSING",
+      "is_noise": true,
+      "noise_category": "CLOSING",
+      "noise_reason": "其他事项：港澳台参照执行及执行期限"
+    },
+
+    {
+      "doc_id": "DF0403",
+      "semantic_block_id": "DF0403_SB001",
+      "section_type": "SUBSIDY",
+      "is_noise": false,
+      "leaves": [
+        {
+          "leaf_name": "新开国际全货机定期航线奖励",
+          "tool_nature": "monetary",
+          "framework_node": "1.1",
+          "framework_label": "定期航线补贴",
+          "framework_source": "TrackC_Monetary_Framework_v9.1",
+          "subsidy_info": {
+            "subject": "航空公司",
+            "scope": "成都机场新开国际全货机定期航线",
+            "tiers": [
+              {"type": "洲际", "amount": "30万-50万元/班", "period": "第一年"},
+              {"type": "亚洲", "amount": "5万-20万元/班", "period": "第一年"},
+              {"type": "第二三年", "amount": "第一年标准的80%"}
+            ],
+            "duration": "三年培育期"
+          },
+          "components": {
+            "M": [],
+            "A": "奖励",
+            "A_type": "operational",
+            "O": "全货机定期航线奖励",
+            "S_scope": ["国际"],
+            "S_focus": [],
+            "S_stage": ["新开"],
+            "S_type": ["全货机", "定期"]
+          },
+          "pau_final": "国际新开全货机定期航线奖励",
+          "cleaning_log": "S_type='全货机/定期'已含在O前导，去重保留O完整性"
+        },
+        {
+          "leaf_name": "国际全货机定期航线加密奖励",
+          "tool_nature": "monetary",
+          "framework_node": "1.1",
+          "framework_label": "定期航线补贴",
+          "framework_source": "TrackC_Monetary_Framework_v9.1",
+          "subsidy_info": {
+            "subject": "航空公司",
+            "scope": "加密国际全货机定期航线（未达每天一班）",
+            "standard": "与现有航线同等标准",
+            "duration": "至协议到期"
+          },
+          "components": {
+            "M": [],
+            "A": "奖励",
+            "A_type": "operational",
+            "O": "全货机定期航线奖励",
+            "S_scope": ["国际"],
+            "S_focus": [],
+            "S_stage": ["加密"],
+            "S_type": ["全货机", "定期"]
+          },
+          "pau_final": "国际加密全货机定期航线奖励",
+          "cleaning_log": "S_stage='加密'与'新开'区分"
+        },
+        {
+          "leaf_name": "新开国内全货机定期航线奖励",
+          "tool_nature": "monetary",
+          "framework_node": "1.1",
+          "framework_label": "定期航线补贴",
+          "framework_source": "TrackC_Monetary_Framework_v9.1",
+          "subsidy_info": {
+            "subject": "航空公司",
+            "scope": "成都机场新开国内（含地区）全货机定期航线",
+            "amount": "2万-5万元/班",
+            "duration": "两年培育期"
+          },
+          "components": {
+            "M": [],
+            "A": "奖励",
+            "A_type": "operational",
+            "O": "全货机定期航线奖励",
+            "S_scope": ["国内"],
+            "S_focus": [],
+            "S_stage": ["新开"],
+            "S_type": ["全货机", "定期"]
+          },
+          "pau_final": "国内新开全货机定期航线奖励",
+          "cleaning_log": "区分scope='国内'与'国际'"
+        },
+        {
+          "leaf_name": "国内全货机定期航线加密奖励",
+          "tool_nature": "monetary",
+          "framework_node": "1.1",
+          "framework_label": "定期航线补贴",
+          "framework_source": "TrackC_Monetary_Framework_v9.1",
+          "subsidy_info": {
+            "subject": "航空公司",
+            "scope": "加密国内（含地区）全货机定期航线",
+            "amount": "1万-3万元/班",
+            "duration": "一年期"
+          },
+          "components": {
+            "M": [],
+            "A": "奖励",
+            "A_type": "operational",
+            "O": "全货机定期航线奖励",
+            "S_scope": ["国内"],
+            "S_focus": [],
+            "S_stage": ["加密"],
+            "S_type": ["全货机", "定期"]
+          },
+          "pau_final": "国内加密全货机定期航线奖励",
+          "cleaning_log": "scope='国内'+stage='加密'"
+        },
+        {
+          "leaf_name": "存量国际全货机定期航线稳定运行奖励",
+          "tool_nature": "monetary",
+          "framework_node": "1.3.3",
+          "framework_label": "存量航线",
+          "framework_source": "TrackC_Monetary_Framework_v9.1",
+          "subsidy_info": {
+            "subject": "航空公司",
+            "scope": "未享受补贴的国际（含地区）全货机定期航线",
+            "amount": "1万-3万元/班",
+            "duration": "三年"
+          },
+          "components": {
+            "M": [],
+            "A": "奖励",
+            "A_type": "operational",
+            "O": "全货机定期航线稳定运行奖励",
+            "S_scope": ["国际"],
+            "S_focus": [],
+            "S_stage": ["存量"],
+            "S_type": ["全货机", "定期"]
+          },
+          "pau_final": "国际存量全货机定期航线稳定运行奖励",
+          "cleaning_log": "'稳定运行'为固定搭配保留在O中"
+        },
+        {
+          "leaf_name": "战略性国际全货机定期航线专项奖励",
+          "tool_nature": "monetary",
+          "framework_node": "1.3.2",
+          "framework_label": "重点国家/战略性航线",
+          "framework_source": "TrackC_Monetary_Framework_v9.1",
+          "subsidy_info": {
+            "subject": "航空公司及其他主体",
+            "scope": "战略性国际全货机定期航线、特别重要急需货运航线和重大招商项目",
+            "standard": "经市政府专题研究确定"
+          },
+          "components": {
+            "M": [],
+            "A": "奖励",
+            "A_type": "operational",
+            "O": "全货机定期航线专项奖励",
+            "S_scope": ["国际"],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": ["全货机", "定期"]
+          },
+          "pau_final": "战略性国际全货机定期航线专项奖励",
+          "cleaning_log": "保留'战略性'作为区分限定"
+        }
+      ]
+    },
+    {
+      "doc_id": "DF0403",
+      "semantic_block_id": "DF0403_SB002",
+      "section_type": "SUBSIDY",
+      "is_noise": false,
+      "leaves": [
+        {
+          "leaf_name": "航空公司进出港国内货物增量奖励",
+          "tool_nature": "monetary",
+          "framework_node": "2.1.1",
+          "framework_label": "进出港货量增量奖励",
+          "framework_source": "TrackC_Monetary_Framework_v9.1",
+          "subsidy_info": {
+            "subject": "航空公司",
+            "basis": "以上年进出港货量为基数按增幅分档",
+            "tiers": [
+              {"threshold": "增长25%及以上", "amount": "1.0元/公斤"},
+              {"threshold": "增长20%及以上", "amount": "0.8元/公斤"},
+              {"threshold": "增长10%及以上", "amount": "0.5元/公斤"}
+            ]
+          },
+          "components": {
+            "M": [],
+            "A": "奖励",
+            "A_type": "operational",
+            "O": "进出港国内货物增量奖励",
+            "S_scope": ["国内"],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "航空公司国内进出港货物增量奖励",
+          "cleaning_log": "保留'航空公司'主体限定以区分货代类奖励"
+        },
+        {
+          "leaf_name": "空空中转国际货物奖励",
+          "tool_nature": "monetary",
+          "framework_node": "2.2.1",
+          "framework_label": "空空中转货量奖励",
+          "framework_source": "TrackC_Monetary_Framework_v9.1",
+          "subsidy_info": {
+            "subject": "航空公司",
+            "scope": "成都机场库区内实现中转的国际（含地区）货物",
+            "tiers": [
+              {"type": "国内转国际/国际转国内/国际转国际", "amount": "2.0元/公斤"}
+            ]
+          },
+          "components": {
+            "M": [],
+            "A": "奖励",
+            "A_type": "operational",
+            "O": "空空中转货物奖励",
+            "S_scope": ["国际"],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": ["空空"]
+          },
+          "pau_final": "国际空空中转货物奖励",
+          "cleaning_log": "'空空中转'为固定搭配保留完整；S_type='空空'已含在O中去重"
+        },
+        {
+          "leaf_name": "跨航司跨货站快速中转处置奖励",
+          "tool_nature": "monetary",
+          "framework_node": "2.2.2",
+          "framework_label": "快速中转处置奖励",
+          "framework_source": "TrackC_Monetary_Framework_v9.1",
+          "subsidy_info": {
+            "subject": "航空货站",
+            "scope": "成都机场跨航空公司、跨货站国际（含地区）货物库区内快速中转",
+            "amount": "1.0元/公斤"
+          },
+          "components": {
+            "M": [],
+            "A": "奖励",
+            "A_type": "operational",
+            "O": "快速中转处置奖励",
+            "S_scope": ["国际"],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "国际跨航司跨货站快速中转处置奖励",
+          "cleaning_log": "保留'跨航司跨货站'对象限定以区分一般中转"
+        },
+        {
+          "leaf_name": "货代企业国际进出港货量奖励",
+          "tool_nature": "monetary",
+          "framework_node": "2.3.3",
+          "framework_label": "货代国际进出港货量奖励",
+          "framework_source": "TrackC_Monetary_Framework_v9.1",
+          "subsidy_info": {
+            "subject": "货代企业",
+            "scope": "成都机场利用国际全货机航班进出港和国际客运航班进港的国际货物",
+            "tiers": [
+              {"type": "全货机进港·远程", "amount": "2.0元/公斤"},
+              {"type": "全货机进港·中程", "amount": "1.5元/公斤"},
+              {"type": "全货机进港·近程", "amount": "1.0元/公斤"},
+              {"type": "全货机出港", "amount": "0.5元/公斤"},
+              {"type": "客运航班进港", "amount": "0.5元/公斤"}
+            ]
+          },
+          "components": {
+            "M": [],
+            "A": "奖励",
+            "A_type": "operational",
+            "O": "进出港货量奖励",
+            "S_scope": ["国际"],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "货代企业国际进出港货量奖励",
+          "cleaning_log": "保留'货代企业'主体限定以区分航空公司货量奖励"
+        },
+        {
+          "leaf_name": "货代企业域外货源空地联运集货奖励",
+          "tool_nature": "monetary",
+          "framework_node": "2.3.4",
+          "framework_label": "货代域外货源导入/空地联运集货奖励",
+          "framework_source": "TrackC_Monetary_Framework_v9.1",
+          "subsidy_info": {
+            "subject": "货代企业",
+            "scope": "四川省行政区域范围以外国际货物通过成都机场进出港",
+            "amount": "2.0元/公斤"
+          },
+          "components": {
+            "M": [],
+            "A": "奖励",
+            "A_type": "operational",
+            "O": "域外货源空地联运集货奖励",
+            "S_scope": ["域外"],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": ["空地"]
+          },
+          "pau_final": "货代企业域外空地联运集货奖励",
+          "cleaning_log": "保留'货代企业'主体限定；S_scope='域外'+S_type='空地'"
+        },
+        {
+          "leaf_name": "特殊货物进口奖励",
+          "tool_nature": "monetary",
+          "framework_node": "2.4.1",
+          "framework_label": "特殊货物进口奖励",
+          "framework_source": "TrackC_Monetary_Framework_v9.1",
+          "subsidy_info": {
+            "subject": "货代企业或贸易企业",
+            "scope": "利用成都空运进境指定监管场地进口特殊货物（植物种苗/冰鲜水产品/食用水生动物/药品/生物制品/水果/肉类/国际邮件）",
+            "amount": "1.0元/公斤"
+          },
+          "components": {
+            "M": [],
+            "A": "奖励",
+            "A_type": "operational",
+            "O": "特殊货物进口奖励",
+            "S_scope": ["进港"],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "进境指定监管场地特殊货物进口奖励",
+          "cleaning_log": "保留'进境指定监管场地'对象限定，增加区分度"
+        },
+        {
+          "leaf_name": "全货机国际包机奖励",
+          "tool_nature": "monetary",
+          "framework_node": "1.4",
+          "framework_label": "包机奖励",
+          "framework_source": "TrackC_Monetary_Framework_v9.1",
+          "subsidy_info": {
+            "subject": "货代企业或货主企业",
+            "scope": "全货机国际包机经成都机场进出港，全年包机航班达到10班以上",
+            "standard": "新开同类国际全货机定期航线奖励标准的30%"
+          },
+          "components": {
+            "M": [],
+            "A": "奖励",
+            "A_type": "operational",
+            "O": "国际包机奖励",
+            "S_scope": ["国际"],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": ["全货机", "包机"]
+          },
+          "pau_final": "全货机国际包机奖励",
+          "cleaning_log": "S_scope='国际'+S_type='全货机/包机'；去重后保留完整"
+        }
+      ]
+    },
+    {
+      "doc_id": "DF0403",
+      "semantic_block_id": "DF0403_SB003",
+      "section_type": "SUBSIDY",
+      "is_noise": false,
+      "leaves": [
+        {
+          "leaf_name": "基地货运航空公司落户一次性奖励",
+          "tool_nature": "monetary",
+          "framework_node": "3.1",
+          "framework_label": "落户奖励（一次性）",
+          "framework_source": "TrackC_Monetary_Framework_v9.1",
+          "subsidy_info": {
+            "subject": "新设立基地货运航空公司",
+            "amount": "1000万-2000万元",
+            "type": "一次性"
+          },
+          "components": {
+            "M": [],
+            "A": "奖励",
+            "A_type": "operational",
+            "O": "基地货运航空公司落户奖励",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "基地货运航空公司落户一次性奖励",
+          "cleaning_log": "保留'基地货运航空公司'主体限定完整"
+        },
+        {
+          "leaf_name": "基地货运航空公司配套建设供地保障",
+          "tool_nature": "non_monetary",
+          "components": {
+            "M": [],
+            "A": "保障",
+            "A_type": "substantive",
+            "O": "基地货运航空公司配套建设供地保障",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "基地货运航空公司配套建设供地保障",
+          "cleaning_log": "non_monetary：供地保障为非资金工具；保留'基地货运航空公司'主体限定，不压缩为'配套建设项目供地保障'"
+        },
+        {
+          "leaf_name": "基地货运航空公司经营贡献奖励",
+          "tool_nature": "monetary",
+          "framework_node": "3.2",
+          "framework_label": "经营贡献奖励（持续性）",
+          "framework_source": "TrackC_Monetary_Framework_v9.1",
+          "subsidy_info": {
+            "subject": "新设立基地货运航空公司",
+            "basis": "对地方经济贡献大小",
+            "duration": "五年"
+          },
+          "components": {
+            "M": [],
+            "A": "奖励",
+            "A_type": "operational",
+            "O": "基地货运航空公司经营贡献奖励",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "基地货运航空公司经营贡献奖励",
+          "cleaning_log": "保留主体限定完整"
+        }
+      ]
+    },
+    {
+      "doc_id": "DF0403",
+      "semantic_block_id": "DF0403_SB004",
+      "section_type": "SUBSIDY",
+      "is_noise": false,
+      "leaves": [
+        {
+          "leaf_name": "国际航空货运转运分拨中心落户一次性奖励",
+          "tool_nature": "monetary",
+          "framework_node": "3.1",
+          "framework_label": "落户奖励（一次性）",
+          "framework_source": "TrackC_Monetary_Framework_v9.1",
+          "subsidy_info": {
+            "subject": "年度航空货运处理能力20万吨（含）以上的国际航空货运转运（分拨）中心",
+            "amount": "2000万元",
+            "type": "一次性"
+          },
+          "components": {
+            "M": [],
+            "A": "奖励",
+            "A_type": "operational",
+            "O": "国际航空货运转运分拨中心落户奖励",
+            "S_scope": ["国际"],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "国际航空货运转运分拨中心落户一次性奖励",
+          "cleaning_log": "保留'转运分拨中心'完整对象限定，不压缩为'国际落户奖励'"
+        },
+        {
+          "leaf_name": "国际航空货运转运分拨中心供地保障",
+          "tool_nature": "non_monetary",
+          "components": {
+            "M": [],
+            "A": "保障",
+            "A_type": "substantive",
+            "O": "国际航空货运转运分拨中心供地保障",
+            "S_scope": ["国际"],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "国际航空货运转运分拨中心供地保障",
+          "cleaning_log": "non_monetary：供地保障为非资金工具；保留完整对象限定"
+        },
+        {
+          "leaf_name": "国际航空货运转运分拨中心经营贡献奖励",
+          "tool_nature": "monetary",
+          "framework_node": "3.2",
+          "framework_label": "经营贡献奖励（持续性）",
+          "framework_source": "TrackC_Monetary_Framework_v9.1",
+          "subsidy_info": {
+            "subject": "转运分拨中心",
+            "basis": "对地方经济贡献大小",
+            "duration": "五年"
+          },
+          "components": {
+            "M": [],
+            "A": "奖励",
+            "A_type": "operational",
+            "O": "转运分拨中心经营贡献奖励",
+            "S_scope": ["国际"],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "国际航空货运转运分拨中心经营贡献奖励",
+          "cleaning_log": "保留'转运分拨中心'完整对象限定"
+        },
+        {
+          "leaf_name": "转运分拨中心年度处理货量奖励",
+          "tool_nature": "monetary",
+          "framework_node": "2.5.1",
+          "framework_label": "转运（分拨）中心年度处理货量奖励",
+          "framework_source": "TrackC_Monetary_Framework_v9.1",
+          "subsidy_info": {
+            "subject": "转运分拨中心",
+            "tiers": [
+              {"threshold": "5万吨及以上", "amount": "500万元"},
+              {"increment": "每增加1万吨", "amount": "增加100万元"},
+              {"cap": "最高2000万元"}
+            ]
+          },
+          "components": {
+            "M": [],
+            "A": "奖励",
+            "A_type": "operational",
+            "O": "转运分拨中心年度处理货量奖励",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "转运分拨中心年度处理货量奖励",
+          "cleaning_log": "'转运分拨中心'为稳定对象限定词块保留"
+        }
+      ]
+    },
+    {
+      "doc_id": "DF0403",
+      "semantic_block_id": "DF0403_SB005",
+      "section_type": "SUBSIDY",
+      "is_noise": false,
+      "leaves": [
+        {
+          "leaf_name": "国际货物操作处置费用补贴",
+          "tool_nature": "monetary",
+          "framework_node": "4.1",
+          "framework_label": "操作费用补贴",
+          "framework_source": "TrackC_Monetary_Framework_v9.1",
+          "subsidy_info": {
+            "scope": "进出成都机场的国际货物",
+            "tiers": [
+              {"type": "进港国际货物", "amount": "0.15元/公斤"},
+              {"type": "出港国际货物", "amount": "0.2元/公斤"}
+            ]
+          },
+          "components": {
+            "M": [],
+            "A": "补贴",
+            "A_type": "operational",
+            "O": "国际货物操作处置费用补贴",
+            "S_scope": ["国际"],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "国际货物操作处置费用补贴",
+          "cleaning_log": "保留完整；S_scope='国际'已含在O前导，去重"
+        },
+        {
+          "leaf_name": "口岸一体化营运费用减免",
+          "tool_nature": "monetary",
+          "framework_node": "4.2",
+          "framework_label": "口岸费用减免",
+          "framework_source": "TrackC_Monetary_Framework_v9.1",
+          "subsidy_info": {
+            "scope": "空港国际快件中心和海关特殊监管场所办理业务的全部费用",
+            "mechanism": "免除企业费用，市区两级财政按8:2分担"
+          },
+          "components": {
+            "M": [],
+            "A": "减免",
+            "A_type": "operational",
+            "O": "口岸一体化营运费用减免",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "口岸一体化营运费用减免",
+          "cleaning_log": "'口岸一体化营运费用'为稳定词块，不拆分不压缩"
+        }
+      ]
+    },
+
+    {
+      "doc_id": "DF0217",
+      "semantic_block_id": "DF0217_SB001",
+      "section_type": "SUBSIDY",
+      "is_noise": false,
+      "leaves": [
+        {
+          "leaf_name": "亚洲全货机定期航线补贴",
+          "tool_nature": "monetary",
+          "framework_node": "1.1",
+          "framework_label": "定期航线补贴",
+          "framework_source": "TrackC_Monetary_Framework_v9.1",
+          "subsidy_info": {
+            "subject": "航空公司",
+            "scope": "从厦门出入境直达亚洲航点的全货机定期航线",
+            "basis": "里程补贴+货量补贴",
+            "condition": "出港实载≥80吨、载运率≥20%、年度≥108班",
+            "tiers_summary": "按单航程6档，里程补贴6万-21万元，货量补贴2000元/吨，航线上限2500万-5000万元"
+          },
+          "components": {
+            "M": [],
+            "A": "补贴",
+            "A_type": "operational",
+            "O": "全货机定期航线补贴",
+            "S_scope": ["亚洲"],
+            "S_focus": [],
+            "S_stage": ["新开"],
+            "S_type": ["全货机", "定期"]
+          },
+          "pau_final": "亚洲新开全货机定期航线补贴",
+          "cleaning_log": "S_scope='亚洲'+S_stage='新开'+O；S_type去重"
+        }
+      ]
+    },
+    {
+      "doc_id": "DF0217",
+      "semantic_block_id": "DF0217_SB002",
+      "section_type": "SUBSIDY",
+      "is_noise": false,
+      "leaves": [
+        {
+          "leaf_name": "港澳台全货机定期航线补贴",
+          "tool_nature": "monetary",
+          "framework_node": "1.1",
+          "framework_label": "定期航线补贴",
+          "framework_source": "TrackC_Monetary_Framework_v9.1",
+          "subsidy_info": {
+            "subject": "航空公司",
+            "scope": "从厦门出入境直达港澳台的全货机定期航线",
+            "standard": "亚洲标准的25%",
+            "cap": "600万元/年"
+          },
+          "components": {
+            "M": [],
+            "A": "补贴",
+            "A_type": "operational",
+            "O": "全货机定期航线补贴",
+            "S_scope": ["港澳台"],
+            "S_focus": [],
+            "S_stage": ["新开"],
+            "S_type": ["全货机", "定期"]
+          },
+          "pau_final": "港澳台新开全货机定期航线补贴",
+          "cleaning_log": "S_scope='港澳台'+S_stage='新开'"
+        }
+      ]
+    },
+    {
+      "doc_id": "DF0217",
+      "semantic_block_id": "DF0217_SB003",
+      "section_type": "SUBSIDY",
+      "is_noise": false,
+      "leaves": [
+        {
+          "leaf_name": "洲际全货机定期航线补贴",
+          "tool_nature": "monetary",
+          "framework_node": "1.1",
+          "framework_label": "定期航线补贴",
+          "framework_source": "TrackC_Monetary_Framework_v9.1",
+          "subsidy_info": {
+            "subject": "航空公司",
+            "scope": "从厦门出入境直达洲际航点的全货机定期航线",
+            "basis": "里程补贴+货量补贴",
+            "condition": "出港实载≥80吨、载运率≥20%、年度≥72班",
+            "tiers_summary": "按单航程6档，里程补贴30万-80万元，货量补贴4000元/吨，航线上限6000万-11000万元"
+          },
+          "components": {
+            "M": [],
+            "A": "补贴",
+            "A_type": "operational",
+            "O": "全货机定期航线补贴",
+            "S_scope": ["洲际"],
+            "S_focus": [],
+            "S_stage": ["新开"],
+            "S_type": ["全货机", "定期"]
+          },
+          "pau_final": "洲际新开全货机定期航线补贴",
+          "cleaning_log": "S_scope='洲际'+S_stage='新开'"
+        }
+      ]
+    },
+    {
+      "doc_id": "DF0217",
+      "semantic_block_id": "DF0217_SB004",
+      "section_type": "SUBSIDY",
+      "is_noise": false,
+      "leaves": [
+        {
+          "leaf_name": "亚洲全货机非定期航线补贴",
+          "tool_nature": "monetary",
+          "framework_node": "1.2",
+          "framework_label": "非定期航线补贴",
+          "framework_source": "TrackC_Monetary_Framework_v9.1",
+          "subsidy_info": {
+            "scope": "从厦门出入境直达境外的跨境货运非定期航线",
+            "standard": "按定期航班标准的30%-100%，按班次分档"
+          },
+          "components": {
+            "M": [],
+            "A": "补贴",
+            "A_type": "operational",
+            "O": "全货机非定期航线补贴",
+            "S_scope": ["亚洲"],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": ["全货机", "不定期"]
+          },
+          "pau_final": "亚洲全货机非定期航线补贴",
+          "cleaning_log": "S_scope='亚洲'+S_type='全货机/不定期'；去重保留O完整"
+        },
+        {
+          "leaf_name": "洲际全货机非定期航线补贴",
+          "tool_nature": "monetary",
+          "framework_node": "1.2",
+          "framework_label": "非定期航线补贴",
+          "framework_source": "TrackC_Monetary_Framework_v9.1",
+          "subsidy_info": {
+            "scope": "洲际跨境货运非定期航线",
+            "standard": "按定期航班标准的30%-100%，按班次分档"
+          },
+          "components": {
+            "M": [],
+            "A": "补贴",
+            "A_type": "operational",
+            "O": "全货机非定期航线补贴",
+            "S_scope": ["洲际"],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": ["全货机", "不定期"]
+          },
+          "pau_final": "洲际全货机非定期航线补贴",
+          "cleaning_log": "scope区分亚洲vs洲际"
+        }
+      ]
+    },
+    {
+      "doc_id": "DF0217",
+      "semantic_block_id": "DF0217_SB005",
+      "section_type": "SUBSIDY",
+      "is_noise": false,
+      "leaves": [
+        {
+          "leaf_name": "重点国家全货机定期航线额外补贴",
+          "tool_nature": "monetary",
+          "framework_node": "1.3.2",
+          "framework_label": "重点国家/战略性航线",
+          "framework_source": "TrackC_Monetary_Framework_v9.1",
+          "subsidy_info": {
+            "scope": "金砖国家及其他经厦门市认定为重点开航国家",
+            "standard": "额外航班补贴标准5%",
+            "cap": "500万元/年"
+          },
+          "components": {
+            "M": [],
+            "A": "补贴",
+            "A_type": "operational",
+            "O": "全货机定期航线额外补贴",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": ["全货机", "定期"]
+          },
+          "pau_final": "重点国家全货机定期航线额外补贴",
+          "cleaning_log": "保留'重点国家'限定以区分普通航线补贴"
+        }
+      ]
+    },
+    {
+      "doc_id": "DF0217",
+      "semantic_block_id": "DF0217_SB006",
+      "section_type": "SUBSIDY",
+      "is_noise": false,
+      "leaves": [
+        {
+          "leaf_name": "货代过境集拼奖励",
+          "tool_nature": "monetary",
+          "framework_node": "2.3.1",
+          "framework_label": "货代过境集拼奖励",
+          "framework_source": "TrackC_Monetary_Framework_v9.1",
+          "subsidy_info": {
+            "subject": "本地航空货运代理",
+            "tiers": [
+              {"threshold": "过境货量≥11000吨", "cap": "400万元"},
+              {"threshold": "8000-11000吨", "cap": "300万元"},
+              {"threshold": "5000-8000吨", "cap": "200万元"}
+            ],
+            "unit": "集货补贴≤300元/吨",
+            "annual_cap": "2000万元"
+          },
+          "components": {
+            "M": [],
+            "A": "奖励",
+            "A_type": "operational",
+            "O": "过境集拼奖励",
+            "S_scope": ["过境"],
+            "S_focus": ["集拼"],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "货代过境集拼奖励",
+          "cleaning_log": "S_scope='过境'+S_focus='集拼'已含在O中，去重；保留'货代'主体限定"
+        },
+        {
+          "leaf_name": "货代出境集货奖励",
+          "tool_nature": "monetary",
+          "framework_node": "2.3.2",
+          "framework_label": "货代出境集货奖励",
+          "framework_source": "TrackC_Monetary_Framework_v9.1",
+          "subsidy_info": {
+            "subject": "本地航空货运代理",
+            "tiers": [
+              {"threshold": "出境货量≥16000吨", "cap": "400万元"},
+              {"threshold": "12000-16000吨", "cap": "300万元"},
+              {"threshold": "8000-12000吨", "cap": "200万元"}
+            ],
+            "unit": "集货补贴≤200元/吨",
+            "annual_cap": "3000万元"
+          },
+          "components": {
+            "M": [],
+            "A": "奖励",
+            "A_type": "operational",
+            "O": "出境集货奖励",
+            "S_scope": ["出境"],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "货代出境集货奖励",
+          "cleaning_log": "保留'货代'主体限定"
+        }
+      ]
+    },
+    {
+      "doc_id": "DF0217",
+      "semantic_block_id": "DF0217_SB007",
+      "section_type": "RULE",
+      "is_noise": true,
+      "noise_category": "RULE",
+      "noise_reason": "补贴退坡及货量增量奖励规则：属于退坡/增量计算方式，作为属性附加给相关航线补贴工具"
+    },
+    {
+      "doc_id": "DF0217",
+      "semantic_block_id": "DF0217_SB008",
+      "section_type": "MIXED",
+      "is_noise": false,
+      "leaves": [
+        {
+          "leaf_name": "第五航权全货机定期航班补贴",
+          "tool_nature": "monetary",
+          "framework_node": "1.3.1",
+          "framework_label": "第五航权航线",
+          "framework_source": "TrackC_Monetary_Framework_v9.1",
+          "subsidy_info": {
+            "scope": "第五航权的全货机定期航班",
+            "standard": "参照国际全货机定期航班补贴标准"
+          },
+          "components": {
+            "M": [],
+            "A": "补贴",
+            "A_type": "operational",
+            "O": "全货机定期航班补贴",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": ["第五航权", "全货机", "定期"]
+          },
+          "pau_final": "第五航权全货机定期航班补贴",
+          "cleaning_log": "S_type='第五航权/全货机/定期'重组；保留'第五航权'区分限定"
+        },
+        {
+          "leaf_name": "存量跨境全货机定期航线补贴",
+          "tool_nature": "monetary",
+          "framework_node": "1.3.3",
+          "framework_label": "存量航线",
+          "framework_source": "TrackC_Monetary_Framework_v9.1",
+          "subsidy_info": {
+            "scope": "2021年1月1日之前开通的跨境全货机定期航线",
+            "tiers": [
+              {"type": "港澳台", "standard": "新开标准30%", "cap": "400万元"},
+              {"type": "亚洲", "standard": "新开标准30%", "cap": "800万元"},
+              {"type": "洲际", "standard": "新开标准15%", "cap": "1200万元"}
+            ]
+          },
+          "components": {
+            "M": [],
+            "A": "补贴",
+            "A_type": "operational",
+            "O": "全货机定期航线补贴",
+            "S_scope": ["跨境"],
+            "S_focus": [],
+            "S_stage": ["存量"],
+            "S_type": ["全货机", "定期"]
+          },
+          "pau_final": "跨境存量全货机定期航线补贴",
+          "cleaning_log": "S_scope='跨境'+S_stage='存量'"
+        }
+      ]
+    },
+
+    {
+      "doc_id": "DF0191",
+      "semantic_block_id": "DF0191_SB001",
+      "section_type": "PREAMBLE",
+      "is_noise": true,
+      "noise_category": "PREAMBLE",
+      "noise_reason": "第一条·立法目的：政策目标声明，无可提取工具"
+    },
+    {
+      "doc_id": "DF0191",
+      "semantic_block_id": "DF0191_SB002",
+      "section_type": "DEFINITION",
+      "is_noise": true,
+      "noise_category": "DEFINITION",
+      "noise_reason": "第二条·资金定义：定义专项资金概念"
+    },
+    {
+      "doc_id": "DF0191",
+      "semantic_block_id": "DF0191_SB003",
+      "section_type": "TECHNICAL",
+      "is_noise": true,
+      "noise_category": "TECHNICAL",
+      "noise_reason": "第三条·资金期限：技术性规定"
+    },
+    {
+      "doc_id": "DF0191",
+      "semantic_block_id": "DF0191_SB004",
+      "section_type": "TECHNICAL",
+      "is_noise": true,
+      "noise_category": "TECHNICAL",
+      "noise_reason": "第四条·使用原则：技术性原则声明"
+    },
+    {
+      "doc_id": "DF0191",
+      "semantic_block_id": "DF0191_SB005",
+      "section_type": "SUBSIDY",
+      "is_noise": false,
+      "leaves": [
+        {
+          "leaf_name": "新开国际货运航线航班奖励",
+          "tool_nature": "monetary",
+          "framework_node": "1.1",
+          "framework_label": "定期航线补贴",
+          "framework_source": "TrackC_Monetary_Framework_v9.1",
+          "subsidy_info": {
+            "subject": "航空公司",
+            "scope": "新开通南宁吴圩国际货运定期或不定期航线航班",
+            "note": "定期≥54班/年，不定期≥20班/年"
+          },
+          "components": {
+            "M": [],
+            "A": "奖励",
+            "A_type": "operational",
+            "O": "货运航线航班奖励",
+            "S_scope": ["国际"],
+            "S_focus": [],
+            "S_stage": ["新开"],
+            "S_type": []
+          },
+          "pau_final": "国际新开货运航线航班奖励",
+          "cleaning_log": "含定期与不定期"
+        },
+        {
+          "leaf_name": "新开国内货运航线航班奖励",
+          "tool_nature": "monetary",
+          "framework_node": "1.1",
+          "framework_label": "定期航线补贴",
+          "framework_source": "TrackC_Monetary_Framework_v9.1",
+          "subsidy_info": {
+            "subject": "航空公司",
+            "scope": "新开通南宁吴圩国内货运定期或不定期航线航班"
+          },
+          "components": {
+            "M": [],
+            "A": "奖励",
+            "A_type": "operational",
+            "O": "货运航线航班奖励",
+            "S_scope": ["国内"],
+            "S_focus": [],
+            "S_stage": ["新开"],
+            "S_type": []
+          },
+          "pau_final": "国内新开货运航线航班奖励",
+          "cleaning_log": "scope区分国际vs国内"
+        },
+        {
+          "leaf_name": "市场开拓奖励",
+          "tool_nature": "monetary",
+          "framework_node": "2.1.3",
+          "framework_label": "承运主体专项货量奖励",
+          "framework_source": "TrackC_Monetary_Framework_v9.1",
+          "subsidy_info": {
+            "subject": "航空货运代理企业",
+            "scope": "年内处理航空货物吞吐量前三名",
+            "cap": "10万元/企业"
+          },
+          "components": {
+            "M": [],
+            "A": "奖励",
+            "A_type": "operational",
+            "O": "市场开拓奖励",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "航空货运市场开拓奖励",
+          "cleaning_log": "补充'航空货运'限定以增加区分度"
+        }
+      ]
+    },
+    {
+      "doc_id": "DF0191",
+      "semantic_block_id": "DF0191_SB006",
+      "section_type": "PROCEDURE",
+      "is_noise": true,
+      "noise_category": "PROCEDURE",
+      "noise_reason": "第六条·申请条件：程序性条款"
+    },
+    {
+      "doc_id": "DF0191",
+      "semantic_block_id": "DF0191_SB007",
+      "section_type": "PROCEDURE",
+      "is_noise": true,
+      "noise_category": "PROCEDURE",
+      "noise_reason": "第七条·排除情形：程序性条款"
+    },
+    {
+      "doc_id": "DF0191",
+      "semantic_block_id": "DF0191_SB008",
+      "section_type": "SUBSIDY",
+      "is_noise": false,
+      "leaves": [
+        {
+          "leaf_name": "洲际定期货运航班直飞奖励",
+          "tool_nature": "monetary",
+          "framework_node": "1.1",
+          "framework_label": "定期航线补贴",
+          "framework_source": "TrackC_Monetary_Framework_v9.1",
+          "subsidy_info": {
+            "subject": "航空公司",
+            "tiers": [
+              {"condition": "业载≥40吨", "cap": "120万元/年"},
+              {"condition": "30-40吨", "cap": "80万元/年"},
+              {"condition": "20-30吨", "cap": "60万元/年"}
+            ]
+          },
+          "components": {
+            "M": [],
+            "A": "奖励",
+            "A_type": "operational",
+            "O": "定期货运航班奖励",
+            "S_scope": ["洲际"],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": ["直达"]
+          },
+          "pau_final": "洲际直飞定期货运航班奖励",
+          "cleaning_log": "S_scope='洲际'+S_type='直达'"
+        },
+        {
+          "leaf_name": "亚洲区域定期货运航班直飞奖励",
+          "tool_nature": "monetary",
+          "framework_node": "1.1",
+          "framework_label": "定期航线补贴",
+          "framework_source": "TrackC_Monetary_Framework_v9.1",
+          "subsidy_info": {
+            "subject": "航空公司",
+            "scope": "含港澳台",
+            "tiers": [
+              {"condition": "业载≥40吨", "cap": "80万元/年"},
+              {"condition": "30-40吨", "cap": "60万元/年"},
+              {"condition": "20-30吨", "cap": "40万元/年"}
+            ]
+          },
+          "components": {
+            "M": [],
+            "A": "奖励",
+            "A_type": "operational",
+            "O": "定期货运航班奖励",
+            "S_scope": ["亚洲"],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": ["直达"]
+          },
+          "pau_final": "亚洲直飞定期货运航班奖励",
+          "cleaning_log": "含港澳台地区"
+        },
+        {
+          "leaf_name": "国内定期货运航班直飞奖励",
+          "tool_nature": "monetary",
+          "framework_node": "1.1",
+          "framework_label": "定期航线补贴",
+          "framework_source": "TrackC_Monetary_Framework_v9.1",
+          "subsidy_info": {
+            "subject": "航空公司",
+            "tiers": [
+              {"condition": "业载≥40吨", "cap": "50万元/年"},
+              {"condition": "30-40吨", "cap": "30万元/年"},
+              {"condition": "20-30吨", "cap": "20万元/年"}
+            ]
+          },
+          "components": {
+            "M": [],
+            "A": "奖励",
+            "A_type": "operational",
+            "O": "定期货运航班奖励",
+            "S_scope": ["国内"],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": ["直达"]
+          },
+          "pau_final": "国内直飞定期货运航班奖励",
+          "cleaning_log": "scope区分洲际/亚洲/国内"
+        },
+        {
+          "leaf_name": "经停国际货运航班奖励",
+          "tool_nature": "monetary",
+          "framework_node": "1.1",
+          "framework_label": "定期航线补贴",
+          "framework_source": "TrackC_Monetary_Framework_v9.1",
+          "subsidy_info": {
+            "subject": "航空公司",
+            "scope": "经停南宁的国际货运航班",
+            "standard": "直飞标准的80%"
+          },
+          "components": {
+            "M": [],
+            "A": "奖励",
+            "A_type": "operational",
+            "O": "货运航班奖励",
+            "S_scope": ["国际"],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": ["经停"]
+          },
+          "pau_final": "国际经停货运航班奖励",
+          "cleaning_log": "S_type='经停'区分直飞"
+        },
+        {
+          "leaf_name": "航空货运市场开拓吞吐量前三名奖励",
+          "tool_nature": "monetary",
+          "framework_node": "2.1.3",
+          "framework_label": "承运主体专项货量奖励",
+          "framework_source": "TrackC_Monetary_Framework_v9.1",
+          "subsidy_info": {
+            "subject": "航空公司/包机公司/货运代理/销售代理",
+            "scope": "南宁吴圩国际机场货物吞吐量当年前三名",
+            "cap": "10万元/企业"
+          },
+          "components": {
+            "M": [],
+            "A": "奖励",
+            "A_type": "operational",
+            "O": "货运市场开拓奖励",
+            "S_scope": [],
+            "S_focus": [],
+            "S_stage": [],
+            "S_type": []
+          },
+          "pau_final": "航空货运市场开拓吞吐量奖励",
+          "cleaning_log": "保留'吞吐量'以区分SB005中的一般市场开拓奖励"
+        }
+      ]
+    },
+    {
+      "doc_id": "DF0191",
+      "semantic_block_id": "DF0191_SB009",
+      "section_type": "PROCEDURE",
+      "is_noise": true,
+      "noise_category": "PROCEDURE",
+      "noise_reason": "第九条·申请材料：程序性条款"
+    },
+    {
+      "doc_id": "DF0191",
+      "semantic_block_id": "DF0191_SB010",
+      "section_type": "PROCEDURE",
+      "is_noise": true,
+      "noise_category": "PROCEDURE",
+      "noise_reason": "第十条·审批程序：程序性条款"
+    },
+    {
+      "doc_id": "DF0191",
+      "semantic_block_id": "DF0191_SB011",
+      "section_type": "PROCEDURE",
+      "is_noise": true,
+      "noise_category": "PROCEDURE",
+      "noise_reason": "第十一条·部门职责：程序性条款"
+    },
+    {
+      "doc_id": "DF0191",
+      "semantic_block_id": "DF0191_SB012",
+      "section_type": "PROCEDURE",
+      "is_noise": true,
+      "noise_category": "PROCEDURE",
+      "noise_reason": "第十二条·监督检查：程序性条款"
+    },
+    {
+      "doc_id": "DF0191",
+      "semantic_block_id": "DF0191_SB013",
+      "section_type": "PROCEDURE",
+      "is_noise": true,
+      "noise_category": "PROCEDURE",
+      "noise_reason": "第十三条·违规处罚：程序性条款"
+    },
+    {
+      "doc_id": "DF0191",
+      "semantic_block_id": "DF0191_SB014",
+      "section_type": "PROCEDURE",
+      "is_noise": true,
+      "noise_category": "PROCEDURE",
+      "noise_reason": "第十四条·人员责任：程序性条款"
+    },
+    {
+      "doc_id": "DF0191",
+      "semantic_block_id": "DF0191_SB015",
+      "section_type": "PROCEDURE",
+      "is_noise": true,
+      "noise_category": "PROCEDURE",
+      "noise_reason": "第十五条·年度报告：程序性条款"
+    },
+    {
+      "doc_id": "DF0191",
+      "semantic_block_id": "DF0191_SB016",
+      "section_type": "CLOSING",
+      "is_noise": true,
+      "noise_category": "CLOSING",
+      "noise_reason": "第十六条·施行日期：收尾条款"
+    }
+  ]
+}

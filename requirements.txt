@@ -1,0 +1,14 @@
+aiohttp
+anthropic
+google-genai
+hdbscan
+matplotlib
+numpy
+openai
+pandas
+plotly
+PyYAML
+requests
+scikit-learn
+scipy
+tqdm

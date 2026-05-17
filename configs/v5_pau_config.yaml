@@ -1,0 +1,40 @@
+﻿version: "v5.2.0"
+
+input:
+  corpus_path: "roundC_v5_1/v5_example_diverse.csv"
+  text_column: "block_text"
+  level_column: "final_level"
+  doc_id_column: "doc_id"
+
+output:
+  raw_output: "data/intermediate_outputs/v5/v5_pau_raw.jsonl"
+  validated_output: "data/intermediate_outputs/v5/v5_pau_validated.csv"
+  report_output: "data/intermediate_outputs/v5/v5_validation_report.json"
+  log_dir: "data/intermediate_outputs/v5/logs"
+
+llm:
+  model_slot: "PRIMARY_LLM"
+  temperature: "${LLM_TEMPERATURE}"
+  max_tokens: "${LLM_MAX_TOKENS}"
+  timeout: "${TIMEOUT}"
+  retries: "${RETRIES}"
+  backoff_factor: "${BACKOFF}"
+
+processing:
+  max_sentence_length: 500
+  batch_size: 10
+  concurrent_requests: 3
+  context_window_size: 2
+  context_strategy: "sliding_window"
+
+dictionaries:
+  dir: "scripts/v5/dictionaries"
+  domain_compounds: "domain_compounds.json"
+  s_keywords: "s_keywords.json"
+  a_type_mapping: "a_type_mapping.json"
+
+validation:
+  require_o_field: true
+  require_a_field: true
+  valid_t_levels: ["T1", "T2", "T3", "T4"]
+  valid_a_types: ["direction", "substantive", "operational", "intent"]

@@ -1,0 +1,710 @@
+{
+  "node_id": "ROOT",
+  "level": "ROOT",
+  "label": "ROOT",
+  "children": [
+    {
+      "node_id": "L1_N6e836104",
+      "label": "基础设施与枢纽",
+      "level": "L1",
+      "children": [
+        {
+          "node_id": "L2_N08a346fe",
+          "label": "加快构建国际航线网络",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_Nfdd2124b",
+              "label": "加快引进国内国际货运航司",
+              "level": "L3",
+              "children": [
+                {
+                  "node_id": "L4_Nfdd2124b",
+                  "label": "加快引进国内国际货运航司",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L4_Nc2b08089",
+                  "label": "积极引进新兴货运航司",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L4_N328ead7e",
+                  "label": "引进货运航司",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L4_Nd79ac9d1",
+                  "label": "加快引进快递企业航司",
+                  "level": "L4",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "node_id": "L3_Nf3b017a0",
+              "label": "完善国际货运航线",
+              "level": "L3",
+              "children": [
+                {
+                  "node_id": "L4_Na37f8214",
+                  "label": "引导国际货运航线布局与制造业需求对接",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L4_Nb967aed3",
+                  "label": "加强与国际机场合作",
+                  "level": "L4",
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "node_id": "L2_Ne4cef915",
+          "label": "增加全货机运力",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_Nc97533ee",
+              "label": "引进航司提升运力",
+              "level": "L3",
+              "children": [
+                {
+                  "node_id": "L4_Na5c9f759",
+                  "label": "以运力发展带动航线布局",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L4_N256f563d",
+                  "label": "引进航司提升运力",
+                  "level": "L4",
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "node_id": "L2_Nbfebbffa",
+          "label": "构建优质航线网络",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_N303eccc1",
+              "label": "打造精品航线网络",
+              "level": "L3",
+              "children": [
+                {
+                  "node_id": "L4_N27d838ea",
+                  "label": "构建双扇形航线网络布局",
+                  "level": "L4",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "node_id": "L3_N198ad664",
+              "label": "积极打造中转航线",
+              "level": "L3",
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "node_id": "L1_N70e79b29",
+      "label": "市场主体与网络",
+      "level": "L1",
+      "children": [
+        {
+          "node_id": "L2_N69b20189",
+          "label": "鼓励新设立基地货运航空公司",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_N571de1aa",
+              "label": "大力招引货运航空公司",
+              "level": "L3",
+              "children": [
+                {
+                  "node_id": "L4_N31c774ef",
+                  "label": "加强与货运航空公司合作",
+                  "level": "L4",
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "node_id": "L2_Nf64b0b03",
+          "label": "提高物流服务保障效率",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_N62ed0091",
+              "label": "推进智慧物流建设",
+              "level": "L3",
+              "children": [
+                {
+                  "node_id": "L4_Nbc7f4787",
+                  "label": "推进保税物流园区建设",
+                  "level": "L4",
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "node_id": "L2_N2f32c229",
+          "label": "增强航空物流服务能力",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_Na1b5b8e4",
+              "label": "加快国际航空物流中心载体建设",
+              "level": "L3",
+              "children": [
+                {
+                  "node_id": "L4_N6bcc2030",
+                  "label": "构建高效的航空物流地面集散体系",
+                  "level": "L4",
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "node_id": "L2_Nc3c2ff15",
+          "label": "完善多式联运体系",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_Nd290d812",
+              "label": "探索开展多式联运",
+              "level": "L3",
+              "children": [
+                {
+                  "node_id": "L4_N3ac13c17",
+                  "label": "探索异地货站模式",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L4_Na8ba2f4a",
+                  "label": "探索开展多式联运",
+                  "level": "L4",
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "node_id": "L2_N926fa20a",
+          "label": "优化拓展货运航线网络",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_N945a64d3",
+              "label": "加密货运航线",
+              "level": "L3",
+              "children": [
+                {
+                  "node_id": "L4_Nb11795db",
+                  "label": "开通贸易密切城市航线",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L4_N945a64d3",
+                  "label": "加密货源丰富地区航线",
+                  "level": "L4",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "node_id": "L3_N65606e29",
+              "label": "强化陆运集货网络",
+              "level": "L3",
+              "children": []
+            }
+          ]
+        },
+        {
+          "node_id": "L2_N13abaa5a",
+          "label": "增强货运保障能力",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_Nb67e0092",
+              "label": "提升国际货运中转功能",
+              "level": "L3",
+              "children": [
+                {
+                  "node_id": "L4_Ne346220c",
+                  "label": "提升国际航空货运枢纽全球响应能力",
+                  "level": "L4",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "node_id": "L3_Nb328f7fc",
+              "label": "完善货运设施功能",
+              "level": "L3",
+              "children": [
+                {
+                  "node_id": "L4_N9596affd",
+                  "label": "积极推进机场各货运区规划建设",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L4_Nc0927f0b",
+                  "label": "稳步推进货运基础设施建设",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L4_N2720f054",
+                  "label": "补齐机场设施短板",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L4_Ndfac356a",
+                  "label": "规划配置货机位",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L4_N5fc249ab",
+                  "label": "规划配置陆侧道路",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L4_N6bfccf65",
+                  "label": "规划配置空侧道路和配套办公设施",
+                  "level": "L4",
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "node_id": "L2_N68c2aa93",
+          "label": "提升货源组织能力",
+          "level": "L2",
+          "children": []
+        }
+      ]
+    },
+    {
+      "node_id": "L1_N6bbea948",
+      "label": "智慧绿色转型",
+      "level": "L1",
+      "children": [
+        {
+          "node_id": "L2_Ne1879105",
+          "label": "提升枢纽智慧水平",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_N1b187997",
+              "label": "提升航空货运智慧化水平",
+              "level": "L3",
+              "children": [
+                {
+                  "node_id": "L4_N6e9da33c",
+                  "label": "实施航空货运全流程定位追踪",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L4_N6b11fc79",
+                  "label": "打造良好的航空货运社区",
+                  "level": "L4",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "node_id": "L3_N09522c48",
+              "label": "推进智慧平台建设",
+              "level": "L3",
+              "children": [
+                {
+                  "node_id": "L4_N96f6c2a8",
+                  "label": "加快构建智慧航空物流综合服务平台",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L4_Ne55e384d",
+                  "label": "统筹单据电子化建设",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L4_N1244f6cb",
+                  "label": "统筹单据标准化建设",
+                  "level": "L4",
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "node_id": "L2_Nfdcfd3c4",
+          "label": "智慧货运高效管理",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_Nfc162f8c",
+              "label": "加强新兴技术应用",
+              "level": "L3",
+              "children": []
+            },
+            {
+              "node_id": "L3_Ne42076c0",
+              "label": "推进智慧货运高效管理",
+              "level": "L3",
+              "children": [
+                {
+                  "node_id": "L4_Nea0a385e",
+                  "label": "实现货物状态可视化",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L4_N48c963e1",
+                  "label": "引入资金",
+                  "level": "L4",
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "node_id": "L1_N52f6895e",
+      "label": "区域协同与产业联动",
+      "level": "L1",
+      "children": [
+        {
+          "node_id": "L2_Na5b73aaf",
+          "label": "推动区港联动发展",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_N724f0a0b",
+              "label": "加强与重点产业园区对接",
+              "level": "L3",
+              "children": [
+                {
+                  "node_id": "L4_N0188902d",
+                  "label": "建设跨境产业园",
+                  "level": "L4",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "node_id": "L3_Nc3d125b3",
+              "label": "加强港区高效联动",
+              "level": "L3",
+              "children": [
+                {
+                  "node_id": "L4_Naf94a663",
+                  "label": "推动区港联动",
+                  "level": "L4",
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "node_id": "L1_N977ed730",
+      "label": "营商环境优化",
+      "level": "L1",
+      "children": [
+        {
+          "node_id": "L2_N6d9c5da7",
+          "label": "营造宜商宜业环境",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_N832c0c49",
+              "label": "建设跨境电商服务平台",
+              "level": "L3",
+              "children": [
+                {
+                  "node_id": "L4_N832c0c49",
+                  "label": "打造中国东盟跨境电商综合服务平台",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L4_N3494c85c",
+                  "label": "简单加工等服务成为东盟跨境电商的核心服务商",
+                  "level": "L4",
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "node_id": "L1_N21391b6c",
+      "label": "产业生态拓展",
+      "level": "L1",
+      "children": [
+        {
+          "node_id": "L2_Nd825449f",
+          "label": "延伸产业丰富业态",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_N97559905",
+              "label": "延伸航空物流链条",
+              "level": "L3",
+              "children": [
+                {
+                  "node_id": "L4_Nd3a9b4af",
+                  "label": "与快递企业深度合作",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L4_Nf3f8f8c3",
+                  "label": "实现门到门服务",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L4_N198738ba",
+                  "label": "打造生鲜集散中心",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L4_N3fa16235",
+                  "label": "打造生鲜加工中心",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L4_N32b417e2",
+                  "label": "打造生鲜交易中心",
+                  "level": "L4",
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "node_id": "L2_Nd39445b0",
+          "label": "大力开拓航空物流新兴业态",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_N18ada171",
+              "label": "积极推进跨境电商发展",
+              "level": "L3",
+              "children": [
+                {
+                  "node_id": "L4_N6834f90a",
+                  "label": "推进跨境电商园区建设",
+                  "level": "L4",
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "node_id": "L1_N07a80a4d",
+      "label": "多元经营主体培育",
+      "level": "L1",
+      "children": [
+        {
+          "node_id": "L2_N709fdde1",
+          "label": "培育市场主体",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_N33c0e278",
+              "label": "引进培育总部型货代企业",
+              "level": "L3",
+              "children": [
+                {
+                  "node_id": "L4_N2d19c279",
+                  "label": "引育优质货运代理",
+                  "level": "L4",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "node_id": "L3_Nb2d030f0",
+              "label": "培育物流龙头企业",
+              "level": "L3",
+              "children": [
+                {
+                  "node_id": "L4_N3bc888c0",
+                  "label": "引育大型电商物流企业",
+                  "level": "L4",
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "node_id": "L1_N39371e6b",
+      "label": "增量市场拓展",
+      "level": "L1",
+      "children": [
+        {
+          "node_id": "L2_N10f72f08",
+          "label": "大力拓展增量市场业务",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_N3ba23cb1",
+              "label": "大力发展货运中转业务",
+              "level": "L3",
+              "children": [
+                {
+                  "node_id": "L4_Nbf72ad46",
+                  "label": "开展多形式中转业务",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L4_N6aba220c",
+                  "label": "开展多渠道中转业务",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L4_N0d91d293",
+                  "label": "延伸货运服务",
+                  "level": "L4",
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "node_id": "L1_N55ba89a6",
+      "label": "服务管理优化",
+      "level": "L1",
+      "children": [
+        {
+          "node_id": "L2_N70eeee1d",
+          "label": "提升运营管理能力",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_N70eeee1d",
+              "label": "提升运营管理能力",
+              "level": "L3",
+              "children": [
+                {
+                  "node_id": "L4_N08407b0e",
+                  "label": "增强经营实力",
+                  "level": "L4",
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "node_id": "L1_N906f0fb9",
+      "label": "战略引资与资本合作",
+      "level": "L1",
+      "children": [
+        {
+          "node_id": "L2_Na35a474b",
+          "label": "引入战略投资",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_Na35a474b",
+              "label": "引入战略投资",
+              "level": "L3",
+              "children": [
+                {
+                  "node_id": "L4_Na35a474b",
+                  "label": "引入战略投资者",
+                  "level": "L4",
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "node_id": "L1_N5d2e3c44",
+      "label": "数字基础设施",
+      "level": "L1",
+      "children": [
+        {
+          "node_id": "L2_Nb0e7dd4f",
+          "label": "加快数字基础设施建设",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_Nb0e7dd4f",
+              "label": "加快数字基建建设",
+              "level": "L3",
+              "children": []
+            },
+            {
+              "node_id": "L3_N0f65b0c3",
+              "label": "丰富货运参与主体",
+              "level": "L3",
+              "children": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

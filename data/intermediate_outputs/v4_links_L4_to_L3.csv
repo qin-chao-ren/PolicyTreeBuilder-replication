@@ -1,0 +1,93 @@
+child_id,parent_id,decision,confidence,reason,human_parent_id,human_action,human_notes,is_new_parent
+L4_Nd3a9b4af,L3_N97559905,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_N97559905,review,,False
+L4_Nf3f8f8c3,L3_N97559905,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_N97559905,review,,False
+L4_N0188902d,L3_N724f0a0b,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_N724f0a0b,review,,False
+L4_N832c0c49,L3_N832c0c49,llm_create_parent,0.85,候选父节点均聚焦物流或园区联动，与‘中国东盟跨境电商综合服务平台’的平台建设主题不匹配；需新建聚焦跨境电商服务的父节点,L3_N832c0c49,keep,,True
+L4_N3494c85c,L3_N832c0c49,llm_assign,0.75,子节点聚焦通过简单加工等服务支撑东盟跨境电商，与候选父节点1'建设跨境电商服务平台'在目标（服务跨境电商）和功能（提供支撑性服务）上高度契合；尽管'简单加工'略偏实体操作，但可视为平台服务生态的一部分。其余候选父节点明显偏离主题。,L3_N832c0c49,keep,,False
+L4_N198738ba,L3_N97559905,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_N97559905,review,,False
+L4_N3fa16235,L3_N97559905,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_N97559905,review,,False
+L4_N32b417e2,L3_N97559905,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_N97559905,review,,False
+L4_Naf94a663,L3_Nc3d125b3,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_Nc3d125b3,review,,False
+L4_N69265178,L3_N97559905,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_N97559905,review,,False
+L4_N5a060ef1,L3_Nd93e3e25,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_Nd93e3e25,review,,False
+L4_N1513dd0d,L3_Nd93e3e25,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_Nd93e3e25,review,,False
+L4_Nc28ba84f,L3_Nd93e3e25,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_Nd93e3e25,review,,False
+L4_N59784fee,L3_Ne6cde812,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_Ne6cde812,review,,False
+L4_Nada24d28,L3_Ne6cde812,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_Ne6cde812,review,,False
+L4_N6c7fdcaf,L3_Ne6cde812,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_Ne6cde812,review,,False
+L4_N96f6c2a8,L3_N09522c48,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_N09522c48,review,,False
+L4_Ne55e384d,L3_N09522c48,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_N09522c48,review,,False
+L4_N1244f6cb,L3_N09522c48,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_N09522c48,review,,False
+L4_N6e9da33c,L3_N1b187997,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_N1b187997,review,,False
+L4_Nea0a385e,L3_Ne42076c0,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_Ne42076c0,review,,False
+L4_N6b11fc79,L3_N1b187997,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_N1b187997,review,,False
+L4_N48c963e1,L3_Ne42076c0,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_Ne42076c0,review,,False
+L4_Na35a474b,L3_Na35a474b,llm_create_parent,0.85,候选父节点均聚焦智慧平台或运营管理，与'引入战略投资者'这一资本运作行为语义不匹配；需新建更贴合的父节点,L3_Na35a474b,keep,,True
+L4_N08407b0e,L3_N70eeee1d,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_N70eeee1d,review,,False
+L4_N8648b9f1,L3_N4b540045,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_N4b540045,review,,False
+L4_N5edfd835,L3_N4b540045,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_N4b540045,review,,False
+L4_N34f6aab4,L3_N53ff6178,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_N53ff6178,review,,False
+L4_Nfb48b97b,L3_N4b540045,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_N4b540045,review,,False
+L4_N9273a814,L3_N7e9ff5f6,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_N7e9ff5f6,review,,False
+L4_N6c65c54a,L3_Nce212504,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_Nce212504,review,,False
+L4_Nfa586cf7,L3_N7e9ff5f6,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_N7e9ff5f6,review,,False
+L4_N30b235c2,L3_N06f95f57,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_N06f95f57,review,,False
+L4_N255c1775,L3_N06f95f57,llm_assign,0.89,候选1语义高度匹配，包含'客货枢纽建设'且强调系统推进，与子节点'推进客货枢纽建设'在动作和对象上一致,L3_N06f95f57,keep,,False
+L4_N3220a070,L3_N8b934feb,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_N8b934feb,review,,False
+L4_Nf737d76d,L3_Ne96a4ba3,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_Ne96a4ba3,review,,False
+L4_Nc38e3e2b,L3_N06f95f57,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_N06f95f57,review,,False
+L4_N4b0d0e0c,L3_Ne96a4ba3,llm_assign,0.72,子节点聚焦空港口岸海关监管场地布局优化，属于航空货运基础设施的组成部分；候选1‘增强航空货运基础保障能力’在语义上最贴近，且cos相似度高达0.91，尽管Jaccard较低，但整体主题一致,L3_Ne96a4ba3,keep,,False
+L4_Nef2378d9,L3_Ne96a4ba3,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_Ne96a4ba3,review,,False
+L4_N848f47e5,L3_Ne96a4ba3,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_Ne96a4ba3,review,,False
+L4_Na052476c,L3_Nd571b089,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_Nd571b089,review,,False
+L4_N85bf292e,L3_Nea54495c,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_Nea54495c,review,,False
+L4_Nfdd2124b,L3_Nfdd2124b,hard_assign,1.0,Hard Assign (Score 1.00 >= 0.92),L3_Nfdd2124b,keep,,False
+L4_Nc2b08089,L3_Nfdd2124b,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_Nfdd2124b,review,,False
+L4_N7d2d45d8,L3_N7d2d45d8,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_N7d2d45d8,review,,False
+L4_N1c9477d5,L3_N1c9477d5,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_N1c9477d5,review,,False
+L4_N70a840eb,L3_N595f8c05,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_N595f8c05,review,,False
+L4_Nc2b9cf21,L3_N595f8c05,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_N595f8c05,review,,False
+L4_Na1c24377,L3_N18ada171,llm_assign,0.85,候选1语义高度相关，聚焦跨境电商发展，与子节点'推进跨境电商产业园区建设'在主题和目标上一致；其余候选聚焦冷链物流，偏离主题,L3_N18ada171,keep,,False
+L4_N5e94e625,L3_N18ada171,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_N18ada171,review,,False
+L4_N8bd3a8a5,L3_Nd551ce89,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_Nd551ce89,review,,False
+L4_N90c2cae1,L3_Nd551ce89,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_Nd551ce89,review,,False
+L4_N219c5452,L3_N29e43ee4,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_N29e43ee4,review,,False
+L4_N61514be4,L3_N29e43ee4,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_N29e43ee4,review,,False
+L4_N8d005590,L3_N29e43ee4,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_N29e43ee4,review,,False
+L4_N6dc065d5,L3_N640a2992,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_N640a2992,review,,False
+L4_N0e93e380,L3_N0e93e380,llm_assign,0.82,候选1语义高度一致，且子节点名称与父节点主题完全匹配，cos相似度达1.0,L3_N0e93e380,keep,,False
+L4_Nf47f4823,L3_N640a2992,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_N640a2992,review,,False
+L4_Nb11795db,L3_N945a64d3,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_N945a64d3,review,,False
+L4_N945a64d3,L3_N945a64d3,llm_assign,0.86,候选1语义高度一致，'加密货运航线'完全涵盖'加密货源丰富地区航线'，且cos相似度达1.0，仅范围略宽但可接受,L3_N945a64d3,keep,,False
+L4_Na37f8214,L3_Nf3b017a0,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_Nf3b017a0,review,,False
+L4_Ne346220c,L3_Nb67e0092,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_Nb67e0092,review,,False
+L4_N27d838ea,L3_N303eccc1,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_N303eccc1,review,,False
+L4_Nb967aed3,L3_Nf3b017a0,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_Nf3b017a0,review,,False
+L4_Nbf72ad46,L3_N3ba23cb1,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_N3ba23cb1,review,,False
+L4_N6aba220c,L3_N3ba23cb1,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_N3ba23cb1,review,,False
+L4_N328ead7e,L3_Nfdd2124b,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_Nfdd2124b,review,,False
+L4_Nd79ac9d1,L3_Nfdd2124b,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_Nfdd2124b,review,,False
+L4_N31c774ef,L3_N571de1aa,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_N571de1aa,review,,False
+L4_Na5c9f759,L3_Nc97533ee,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_Nc97533ee,review,,False
+L4_N256f563d,L3_Nc97533ee,hard_assign,1.0,Hard Assign (Score 0.99 >= 0.92),L3_Nc97533ee,keep,,False
+L4_N9596affd,L3_Nb328f7fc,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_Nb328f7fc,review,,False
+L4_Nc0927f0b,L3_Nb328f7fc,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_Nb328f7fc,review,,False
+L4_N2720f054,L3_Nb328f7fc,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_Nb328f7fc,review,,False
+L4_Ndfac356a,L3_Nb328f7fc,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_Nb328f7fc,review,,False
+L4_N5fc249ab,L3_Nb328f7fc,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_Nb328f7fc,review,,False
+L4_N6bfccf65,L3_Nb328f7fc,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_Nb328f7fc,review,,False
+L4_Nbc7f4787,L3_N62ed0091,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_N62ed0091,review,,False
+L4_N6834f90a,L3_N18ada171,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_N18ada171,review,,False
+L4_N2d19c279,L3_N33c0e278,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_N33c0e278,review,,False
+L4_N3bc888c0,L3_Nb2d030f0,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_Nb2d030f0,review,,False
+L4_N6bcc2030,L3_Na1b5b8e4,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_Na1b5b8e4,review,,False
+L4_N0d91d293,L3_N3ba23cb1,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_N3ba23cb1,review,,False
+L4_N3ac13c17,L3_Nd290d812,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_Nd290d812,review,,False
+L4_Na8ba2f4a,L3_Nd290d812,hard_assign,1.0,Hard Assign (Score 1.00 >= 0.92),L3_Nd290d812,keep,,False
+L4_N162d5723,L3_Ncc6e46eb,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_Ncc6e46eb,review,,False
+L4_Nd788e769,L3_Naeed249a,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_Naeed249a,review,,False
+L4_N94978a33,L3_Nb67e0092,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_Nb67e0092,review,,False
+L4_Ne0f95b19,L3_Nc594b785,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_Nc594b785,review,,False
+L4_Nea99104a,L3_N4c90cbd7,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_N4c90cbd7,review,,False
+L4_Na35280bb,L3_Na7c6a537,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L3_Na7c6a537,review,,False
+L4_Na2b3c84a,L3_N4da94e7a,llm_assign,0.85,候选1‘大力拓展货源’与子节点‘拓展园区货源’在动作（拓展）和对象（货源）上高度一致，语义匹配度高，且cos相似度达0.96，综合得分最高,L3_N4da94e7a,keep,,False

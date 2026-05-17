@@ -1,0 +1,216 @@
+{
+  "node_id": "ROOT",
+  "level": "ROOT",
+  "label": "ROOT",
+  "children": [
+    {
+      "node_id": "L1_N762e6689",
+      "label": "战略规划与治理",
+      "level": "L1",
+      "children": [
+        {
+          "node_id": "L2_N6da1b013",
+          "label": "注重规划支撑引领",
+          "level": "L2",
+          "children": []
+        }
+      ]
+    },
+    {
+      "node_id": "L1_N6e836104",
+      "label": "基础设施与枢纽",
+      "level": "L1",
+      "children": [
+        {
+          "node_id": "L2_N649ec6c7",
+          "label": "扎实做好货物运输保障",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_N98ef0212",
+              "label": "优化货物运输组织",
+              "level": "L3",
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "node_id": "L1_N70e79b29",
+      "label": "市场主体与网络",
+      "level": "L1",
+      "children": [
+        {
+          "node_id": "L2_N68c2aa93",
+          "label": "提升货源组织能力",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_N071b8d1d",
+              "label": "强化货源组织调度",
+              "level": "L3",
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "node_id": "L1_N604d4c42",
+      "label": "资源与要素保障",
+      "level": "L1",
+      "children": [
+        {
+          "node_id": "L2_N9f46f3fd",
+          "label": "继续做好航空资源保障",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_N8458a8a8",
+              "label": "完善航线网络布局",
+              "level": "L3",
+              "children": []
+            }
+          ]
+        },
+        {
+          "node_id": "L2_N24b2144b",
+          "label": "加大政策扶持力度",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_Nc21e1f2f",
+              "label": "完善财政奖补机制",
+              "level": "L3",
+              "children": []
+            },
+            {
+              "node_id": "L3_N71ce64b1",
+              "label": "积极争取政策倾斜",
+              "level": "L3",
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "node_id": "L1_Nc7535a4f",
+      "label": "基础能力支撑",
+      "level": "L1",
+      "children": [
+        {
+          "node_id": "L2_N306e9a75",
+          "label": "强化基础能力保障",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_N3ab0a1a9",
+              "label": "加快基础设施建设",
+              "level": "L3",
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "node_id": "L1_N07a80a4d",
+      "label": "多元经营主体培育",
+      "level": "L1",
+      "children": [
+        {
+          "node_id": "L2_N709fdde1",
+          "label": "培育市场主体",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_Nca0d54be",
+              "label": "引入培育龙头企业",
+              "level": "L3",
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "node_id": "L1_N55ba89a6",
+      "label": "服务管理优化",
+      "level": "L1",
+      "children": [
+        {
+          "node_id": "L2_N6db20b9a",
+          "label": "提升服务管理水平",
+          "level": "L2",
+          "children": []
+        }
+      ]
+    },
+    {
+      "node_id": "L1_N5d2e3c44",
+      "label": "数字基础设施",
+      "level": "L1",
+      "children": [
+        {
+          "node_id": "L2_Nb0e7dd4f",
+          "label": "加快数字基础设施建设",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_Nf8bb4ea7",
+              "label": "加强集疏运体系建设",
+              "level": "L3",
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "node_id": "L1_N00e94186",
+      "label": "跨境物流服务",
+      "level": "L1",
+      "children": [
+        {
+          "node_id": "L2_N578f3b8a",
+          "label": "提升跨境物流服务能力",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_Ne78d3c45",
+              "label": "开展航空货运总体规划研究",
+              "level": "L3",
+              "children": []
+            },
+            {
+              "node_id": "L3_N55664f5d",
+              "label": "开展航空货运发展专项研究",
+              "level": "L3",
+              "children": []
+            },
+            {
+              "node_id": "L3_N0362ceea",
+              "label": "加快完善口岸功能",
+              "level": "L3",
+              "children": []
+            },
+            {
+              "node_id": "L3_Ne7b47d1e",
+              "label": "优化口岸营商环境",
+              "level": "L3",
+              "children": []
+            },
+            {
+              "node_id": "L3_N888d7345",
+              "label": "提升通关服务效率",
+              "level": "L3",
+              "children": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

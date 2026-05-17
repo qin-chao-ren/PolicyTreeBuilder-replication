@@ -1,0 +1,28 @@
+# Local-only frozen source archive
+_local_archive/
+
+# Secrets and local environment files
+.env
+*.env
+!*.env.example
+configs/*.env
+!configs/*.env.example
+gemini_key.txt
+qwen_key.txt
+
+# Python/runtime artifacts
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# Logs and temporary files
+*.log
+logs/
+data/**/logs/
+.tmp/
+tmp/

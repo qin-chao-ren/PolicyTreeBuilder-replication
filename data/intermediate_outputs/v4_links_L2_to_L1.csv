@@ -1,0 +1,67 @@
+child_id,parent_id,decision,confidence,reason,support_counts,human_parent_id,human_action,human_notes,is_new_parent
+L2_N60c3ab56,L1_N70e79b29,llm_assign,0.82,,"{""L1_N6e836104"": 1}",L1_N70e79b29,keep,,False
+L2_Nc81ee0b8,L1_N52f6895e,llm_assign,0.72,,"{""L1_N52f6895e"": 1}",L1_N52f6895e,keep,,False
+L2_N6d9c5da7,L1_N977ed730,llm_assign_new,0.65,现有 L1 均聚焦具体领域（如枢纽、通关、产业联动等），而‘营造宜商宜业环境’属综合性营商环境主题，未被覆盖,"{""L1_N52f6895e"": 1}",L1_N977ed730,review,现有 L1 均聚焦具体领域（如枢纽、通关、产业联动等），而‘营造宜商宜业环境’属综合性营商环境主题，未被覆盖,True
+L2_Na5b73aaf,L1_N52f6895e,llm_assign,0.75,,"{""L1_N52f6895e"": 1}",L1_N52f6895e,keep,,False
+L2_N4f9516d8,L1_N52f6895e,llm_assign,0.72,,"{""L1_N52f6895e"": 1}",L1_N52f6895e,keep,,False
+L2_Nd825449f,L1_N21391b6c,llm_assign_new,0.35,L2 标签过于宽泛且样本单一，无法准确对应任一现有 L1；'延伸产业丰富业态'更偏向产业生态拓展，但候选 L1 均聚焦具体功能领域（如枢纽、通关、协同等），语义覆盖不足,"{""L1_N52f6895e"": 1}",L1_N21391b6c,review,L2 标签过于宽泛且样本单一，无法准确对应任一现有 L1；'延伸产业丰富业态'更偏向产业生态拓展，但候选 L1 均聚焦具体功能领域（如枢纽、通关、协同等），语义覆盖不足,True
+L2_N649ec6c7,L1_N6e836104,llm_assign,0.72,,"{""L1_N604d4c42"": 1}",L1_N6e836104,keep,,False
+L2_N9f46f3fd,L1_N604d4c42,llm_assign,0.75,,"{""L1_N604d4c42"": 1}",L1_N604d4c42,keep,,False
+L2_Nbd50000d,L1_N604d4c42,llm_assign,0.35,样本标题过于泛化且无具体语义指向，现有 L1 均无法准确覆盖其内涵；同时仅含 1 个样本，不足以支撑可靠挂接,"{""L1_N604d4c42"": 1}",L1_N604d4c42,keep,样本标题过于泛化且无具体语义指向，现有 L1 均无法准确覆盖其内涵；同时仅含 1 个样本，不足以支撑可靠挂接,False
+L2_N306e9a75,L1_Nc7535a4f,llm_assign_new,0.65,L2 标题过于宽泛且样本重复，无法明确指向任一候选 L1；现有 L1 虽有‘保障’相关关键词，但语义聚焦具体要素（如土地、人才、航权），而‘基础能力保障’缺乏实质内容支撑，若保留该 L2 需更清晰定义，建议新建更具操作性的 L1 或合并至更明确类别。,"{""L1_N604d4c42"": 2}",L1_Nc7535a4f,review,L2 标题过于宽泛且样本重复，无法明确指向任一候选 L1；现有 L1 虽有‘保障’相关关键词，但语义聚焦具体要素（如土地、人才、航权），而‘基础能力保障’缺乏实质内容支撑，若保留该 L2 需更清晰定义，建议新建更具操作性的 L1 或合并至更明确类别。,True
+L2_Nff3b5230,L1_N604d4c42,llm_assign,0.75,,"{""L1_N604d4c42"": 1}",L1_N604d4c42,keep,,False
+L2_N24b2144b,L1_N604d4c42,llm_assign,0.35,L2 标题'加大政策扶持力度'过于宽泛且缺乏具体语义指向，无法准确归属任一现有 L1；同时样本量仅为1，不足以支撑可靠挂接。,"{""L1_N604d4c42"": 1}",L1_N604d4c42,keep,L2 标题'加大政策扶持力度'过于宽泛且缺乏具体语义指向，无法准确归属任一现有 L1；同时样本量仅为1，不足以支撑可靠挂接。,False
+L2_Ne1879105,L1_N6bbea948,llm_assign,0.72,,"{""L1_N6bbea948"": 1}",L1_N6bbea948,keep,,False
+L2_Na75f0b05,L1_N6bbea948,llm_assign,0.72,,"{""L1_N6bbea948"": 1}",L1_N6bbea948,keep,,False
+L2_Nc8ab6162,L1_N6bbea948,llm_assign,0.65,,"{""L1_N6bbea948"": 1}",L1_N6bbea948,keep,,False
+L2_Nfdcfd3c4,L1_N6bbea948,llm_assign,0.72,,"{""L1_N6bbea948"": 1}",L1_N6bbea948,keep,,False
+L2_N9e86e873,L1_N6be998d8,llm_assign,0.72,,"{""L1_N6be998d8"": 1}",L1_N6be998d8,keep,,False
+L2_N33b2d022,L1_N6be998d8,llm_assign,0.72,,"{""L1_N6be998d8"": 1}",L1_N6be998d8,keep,,False
+L2_Nbde783bd,L1_N6be998d8,llm_assign,0.72,,"{""L1_N6be998d8"": 1}",L1_N6be998d8,keep,,False
+L2_N0109e16a,L1_N6be998d8,llm_assign,0.72,,"{""L1_N6be998d8"": 1}",L1_N6be998d8,keep,,False
+L2_N227589e0,L1_N6be998d8,llm_assign,0.85,,"{""L1_N6be998d8"": 1}",L1_N6be998d8,keep,,False
+L2_Nd8a500a1,L1_N6e836104,llm_assign,0.72,,"{""L1_N6e836104"": 1}",L1_N6e836104,keep,,False
+L2_N0a6e8ca5,L1_N6e836104,llm_assign,0.72,,"{""L1_N6e836104"": 1}",L1_N6e836104,keep,,False
+L2_Nb22f5139,L1_N6e836104,llm_assign,0.65,,"{""L1_N6e836104"": 1}",L1_N6e836104,keep,,False
+L2_N4db8aea7,L1_N6e836104,llm_assign,0.72,,"{""L1_N6e836104"": 1}",L1_N6e836104,keep,,False
+L2_Nfeea0571,L1_N6e836104,llm_assign,0.72,,"{""L1_N6e836104"": 1}",L1_N6e836104,keep,,False
+L2_Nb80d9c6e,L1_N6e836104,llm_assign,0.75,,"{""L1_N6e836104"": 1}",L1_N6e836104,keep,,False
+L2_N8228268e,L1_N6e836104,llm_assign,0.72,,"{""L1_N6e836104"": 1}",L1_N6e836104,keep,,False
+L2_N5e2fe781,L1_N6e836104,llm_assign,0.92,,"{""L1_N6e836104"": 1}",L1_N6e836104,keep,,False
+L2_N3d4844b8,L1_N6e836104,llm_assign,0.72,,"{""L1_N6e836104"": 1}",L1_N6e836104,keep,,False
+L2_N7d5270bf,L1_N6e836104,llm_assign,0.72,,"{""L1_N6e836104"": 1}",L1_N6e836104,keep,,False
+L2_N3c9cbbd0,L1_N6e836104,llm_assign,0.72,,"{""L1_N6e836104"": 1}",L1_N6e836104,keep,,False
+L2_N18198f00,L1_N6e836104,llm_assign,0.72,,"{""L1_N6e836104"": 1}",L1_N6e836104,keep,,False
+L2_Nadf8c478,L1_N6e836104,llm_assign,0.72,,"{""L1_N6e836104"": 1}",L1_N6e836104,keep,,False
+L2_N466127b4,L1_N07a80a4d,llm_assign_new,0.65,现有 L1 中‘市场主体与网络’虽包含‘市场主体’关键词，但其聚焦物流与货运能力建设，与‘多元经营主体’的广泛培育目标（如农业、服务业、小微企业等）不匹配；其余 L1 更无相关性。该 L2 表达的是对多样化市场主体的系统性扶持，需独立归类。,"{""L1_N70e79b29"": 1}",L1_N07a80a4d,review,现有 L1 中‘市场主体与网络’虽包含‘市场主体’关键词，但其聚焦物流与货运能力建设，与‘多元经营主体’的广泛培育目标（如农业、服务业、小微企业等）不匹配；其余 L1 更无相关性。该 L2 表达的是对多样化市场主体的系统性扶持，需独立归类。,True
+L2_N10f72f08,L1_N39371e6b,llm_assign_new,0.65,现有 L1 均未准确覆盖‘拓展增量市场业务’这一战略导向型商业行为，语义匹配度低且支持样本仅来自关键词表面重合,"{""L1_N70e79b29"": 2}",L1_N39371e6b,review,现有 L1 均未准确覆盖‘拓展增量市场业务’这一战略导向型商业行为，语义匹配度低且支持样本仅来自关键词表面重合,True
+L2_N08a346fe,L1_N6e836104,llm_assign,0.72,,"{""L1_N70e79b29"": 1}",L1_N6e836104,keep,,False
+L2_N709fdde1,L1_N07a80a4d,llm_assign,0.82,,"{""L1_N70e79b29"": 4}",L1_N07a80a4d,keep,,False
+L2_N9a2b3002,L1_N70e79b29,llm_assign,0.65,,"{""L1_N70e79b29"": 1}",L1_N70e79b29,keep,,False
+L2_N8c3b0cad,L1_N70e79b29,llm_assign,0.65,,"{""L1_N70e79b29"": 1}",L1_N70e79b29,keep,,False
+L2_Nd77a7607,L1_N6e836104,llm_assign,0.72,,"{""L1_N70e79b29"": 1}",L1_N6e836104,keep,,False
+L2_N9ef25cc0,L1_N6e836104,llm_assign,0.72,,"{""L1_N70e79b29"": 1}",L1_N6e836104,keep,,False
+L2_N69b20189,L1_N70e79b29,llm_assign,0.68,,"{""L1_N70e79b29"": 1}",L1_N70e79b29,keep,,False
+L2_Ne4cef915,L1_N6e836104,llm_assign,0.72,,"{""L1_N70e79b29"": 1}",L1_N6e836104,keep,,False
+L2_N8e687f9d,L1_N70e79b29,llm_assign,0.65,,"{""L1_N70e79b29"": 1}",L1_N70e79b29,keep,,False
+L2_Nf64b0b03,L1_N70e79b29,llm_assign,0.65,,"{""L1_N70e79b29"": 1}",L1_N70e79b29,keep,,False
+L2_Nd0b47c6e,L1_N6e836104,llm_assign,0.72,,"{""L1_N70e79b29"": 1}",L1_N6e836104,keep,,False
+L2_N172cd711,L1_N70e79b29,llm_assign,0.65,,"{""L1_N70e79b29"": 1}",L1_N70e79b29,keep,,False
+L2_N2f32c229,L1_N70e79b29,llm_assign,0.65,,"{""L1_N70e79b29"": 1}",L1_N70e79b29,keep,,False
+L2_Nc3c2ff15,L1_N70e79b29,llm_assign,0.85,,"{""L1_N70e79b29"": 2}",L1_N70e79b29,keep,,False
+L2_Nd39445b0,L1_N21391b6c,llm_assign,0.72,,"{""L1_N70e79b29"": 1}",L1_N21391b6c,keep,,False
+L2_N926fa20a,L1_N70e79b29,llm_assign,0.65,,"{""L1_N70e79b29"": 1}",L1_N70e79b29,keep,,False
+L2_N3782a8fc,L1_N07a80a4d,llm_assign,0.72,,"{""L1_N70e79b29"": 1}",L1_N07a80a4d,keep,,False
+L2_Naaad89dc,L1_N70e79b29,llm_assign,0.65,,"{""L1_N70e79b29"": 1}",L1_N70e79b29,keep,,False
+L2_Nbfebbffa,L1_N6e836104,llm_assign,0.72,,"{""L1_N70e79b29"": 1}",L1_N6e836104,keep,,False
+L2_N13abaa5a,L1_N70e79b29,llm_assign,0.65,,"{""L1_N70e79b29"": 1}",L1_N70e79b29,keep,,False
+L2_N68c2aa93,L1_N70e79b29,llm_assign,0.65,,"{""L1_N70e79b29"": 1}",L1_N70e79b29,keep,,False
+L2_N8ed52793,L1_N762e6689,llm_assign,0.65,,"{""L1_N762e6689"": 1}",L1_N762e6689,keep,,False
+L2_N6db20b9a,L1_N55ba89a6,llm_assign_new,0.35,样本内容过于泛化且重复，无法明确归属现有L1；'提升服务管理水平'属于通用管理表述，未体现具体领域特征，现有L1均聚焦特定业务维度（如智慧货运、口岸效能等），语义覆盖不足,"{""L1_N762e6689"": 2}",L1_N55ba89a6,review,样本内容过于泛化且重复，无法明确归属现有L1；'提升服务管理水平'属于通用管理表述，未体现具体领域特征，现有L1均聚焦特定业务维度（如智慧货运、口岸效能等），语义覆盖不足,True
+L2_Nd5d2d592,L1_N762e6689,llm_assign,0.85,,"{""L1_N762e6689"": 1}",L1_N762e6689,keep,,False
+L2_N242a428d,L1_N762e6689,llm_assign,0.92,,"{""L1_N762e6689"": 1}",L1_N762e6689,keep,,False
+L2_N6da1b013,L1_N762e6689,llm_assign,0.65,,"{""L1_N762e6689"": 1}",L1_N762e6689,keep,,False
+L2_N70eeee1d,L1_N55ba89a6,llm_assign,0.65,,"{""L1_N6bbea948"": 1}",L1_N55ba89a6,keep,,False
+L2_Na35a474b,L1_N906f0fb9,llm_assign_new,0.72,引入战略投资属于资本运作或企业引资行为，现有 L1 均聚焦政策、设施、治理或资源保障，未覆盖投融资或股权引入主题,"{""L1_N6bbea948"": 1}",L1_N906f0fb9,review,引入战略投资属于资本运作或企业引资行为，现有 L1 均聚焦政策、设施、治理或资源保障，未覆盖投融资或股权引入主题,True
+L2_Nb0e7dd4f,L1_N5d2e3c44,llm_assign_new,0.72,现有 L1 主要聚焦交通物流、口岸或治理类基础设施，未覆盖‘数字基础设施’这一新型基础设施主题,"{""L1_N70e79b29"": 1}",L1_N5d2e3c44,review,现有 L1 主要聚焦交通物流、口岸或治理类基础设施，未覆盖‘数字基础设施’这一新型基础设施主题,True
+L2_N578f3b8a,L1_N00e94186,llm_assign_new,0.72,现有 L1 中无明确覆盖跨境物流或国际货运服务的类别；'基础能力支撑'和'服务管理优化'语义较泛，无法精准涵盖跨境物流特性,"{""L1_N762e6689"": 1}",L1_N00e94186,review,现有 L1 中无明确覆盖跨境物流或国际货运服务的类别；'基础能力支撑'和'服务管理优化'语义较泛，无法精准涵盖跨境物流特性,True

@@ -1,0 +1,199 @@
+{
+  "node_id": "ROOT",
+  "level": "ROOT",
+  "label": "ROOT",
+  "children": [
+    {
+      "node_id": "L1_N762e6689",
+      "label": "战略规划与治理",
+      "level": "L1",
+      "children": [
+        {
+          "node_id": "L2_N8ed52793",
+          "label": "强化政策引导支持",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_Nef0fcc52",
+              "label": "出台新一轮专项扶持政策",
+              "level": "L3",
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "node_id": "L1_N6e836104",
+      "label": "基础设施与枢纽",
+      "level": "L1",
+      "children": [
+        {
+          "node_id": "L2_N649ec6c7",
+          "label": "扎实做好货物运输保障",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_N133b0ed2",
+              "label": "推进集疏运体系建设",
+              "level": "L3",
+              "children": []
+            }
+          ]
+        },
+        {
+          "node_id": "L2_N08a346fe",
+          "label": "加快构建国际航线网络",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_N4c90cbd7",
+              "label": "完善国际航空货运航线",
+              "level": "L3",
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "node_id": "L1_N70e79b29",
+      "label": "市场主体与网络",
+      "level": "L1",
+      "children": [
+        {
+          "node_id": "L2_N69b20189",
+          "label": "鼓励新设立基地货运航空公司",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_N571de1aa",
+              "label": "大力招引货运航空公司",
+              "level": "L3",
+              "children": []
+            }
+          ]
+        },
+        {
+          "node_id": "L2_N13abaa5a",
+          "label": "增强货运保障能力",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_Nb67e0092",
+              "label": "提升国际货运中转功能",
+              "level": "L3",
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "node_id": "L1_N52f6895e",
+      "label": "区域协同与产业联动",
+      "level": "L1",
+      "children": [
+        {
+          "node_id": "L2_Nc81ee0b8",
+          "label": "大力拓展货源腹地",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_Nc5166684",
+              "label": "加快提升揽货集货能力",
+              "level": "L3",
+              "children": []
+            }
+          ]
+        },
+        {
+          "node_id": "L2_N4f9516d8",
+          "label": "大力发展航空经济",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_Nf50b9a9d",
+              "label": "推进临空经济发展",
+              "level": "L3",
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "node_id": "L1_N604d4c42",
+      "label": "资源与要素保障",
+      "level": "L1",
+      "children": [
+        {
+          "node_id": "L2_Nbd50000d",
+          "label": "持续提升服务保障能力",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_N84a28744",
+              "label": "打造高效便利的营商环境",
+              "level": "L3",
+              "children": []
+            }
+          ]
+        },
+        {
+          "node_id": "L2_Nff3b5230",
+          "label": "聚集航空物流资源要素",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_Na5cf0ba6",
+              "label": "完善航空物流配套设施",
+              "level": "L3",
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "node_id": "L1_Nc7535a4f",
+      "label": "基础能力支撑",
+      "level": "L1",
+      "children": [
+        {
+          "node_id": "L2_N306e9a75",
+          "label": "强化基础能力保障",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_N07990008",
+              "label": "加快机场基础设施建设",
+              "level": "L3",
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "node_id": "L1_N07a80a4d",
+      "label": "多元经营主体培育",
+      "level": "L1",
+      "children": [
+        {
+          "node_id": "L2_N709fdde1",
+          "label": "培育市场主体",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_N33c0e278",
+              "label": "引进培育总部型货代企业",
+              "level": "L3",
+              "children": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

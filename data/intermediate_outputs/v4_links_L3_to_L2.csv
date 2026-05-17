@@ -1,0 +1,131 @@
+child_id,parent_id,decision,confidence,reason,human_parent_id,human_action,human_notes,is_new_parent
+L3_Nc5166684,L2_Nc81ee0b8,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_Nc81ee0b8,review,,False
+L3_Nf50b9a9d,L2_N4f9516d8,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N4f9516d8,review,,False
+L3_Nb1103d45,L2_N6d9c5da7,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N6d9c5da7,review,,False
+L3_N792037db,L2_N6d9c5da7,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N6d9c5da7,review,,False
+L3_N42402ab1,L2_N6d9c5da7,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N6d9c5da7,review,,False
+L3_Nea04744e,L2_N4f9516d8,llm_assign,0.76,子节点聚焦国际机场与区域联动，属于航空经济范畴；候选2‘大力发展航空经济’语义覆盖该主题，尽管Jaccard相似度低，但余弦相似度高且主题一致,L2_N4f9516d8,keep,,False
+L3_N724f0a0b,L2_Na5b73aaf,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_Na5b73aaf,review,,False
+L3_N2c29b561,L2_N4f9516d8,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N4f9516d8,review,,False
+L3_N97559905,L2_Nd825449f,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_Nd825449f,review,,False
+L3_Nc3d125b3,L2_Na5b73aaf,llm_assign,0.85,候选1‘推动区港联动发展’在语义和主题上与‘加强港区高效联动’高度契合，cos相似度达0.84，尽管Jaccard较低，但整体综合得分最高且对象一致,L2_Na5b73aaf,keep,,False
+L3_Nd93e3e25,L2_N4f9516d8,llm_assign,0.85,“发展临空经济”是“大力发展航空经济”的典型组成部分，语义高度相关且对象一致；综合相似度和余弦相似度均较高，Jaccard较低但可接受（因用词不重叠但概念一致）,L2_N4f9516d8,keep,,False
+L3_N832c0c49,L2_N6d9c5da7,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N6d9c5da7,review,,False
+L3_N07990008,L2_N306e9a75,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N306e9a75,review,,False
+L3_N133b0ed2,L2_N649ec6c7,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N649ec6c7,review,,False
+L3_Na5cf0ba6,L2_Nff3b5230,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_Nff3b5230,review,,False
+L3_N84a28744,L2_Nbd50000d,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_Nbd50000d,review,,False
+L3_N3ab0a1a9,L2_N306e9a75,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N306e9a75,review,,False
+L3_N77a3b68b,L2_N649ec6c7,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N649ec6c7,review,,False
+L3_Nb148a883,L2_Nbd50000d,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_Nbd50000d,review,,False
+L3_N48dcd88a,L2_Nff3b5230,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_Nff3b5230,review,,False
+L3_N9815851a,L2_Nff3b5230,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_Nff3b5230,review,,False
+L3_N8458a8a8,L2_N9f46f3fd,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N9f46f3fd,review,,False
+L3_N98ef0212,L2_N649ec6c7,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N649ec6c7,review,,False
+L3_Nc21e1f2f,L2_N24b2144b,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N24b2144b,review,,False
+L3_N71ce64b1,L2_N24b2144b,llm_assign,0.75,子节点'积极争取政策倾斜'与候选父节点1'加大政策扶持力度'在语义上高度相关，均聚焦于获取或强化政策支持；尽管Jaccard相似度低（因成员示例单一），但余弦相似度高（0.84）表明语义向量接近，且动作目标一致。,L2_N24b2144b,keep,,False
+L3_Ne6cde812,L2_N24b2144b,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N24b2144b,review,,False
+L3_N1b187997,L2_Ne1879105,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_Ne1879105,review,,False
+L3_Nbf5cb6ef,L2_Nc8ab6162,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_Nc8ab6162,review,,False
+L3_N5b8fd671,L2_Na75f0b05,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_Na75f0b05,review,,False
+L3_N09522c48,L2_Ne1879105,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_Ne1879105,review,,False
+L3_Nfc162f8c,L2_Nfdcfd3c4,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_Nfdcfd3c4,review,,False
+L3_N70eeee1d,L2_N70eeee1d,llm_create_parent,0.68,候选父节点均聚焦‘智慧’或‘绿色’等特定维度，而子节点‘提升运营管理能力’为通用管理能力提升，语义范围更广且不特指智慧或绿色，缺乏精准匹配的上位节点,L2_N70eeee1d,keep,,True
+L3_Ne42076c0,L2_Nfdcfd3c4,llm_assign,0.85,候选1与子节点名称完全一致，语义和对象高度匹配,L2_Nfdcfd3c4,keep,,False
+L3_Na35a474b,L2_Na35a474b,llm_create_parent,0.85,候选父节点均聚焦运营管理或智慧化建设，与‘引入战略投资’这一资本运作行为语义不匹配；且Jaccard相似度为0，表明成员无重叠，应新建独立父节点,L2_Na35a474b,keep,,True
+L3_N8283673b,L2_N0109e16a,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N0109e16a,review,,False
+L3_Nce212504,L2_N227589e0,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N227589e0,review,,False
+L3_N53ff6178,L2_N0109e16a,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N0109e16a,review,,False
+L3_N4b540045,L2_N0109e16a,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N0109e16a,review,,False
+L3_N1da589d2,L2_N0109e16a,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N0109e16a,review,,False
+L3_Ne455f9ae,L2_N0109e16a,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N0109e16a,review,,False
+L3_N7e9ff5f6,L2_Nbde783bd,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_Nbde783bd,review,,False
+L3_N08db7b5b,L2_N0a6e8ca5,llm_assign,0.89,候选1语义高度一致，均为泛指基础设施建设的推进类表述，且综合相似度最高,L2_N0a6e8ca5,keep,,False
+L3_Nd571b089,L2_N8228268e,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N8228268e,review,,False
+L3_Nea54495c,L2_Nadf8c478,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_Nadf8c478,review,,False
+L3_N965cfc12,L2_N3d4844b8,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N3d4844b8,review,,False
+L3_Nba68b284,L2_N18198f00,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N18198f00,review,,False
+L3_Nbccd8d12,L2_Nadf8c478,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_Nadf8c478,review,,False
+L3_N8b934feb,L2_Nb80d9c6e,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_Nb80d9c6e,review,,False
+L3_N7c0dd099,L2_Nb80d9c6e,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_Nb80d9c6e,review,,False
+L3_Nd003c070,L2_N7d5270bf,llm_assign,0.89,候选1与子节点在语义和目标对象上高度一致，均聚焦于建设中国国际航空物流中心，且cos相似度达0.92，综合得分最高,L2_N7d5270bf,keep,,False
+L3_N252b74e4,L2_N7d5270bf,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N7d5270bf,review,,False
+L3_N51765af4,L2_N7d5270bf,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N7d5270bf,review,,False
+L3_N5c977f92,L2_Nb80d9c6e,llm_assign,0.75,‘引育货运基地航空公司’属于提升航空货运枢纽集疏运能力的关键举措，语义和目标对象高度契合；其余候选偏重基础设施或多式联运，匹配度较低。,L2_Nb80d9c6e,keep,,False
+L3_N9ae5e272,L2_N60c3ab56,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N60c3ab56,review,,False
+L3_Nbf6e7bf3,L2_Nadf8c478,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_Nadf8c478,review,,False
+L3_N701e7011,L2_N3c9cbbd0,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N3c9cbbd0,review,,False
+L3_N14530829,L2_Nb80d9c6e,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_Nb80d9c6e,review,,False
+L3_N60c3ab56,L2_N60c3ab56,hard_assign,1.0,Hard Assign (Score 0.97 >= 0.92),L2_N60c3ab56,keep,,False
+L3_N06f95f57,L2_Nb80d9c6e,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_Nb80d9c6e,review,,False
+L3_Ne96a4ba3,L2_Nb80d9c6e,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_Nb80d9c6e,review,,False
+L3_Nfdd2124b,L2_N08a346fe,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N08a346fe,review,,False
+L3_N7d2d45d8,L2_Nd39445b0,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_Nd39445b0,review,,False
+L3_N1c9477d5,L2_Nd39445b0,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_Nd39445b0,review,,False
+L3_N0e93e380,L2_Nd39445b0,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_Nd39445b0,review,,False
+L3_N945a64d3,L2_N926fa20a,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N926fa20a,review,,False
+L3_N4c90cbd7,L2_N08a346fe,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N08a346fe,review,,False
+L3_Nb67e0092,L2_N13abaa5a,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N13abaa5a,review,,False
+L3_N571de1aa,L2_N69b20189,llm_assign,0.85,候选1语义最贴近，均聚焦于吸引/设立货运航空公司，尽管子节点表述更宽泛，但核心意图一致,L2_N69b20189,keep,,False
+L3_N33c0e278,L2_N709fdde1,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N709fdde1,review,,False
+L3_N303eccc1,L2_Nbfebbffa,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_Nbfebbffa,review,,False
+L3_Ne5a02d74,L2_Nc3c2ff15,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_Nc3c2ff15,review,,False
+L3_N74ff71bd,L2_N8e687f9d,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N8e687f9d,review,,False
+L3_Nc56580b0,L2_N68c2aa93,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N68c2aa93,review,,False
+L3_Nb2d030f0,L2_N709fdde1,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N709fdde1,review,,False
+L3_N251661ab,L2_N68c2aa93,hard_assign,1.0,Hard Assign (Score 0.94 >= 0.92),L2_N68c2aa93,keep,,False
+L3_N27ba78e2,L2_N9ef25cc0,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N9ef25cc0,review,,False
+L3_Ned79e54c,L2_N13abaa5a,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N13abaa5a,review,,False
+L3_Nb394347b,L2_Nf64b0b03,llm_assign,0.75,‘优化简化安检流程’旨在提升效率，与‘提高物流服务保障效率’在目标和语义上最为契合；其余候选侧重航空能力或航线网络，关联较弱,L2_Nf64b0b03,keep,,False
+L3_N22d9d7b1,L2_Nf64b0b03,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_Nf64b0b03,review,,False
+L3_N62ed0091,L2_Nf64b0b03,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_Nf64b0b03,review,,False
+L3_Nccfe417c,L2_Nd0b47c6e,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_Nd0b47c6e,review,,False
+L3_N9ecfe06c,L2_Nd0b47c6e,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_Nd0b47c6e,review,,False
+L3_N86ef6403,L2_N08a346fe,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N08a346fe,review,,False
+L3_N22dcecc8,L2_N709fdde1,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N709fdde1,review,,False
+L3_Nc3e4e468,L2_N9ef25cc0,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N9ef25cc0,review,,False
+L3_N9a9d4b5c,L2_N709fdde1,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N709fdde1,review,,False
+L3_N2d02331f,L2_Nd77a7607,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_Nd77a7607,review,,False
+L3_N3ba23cb1,L2_N10f72f08,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N10f72f08,review,,False
+L3_Nc594b785,L2_N926fa20a,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N926fa20a,review,,False
+L3_Na7c6a537,L2_Nc3c2ff15,llm_assign,0.85,候选1‘完善多式联运体系’在语义和主题上与子节点‘推动多式联运发展’高度一致，且cos相似度达0.87，虽Jaccard较低但综合得分最高，符合上位概括关系,L2_Nc3c2ff15,keep,,False
+L3_Na1b5b8e4,L2_N2f32c229,llm_assign,0.78,子节点聚焦国际航空物流中心载体建设，属于提升航空物流服务能力的具体举措；候选1语义最贴近，cos相似度高（0.85），尽管Jaccard较低，但整体主题一致,L2_N2f32c229,keep,,False
+L3_Nd3c80123,L2_Ne4cef915,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_Ne4cef915,review,,False
+L3_N82cdf37d,L2_Nd39445b0,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_Nd39445b0,review,,False
+L3_Nc92a3618,L2_Nc3c2ff15,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_Nc3c2ff15,review,,False
+L3_N595f8c05,L2_Nd39445b0,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_Nd39445b0,review,,False
+L3_N18ada171,L2_Nd39445b0,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_Nd39445b0,review,,False
+L3_Nd551ce89,L2_Nd39445b0,llm_assign,0.85,“发展航空中转集拼业务”属于航空物流新兴业态的具体举措，与候选父节点1“大力开拓航空物流新兴业态”在语义和业务范畴上高度契合；其余候选侧重服务能力或市场主体行为，匹配度较低。,L2_Nd39445b0,keep,,False
+L3_N29e43ee4,L2_N69b20189,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N69b20189,review,,False
+L3_N640a2992,L2_Nd39445b0,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_Nd39445b0,review,,False
+L3_Nf3b017a0,L2_N08a346fe,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N08a346fe,review,,False
+L3_N198ad664,L2_Nbfebbffa,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_Nbfebbffa,review,,False
+L3_Nc97533ee,L2_Ne4cef915,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_Ne4cef915,review,,False
+L3_Nb328f7fc,L2_N13abaa5a,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N13abaa5a,review,,False
+L3_Nb0e7dd4f,L2_Nb0e7dd4f,llm_create_parent,0.85,所有候选父节点均聚焦航空货运或运力，与‘数字基建’主题无关；需新建匹配的上位节点,L2_Nb0e7dd4f,keep,,True
+L3_N0f65b0c3,L2_Nb0e7dd4f,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_Nb0e7dd4f,review,,False
+L3_N65606e29,L2_N926fa20a,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N926fa20a,review,,False
+L3_Nd290d812,L2_Nc3c2ff15,llm_assign,0.85,候选1‘完善多式联运体系’在语义和主题上高度契合子节点‘探索开展多式联运’，尽管Jaccard相似度较低，但余弦相似度高且内容直接相关,L2_Nc3c2ff15,keep,,False
+L3_Nca0d54be,L2_N709fdde1,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N709fdde1,review,,False
+L3_N071b8d1d,L2_N68c2aa93,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N68c2aa93,review,,False
+L3_Nf8bb4ea7,L2_Nb0e7dd4f,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_Nb0e7dd4f,review,,False
+L3_Ncc6e46eb,L2_N709fdde1,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N709fdde1,review,,False
+L3_Naeed249a,L2_Nb0e7dd4f,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_Nb0e7dd4f,review,,False
+L3_N4da94e7a,L2_N68c2aa93,llm_assign,0.75,“提升货源组织能力”在语义和目标对象上最贴近“大力拓展货源”，均聚焦于货源获取与组织，而其他候选偏重市场或航线维度,L2_N68c2aa93,keep,,False
+L3_Nef0fcc52,L2_N8ed52793,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N8ed52793,review,,False
+L3_Nb3d3c087,L2_N6db20b9a,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N6db20b9a,review,,False
+L3_N578f3b8a,L2_N578f3b8a,llm_create_parent,0.82,子节点聚焦跨境电子商务国际货运服务，现有候选父节点均偏重政策或泛化管理，缺乏对物流/货运能力的直接覆盖；新建标签更精准反映其核心对象与动作,L2_N578f3b8a,keep,,True
+L3_N9c47a867,L2_N578f3b8a,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N578f3b8a,review,,False
+L3_N5383b7aa,L2_N6db20b9a,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N6db20b9a,review,,False
+L3_N55fb6992,L2_N6da1b013,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N6da1b013,review,,False
+L3_N3810ecfd,L2_N578f3b8a,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N578f3b8a,review,,False
+L3_Na04441bf,L2_N8ed52793,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N8ed52793,review,,False
+L3_Nf8276134,L2_N8ed52793,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N8ed52793,review,,False
+L3_Na6c4ae61,L2_N8ed52793,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N8ed52793,review,,False
+L3_N4888066d,L2_N578f3b8a,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N578f3b8a,review,,False
+L3_Nb28e82d6,L2_N8ed52793,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N8ed52793,review,,False
+L3_Ne78d3c45,L2_N578f3b8a,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N578f3b8a,review,,False
+L3_N55664f5d,L2_N578f3b8a,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N578f3b8a,review,,False
+L3_N0362ceea,L2_N578f3b8a,llm_assign,0.68,‘加快完善口岸功能’属于提升跨境物流服务能力的关键举措，语义和目标一致；尽管Jaccard相似度低，但余弦相似度高，表明文本表征接近,L2_N578f3b8a,keep,,False
+L3_Ne7b47d1e,L2_N578f3b8a,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N578f3b8a,review,,False
+L3_N888d7345,L2_N578f3b8a,fallback_top1,0.0,"LLM未明确或匹配失败(raw_assign=None), 采用Top1",L2_N578f3b8a,review,,False

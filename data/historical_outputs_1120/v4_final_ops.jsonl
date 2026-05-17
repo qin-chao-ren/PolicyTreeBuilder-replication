@@ -1,0 +1,11 @@
+{"type": "merge", "node_id": "L3_Nf6b4d1be", "reason": "垂直冗余：L3(机场建设)与L2(机场建设与升级)语义高度重叠且未提供新分类维度，合并以消除冗余层级。", "confidence": 0.95, "status": "skipped", "message": "节点不存在", "l1_id": "L1_N32b4d1be"}
+{"type": "merge", "node_id": "L3_Nb6b4d1be", "reason": "中间商消融：L3(延伸物流链条)仅为L2(延伸产业业态)的弱化复述，未形成有效分类层级。", "confidence": 0.9, "status": "skipped", "message": "节点不存在", "l1_id": "L1_N32b4d1be"}
+{"type": "merge", "node_id": "L3_2eef0b7d", "reason": "垂直坍缩：L3(企业培育)与L2(市场主体培育)语义重复且无分类增量，其下L4可直接归属L2", "confidence": 0.95, "status": "skipped", "message": "节点不存在", "l1_id": "L1_N47d528f3"}
+{"type": "merge", "node_id": "L3_5b5a1c8c", "reason": "中间商消融：L3(服务网络构建)与父节点L2(服务网络构建)完全同义，属冗余层级", "confidence": 0.98, "status": "skipped", "message": "节点不存在", "l1_id": "L1_N47d528f3"}
+{"type": "merge", "node_id": "L3_6c6d3b9f", "reason": "单脉传代优化：L3(特定领域培育)与L2(细分领域拓展)语义重叠且仅挂载单L4，合并后保持语义完整性", "confidence": 0.9, "status": "skipped", "message": "节点不存在", "l1_id": "L1_N47d528f3"}
+{"type": "move", "node_id": "L4_8a7b9c3d", "reason": "层级适配：跨境产业园建设属于具体园区建设事项，应归属业务组层级管理", "confidence": 0.85, "status": "skipped", "message": "节点或目标父节点不存在", "l1_id": "L1_N47d528f3"}
+{"type": "merge", "node_id": "L3_0", "reason": "垂直冗余：L3_0(流程简化)与父节点L2_0(通关流程优化)语义高度重叠，未提供新分类维度，予以合并以扁平化结构。", "confidence": 0.95, "status": "skipped", "message": "节点不存在", "l1_id": "L1_N9adcfb9c"}
+{"type": "merge", "node_id": "L3_7", "reason": "兄弟冗余：L3_7(信息系统建设)与L3_8(信息化建设)均指向同一技术领域，合并为统一信息化建设节点以消除重复。", "confidence": 0.9, "status": "skipped", "message": "节点不存在", "l1_id": "L1_N9adcfb9c"}
+{"type": "merge", "node_id": "L3_9", "reason": "语义同质：L3_9(查验设施)与L3_a(查验设备)均属查验环节硬件升级范畴，合并为单一节点保留核心语义。", "confidence": 0.85, "status": "skipped", "message": "节点不存在", "l1_id": "L1_N9adcfb9c"}
+{"type": "merge", "node_id": "L3_4", "reason": "垂直冗余：L3(应急响应体系)与父节点L2(韧性发展)语义重叠，未提供新分类维度，且其下L4节点可直接归属韧性发展范畴", "confidence": 0.95, "status": "skipped", "message": "节点不存在", "l1_id": "L1_N12cea225"}
+{"type": "merge", "node_id": "L4_3", "reason": "兄弟归并：'提升物流网络抗风险能力'与'完善应急预案体系'同属应急准备范畴，保留更精准的L4表述", "confidence": 0.85, "status": "skipped", "message": "节点不存在", "l1_id": "L1_N12cea225"}

@@ -1,0 +1,13 @@
+{
+  "n_samples": 287,
+  "embed_dim": 1024,
+  "nn_topk": 286,
+  "local_k": 20,
+  "min_sim": 0.0,
+  "use_reranker": "yes",
+  "rerank_topm": 10,
+  "deg_mean": 2.5993031358885017,
+  "deg_median": 2.0,
+  "deg_p05": 0.0,
+  "deg_p95": 8.0
+}

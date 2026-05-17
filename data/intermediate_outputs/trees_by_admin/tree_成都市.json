@@ -1,0 +1,94 @@
+{
+  "node_id": "ROOT",
+  "level": "ROOT",
+  "label": "ROOT",
+  "children": [
+    {
+      "node_id": "L1_N6e836104",
+      "label": "基础设施与枢纽",
+      "level": "L1",
+      "children": [
+        {
+          "node_id": "L2_N4db8aea7",
+          "label": "促进中转货量增长",
+          "level": "L2",
+          "children": []
+        },
+        {
+          "node_id": "L2_Nfeea0571",
+          "label": "鼓励新设立国际航空货运转运分拨中心",
+          "level": "L2",
+          "children": []
+        },
+        {
+          "node_id": "L2_Nb80d9c6e",
+          "label": "提升航空货运枢纽集疏运能力",
+          "level": "L2",
+          "children": []
+        },
+        {
+          "node_id": "L2_Nd77a7607",
+          "label": "鼓励航空货运市场主体向机场集货",
+          "level": "L2",
+          "children": []
+        },
+        {
+          "node_id": "L2_N9ef25cc0",
+          "label": "促进航空货量增长",
+          "level": "L2",
+          "children": []
+        },
+        {
+          "node_id": "L2_Ne4cef915",
+          "label": "增加全货机运力",
+          "level": "L2",
+          "children": []
+        }
+      ]
+    },
+    {
+      "node_id": "L1_N70e79b29",
+      "label": "市场主体与网络",
+      "level": "L1",
+      "children": [
+        {
+          "node_id": "L2_N9a2b3002",
+          "label": "鼓励航空货运市场主体开行全货机定期航线",
+          "level": "L2",
+          "children": []
+        },
+        {
+          "node_id": "L2_N8c3b0cad",
+          "label": "构建覆盖全球的货运航线网络",
+          "level": "L2",
+          "children": []
+        },
+        {
+          "node_id": "L2_N69b20189",
+          "label": "鼓励新设立基地货运航空公司",
+          "level": "L2",
+          "children": []
+        }
+      ]
+    },
+    {
+      "node_id": "L1_N6be998d8",
+      "label": "通关与口岸效能",
+      "level": "L1",
+      "children": [
+        {
+          "node_id": "L2_N9e86e873",
+          "label": "提升空港口岸作业效率",
+          "level": "L2",
+          "children": []
+        },
+        {
+          "node_id": "L2_N33b2d022",
+          "label": "减免口岸及货站操作处置费用",
+          "level": "L2",
+          "children": []
+        }
+      ]
+    }
+  ]
+}
