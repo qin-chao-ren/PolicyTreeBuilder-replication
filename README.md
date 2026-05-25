@@ -28,7 +28,6 @@ The older 317-node package is not part of the ATRS 2026 replication version. It 
 - `data/intermediate_outputs/`: intermediate Round C v4 outputs and provenance logs.
 - `data/final_tree/`: final 353-node tree and final tabular outputs.
 - `figures/`: figures generated from the 353-node Round C v4 outputs.
-- `v10_simulation/`: supplementary simulation materials retained from the previous package; not part of the main 353-node tree-building pipeline.
 - `SCRIPT_PROVENANCE.tsv`: source and public hashes for the Round C v4 scripts after repository path normalization.
 
 ## Setup

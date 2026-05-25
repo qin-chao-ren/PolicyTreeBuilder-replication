@@ -21,7 +21,6 @@ This repository is organized for review of the ATRS 2026 353-node PolicyTreeBuil
 - The 353-node tree is the final paper version.
 - The 317-node tree is superseded and is not part of this public package.
 - `policy_tree_eval` is local-only and not part of the public replication package.
-- `v10_simulation/` is supplementary and not required for rebuilding the 353-node tree.
 
 ## Generated Manifest
 

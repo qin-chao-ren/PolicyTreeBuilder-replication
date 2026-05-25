@@ -4,7 +4,7 @@
 圆形辐射树状图可视化
 生成静态图像版本
 
-python scripts/radial_tree_visualization.py -i data/intermediate_outputs/v5_tree_new_structure.json -o data/intermediate_outputs
+python scripts/radial_tree_visualization.py -i data/final_tree/v4_tree_final.json -o figures
 """
 
 
