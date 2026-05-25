@@ -15,7 +15,7 @@ from common_llm import LLMConfig
 class Step4Env:
     """环境与配置加载器"""
     def __init__(self, config_path: str, env_path: str):
-        self.root_dir = Path(config_path).resolve().parents[2]  # 假设在 roundC_v4/
+        self.root_dir = Path(config_path).resolve().parents[2]  # 假设在 replication package/
         self._enforce_env(Path(env_path))
         self.config = yaml.safe_load(Path(config_path).read_text(encoding="utf-8"))
         self.outdir = Path(self.config.get("outdir", "data/intermediate_outputs"))
@@ -97,7 +97,7 @@ def append_jsonl(path: Path, data: Dict):
 
 
 def read_membership_map(outdir: Path, level: str) -> Dict[str, List[str]]:
-    p = outdir / f"v4_membership_{level}.csv"
+    p = outdir / f"tree_node_membership_{level}.csv"
     if not p.exists():
         return {}
     df = pd.read_csv(p, dtype=str)

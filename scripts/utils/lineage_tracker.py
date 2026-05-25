@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-LineageTracker（v4）
+LineageTracker（public）
 - 记录节点的谱系/操作历史，写入 JSONL，便于后续审计与溯源。
 - 目前提供基础接口：record / merge / move / rename / flag。
 """

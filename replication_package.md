@@ -6,21 +6,20 @@ This repository is organized for review of the ATRS 2026 353-node PolicyTreeBuil
 
 | Path | Purpose |
 | --- | --- |
-| `data/source/roundB_types_merged1121.csv` | Primary Round B input for the Round C v4 pipeline. |
-| `data/source/admin_mapping/roundA_final_overview_scored_selected1120.csv` | Administrative mapping source used for administrative tree splitting. |
-| `data/intermediate_outputs/` | Intermediate Round C v4 outputs, logs, embeddings, and trace files. |
-| `data/final_tree/v4_tree_final.json` | Final 353-node policy tree used for ATRS 2026. |
-| `data/final_tree/v4_tree_label_map_en_academic_0509.json` | Academic English label map used for paper figure preparation. |
-| `data/final_tree/v4_tree_final_en_academic_0509.json` | Academic English final tree used by the latest visualization script. |
-| `data/final_tree/v4_tree_final_provincial_en_academic_0509.json` | Academic English provincial subset tree. |
-| `data/final_tree/v4_tree_final_city_en_academic_0509.json` | Academic English city-level subset tree. |
-| `data/final_tree/v4_tree_final_en_radial.jpg` | Final English radial tree figure image prepared for the paper. |
-| `scripts/` | Round C v4 source scripts from the 353-node source version. |
-| `scripts/split_final_tree_by_admin_revised_0509.py` | Latest administrative split script for provincial, city-level, and per-admin trees. |
-| `scripts/visualize_radial_tree_v6_style_0510.py` | Latest radial visualization script used after the final tree or split-tree JSONs are prepared. |
-| `prompts/` | LLM prompt templates used by Round C v4. |
+| `data/source/policy_action_segments.csv` | Primary source input for the public pipeline. |
+| `data/source/administrative_unit_metadata.csv` | Administrative metadata used for administrative tree splitting. |
+| `data/intermediate_outputs/` | Included intermediate outputs, logs, embeddings, and trace files. |
+| `data/final_tree/policy_tree_final.json` | Final 353-node policy tree used for ATRS 2026. |
+| `data/final_tree/policy_tree_label_map_en_academic.json` | Academic English label map used for paper figure preparation. |
+| `data/final_tree/policy_tree_final_en_academic.json` | Academic English final tree used by the radial figure script. |
+| `data/final_tree/policy_tree_provincial_en_academic.json` | Academic English provincial subset tree. |
+| `data/final_tree/policy_tree_city_en_academic.json` | Academic English city-level subset tree. |
+| `data/final_tree/policy_tree_final_en_radial.jpg` | Final English radial tree figure image prepared for the paper. |
+| `scripts/` | Public pipeline and figure-generation scripts. |
+| `prompts/` | LLM prompt templates used by the pipeline. |
 | `configs/` | YAML configs and safe environment template. |
-| `SCRIPT_PROVENANCE.tsv` | Hash mapping from extracted Round C v4 source scripts to public path-normalized scripts. |
+| `LEGACY_NAME_MAP.tsv` | Legacy-to-public path mapping for traceability. |
+| `SCRIPT_PROVENANCE.tsv` | Hash mapping from extracted source scripts to public path-normalized scripts. |
 
 ## Version Notes
 

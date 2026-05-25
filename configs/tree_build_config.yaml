@@ -1,0 +1,38 @@
+# Tree-building config template.
+
+merge:
+  high_thr: 0.90
+  mid_thr_low: 0.80
+  mutual_required: false
+  edge_aggregate: ["mean_trim10", "p75", "max", "count"]
+
+vertical:
+  topk_candidates: 5
+  weights:
+    cosine: 0.7
+    jaccard: 0.3
+  orphan_policy: "create_new_parent"
+
+global_link:
+  hard_threshold: 0.50
+  auto_accept_conf: 0.85
+
+llm:
+  primary: "qwen3-max"
+  secondary: "deepseek-r1-0528"
+  temperature: 0.2
+  max_tokens: 3000
+  response_format: "json_object"
+  workers: 1
+  tie_breaker: "score_margin_or_conservative"
+
+paths:
+  outdir: "data/intermediate_outputs"
+  corpus: "data/intermediate_outputs/policy_corpus_calibrated.csv"
+  embeddings: "data/intermediate_outputs/policy_corpus_embeddings.parquet"
+  pairs: "data/intermediate_outputs/policy_similarity_rerank_edges.csv"
+  l1_def: "data/intermediate_outputs/top_level_categories.json"
+
+logging:
+  keep_prompts: true
+  redact_vectors: true

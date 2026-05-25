@@ -1,10 +1,10 @@
 # Publication Snapshot
 
-This package is the ATRS 2026 final replication snapshot for PolicyTreeBuilder Round C v4.
+This package is the ATRS 2026 final replication snapshot for PolicyTreeBuilder.
 
 ## Fixed Public Version
 
-- Final tree: `data/final_tree/v4_tree_final.json`
+- Final tree: `data/final_tree/policy_tree_final.json`
 - Nodes: 353
 - Edges: 352
 - Leaf nodes: 272
@@ -14,7 +14,7 @@ This package is the ATRS 2026 final replication snapshot for PolicyTreeBuilder R
 
 ## Source Selection
 
-The public code and data are based on the Round C v4 source archive that produced the 353-node tree. The previous 317-node public package is superseded and retained only in a local archive.
+The public code and data are based on the source archive that produced the 353-node tree. The previous 317-node public package is superseded and retained only in a local archive.
 
 ## Evaluation Package
 

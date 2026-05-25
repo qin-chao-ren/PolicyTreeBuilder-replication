@@ -1,0 +1,57 @@
+# Tree-refinement config template.
+
+outdir: "data/intermediate_outputs"
+
+llm:
+  models: ["qwen3-max", "deepseek-r1-0528"]
+  primary: "qwen3-max"
+  secondary: "deepseek-r1-0528"
+  temperature: 0.2
+  max_tokens: 3000
+  timeout: 120
+  retries: 2
+  backoff: 1.5
+  response_format: "json_object"
+  workers: 1
+  tie_breaker: "score_margin_or_conservative"
+  voting:
+    strategy: "majority"
+    tie_breaker: "prefer_collapse_up"
+
+similarity:
+  weights:
+    cosine: 0.7
+    jaccard: 0.3
+
+jump_fix:
+  min_confidence: 0.65
+  top_k_titles: 10
+
+rehome:
+  enable: true
+  batch: true
+  topk_uncles: 3
+  min_confidence: 0.60
+
+balance:
+  enable: true
+  targets: ["L1", "L2"]
+  max_children_per_node: 25
+  link_thr_soft: 0.65
+  allow_near_groups: true
+  min_group_size: 3
+  min_group_cohesion: 0.70
+  top_k_titles_per_child: 6
+  min_confidence: 0.65
+
+label_refine:
+  enable: true
+  min_confidence: 0.55
+  siblings_top: 8
+  children_titles_top: 10
+
+paths:
+  tree_coarse: "data/intermediate_outputs/policy_tree_initial.json"
+  corpus: "data/intermediate_outputs/policy_corpus_calibrated.csv"
+  pairs: "data/intermediate_outputs/policy_similarity_rerank_edges.csv"
+  embeddings: "data/intermediate_outputs/policy_corpus_embeddings.parquet"

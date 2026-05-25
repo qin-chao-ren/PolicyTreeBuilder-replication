@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-统一的 LLM 调用辅助（v4）
+统一的 LLM 调用辅助（public）
 - 提供 load_env_file：读取 env 并注入 OPENAI_BASE_URL / OPENAI_API_KEY 等。
 - 提供 chat_json：基于 scripts/common_llm.call_json 的轻量封装，返回 (ChatResult, json_obj)。
 """

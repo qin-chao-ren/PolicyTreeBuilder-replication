@@ -3,7 +3,7 @@ from typing import Dict, List, Optional, Any, Set
 
 class TreeManager:
     """
-    v4 动态树拓扑管理器
+    public 动态树拓扑管理器
     功能：
     1. 统一管理节点索引，防止 Stale Index（过期索引）。
     2. 强制清洗 tree_id，只保留 node_id。

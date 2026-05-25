@@ -20,7 +20,7 @@ def _load_env_file_once():
     if _ENV_LOADED:
         return
     # 简易 .env 加载器（不覆盖已存在变量）
-    for candidate in ["configs/roundC.env", "roundC.env", ".env"]:
+    for candidate in ["configs/.env", ".env", ".env"]:
         p = Path(candidate)
         if p.exists():
             try:
