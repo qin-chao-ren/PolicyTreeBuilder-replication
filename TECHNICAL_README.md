@@ -16,8 +16,6 @@ Administrative mapping input:
 data/source/admin_mapping/roundA_final_overview_scored_selected1120.csv
 ```
 
-The historical file `data/source/roundB_types_merged1113_test.csv` is retained for traceability and is not the main reproduction input.
-
 ## Configuration
 
 YAML configs are in `configs/`.
@@ -44,6 +42,8 @@ The Round C v4 pipeline follows this sequence:
 8. Split administrative trees with `scripts/split_final_tree_by_admin_revised_0509.py` and render radial visualizations with `scripts/visualize_radial_tree_v6_style_0510.py` when needed.
 
 Intermediate outputs are stored in `data/intermediate_outputs/`. The fixed final publication tree is stored in `data/final_tree/`.
+
+The paper-figure companion files are also stored in `data/final_tree/`, including the academic English label map, English final/provincial/city tree JSONs, and the final English radial JPG.
 
 ## Minimal Rerun Skeleton
 

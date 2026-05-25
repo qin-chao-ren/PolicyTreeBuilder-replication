@@ -27,6 +27,11 @@ The older 317-node package is not part of the ATRS 2026 replication version. It 
 - `data/source/`: source inputs for the 353-node run.
 - `data/intermediate_outputs/`: intermediate Round C v4 outputs and provenance logs.
 - `data/final_tree/`: final 353-node tree and final tabular outputs.
+- `data/final_tree/v4_tree_label_map_en_academic_0509.json`: node_id-based academic English label map used for paper figure preparation.
+- `data/final_tree/v4_tree_final_en_academic_0509.json`: academic English version of the final 353-node tree.
+- `data/final_tree/v4_tree_final_provincial_en_academic_0509.json`: academic English provincial subset tree.
+- `data/final_tree/v4_tree_final_city_en_academic_0509.json`: academic English city-level subset tree.
+- `data/final_tree/v4_tree_final_en_radial.jpg`: final radial figure image prepared for the paper.
 - `scripts/split_final_tree_by_admin_revised_0509.py`: split the final tree into provincial, city-level, and per-administrative-unit JSON trees.
 - `scripts/visualize_radial_tree_v6_style_0510.py`: render final and administrative tree JSON files as radial visualizations.
 - `SCRIPT_PROVENANCE.tsv`: source and public hashes for the Round C v4 scripts after repository path normalization.
@@ -65,12 +70,6 @@ Main output:
 
 ```text
 data/final_tree/v4_tree_final.json
-```
-
-Historical/test input retained for traceability:
-
-```text
-data/source/roundB_types_merged1113_test.csv
 ```
 
 Administrative mapping source:

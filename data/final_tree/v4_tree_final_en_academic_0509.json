@@ -1,0 +1,2199 @@
+{
+  "node_id": "ROOT",
+  "level": "ROOT",
+  "label": "ROOT",
+  "children": [
+    {
+      "node_id": "L1_N762e6689",
+      "label": "Strategic Planning & Governance",
+      "level": "L1",
+      "children": [
+        {
+          "node_id": "L2_N8ed52793",
+          "label": "Policy Guidance and Support",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_Nef0fcc52",
+              "label": "New Round of Targeted Support Policies",
+              "level": "L3",
+              "children": []
+            },
+            {
+              "node_id": "L3_Na04441bf",
+              "label": "National Civil Aviation Policy Support",
+              "level": "L3",
+              "children": []
+            },
+            {
+              "node_id": "L3_Nf8276134",
+              "label": "National Customs Policy Support",
+              "level": "L3",
+              "children": []
+            },
+            {
+              "node_id": "L3_Na6c4ae61",
+              "label": "Local Fiscal, Land, and Talent Policy Support",
+              "level": "L3",
+              "children": []
+            }
+          ]
+        },
+        {
+          "node_id": "L2_N6db20b9a",
+          "label": "Service Management Enhancement",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_Nb3d3c087",
+              "label": "Efficient and Convenient Port-of-Entry Business Environment",
+              "level": "L3",
+              "children": []
+            },
+            {
+              "node_id": "L3_N5383b7aa",
+              "label": "Innovative Development Management Models",
+              "level": "L3",
+              "children": []
+            }
+          ]
+        },
+        {
+          "node_id": "L2_Nd5d2d592",
+          "label": "Strategic Coordination and Guidance",
+          "level": "L2",
+          "children": []
+        },
+        {
+          "node_id": "L2_N242a428d",
+          "label": "Policy Coordination and Innovation",
+          "level": "L2",
+          "children": []
+        },
+        {
+          "node_id": "L2_N6da1b013",
+          "label": "Planning-Based Support and Guidance",
+          "level": "L2",
+          "children": []
+        },
+        {
+          "node_id": "L2_N578f3b8a",
+          "label": "International Cargo Service Capacity Enhancement",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_N578f3b8a",
+              "label": "International Cargo Services for Cross-Border E-Commerce",
+              "level": "L3",
+              "children": []
+            },
+            {
+              "node_id": "L3_N9c47a867",
+              "label": "Smart Logistics Development",
+              "level": "L3",
+              "children": []
+            },
+            {
+              "node_id": "L2_N578f3b8a_BR_6092b1",
+              "label": "Air-Cargo Hub Development",
+              "level": "L3",
+              "children": [
+                {
+                  "node_id": "L3_N3810ecfd",
+                  "label": "Regional Airport Cooperation",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L3_N4888066d",
+                  "label": "Specialized Research and Support for Air-Cargo Development",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L3_Nb28e82d6",
+                  "label": "Reactivation of Idle Land Resources for Air-Cargo Hub Projects",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L3_Ne78d3c45",
+                  "label": "Air-Cargo Master-Planning Research",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L3_N55664f5d",
+                  "label": "Specialized Research on Air-Cargo Development",
+                  "level": "L4",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "node_id": "L2_N578f3b8a_BR_5b483d",
+              "label": "Port-of-Entry Customs-Clearance Optimization",
+              "level": "L3",
+              "children": [
+                {
+                  "node_id": "L3_N0362ceea",
+                  "label": "Port-of-Entry Function Improvement",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L3_Ne7b47d1e",
+                  "label": "Port-of-Entry Business Environment Optimization",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L3_N888d7345",
+                  "label": "Customs-Clearance Service Efficiency Improvement",
+                  "level": "L4",
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "node_id": "L1_N762e6689_BR_c43b41",
+          "label": "Top-Level Planning Design",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_N55fb6992",
+              "label": "Top-Level Planning Design Strengthening",
+              "level": "L3",
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "node_id": "L1_N6e836104",
+      "label": "Infrastructure & Hub Provision",
+      "level": "L1",
+      "children": [
+        {
+          "node_id": "L1_N6e836104_BR_7637d7",
+          "label": "Hub Planning and Development",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L2_Nd8a500a1",
+              "label": "Hub Planning and Spatial Layout Improvement",
+              "level": "L2",
+              "children": []
+            },
+            {
+              "node_id": "L2_N0a6e8ca5",
+              "label": "Infrastructure Development Acceleration",
+              "level": "L2",
+              "children": []
+            },
+            {
+              "node_id": "L2_N7d5270bf",
+              "label": "China International Air Logistics Center Development",
+              "level": "L2",
+              "children": []
+            },
+            {
+              "node_id": "L1_N6e836104_BR_99d8b8",
+              "label": "Infrastructure Development",
+              "level": "L2",
+              "children": []
+            },
+            {
+              "node_id": "L3_Nd003c070",
+              "label": "Platform Development for the China International Air Logistics Center",
+              "level": "L3",
+              "children": []
+            },
+            {
+              "node_id": "L3_N51765af4",
+              "label": "Air-Logistics Industrial Ecosystem Optimization",
+              "level": "L3",
+              "children": []
+            },
+            {
+              "node_id": "L3_N08db7b5b",
+              "label": "Infrastructure Development Strengthening",
+              "level": "L3",
+              "children": []
+            }
+          ]
+        },
+        {
+          "node_id": "L1_N6e836104_BR_c83016",
+          "label": "Cargo Infrastructure",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L2_N8228268e",
+              "label": "Cargo-Facility Support Capacity Enhancement",
+              "level": "L3",
+              "children": [
+                {
+                  "node_id": "L3_Nd571b089",
+                  "label": "Specialized Equipment Capability Enhancement",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L2_N8228268e_BR_50c2c9",
+                  "label": "Digital and Intelligent Cargo-Facility Development",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L4_Na052476c",
+                  "label": "Smart Airport Cargo-Terminal Development",
+                  "level": "L4",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "node_id": "L2_N3c9cbbd0",
+              "label": "Airside Basic Support Reinforcement",
+              "level": "L3",
+              "children": [
+                {
+                  "node_id": "L3_N9ae5e272",
+                  "label": "Coordinated Functions of Primary Cargo Terminals",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L3_N701e7011",
+                  "label": "Air-to-Air Transfer Service Optimization",
+                  "level": "L4",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "node_id": "L2_N18198f00",
+              "label": "Landside Airport Cargo-Logistics System Improvement",
+              "level": "L3",
+              "children": [
+                {
+                  "node_id": "L3_Nba68b284",
+                  "label": "Airport-Area Collection-and-Distribution Transport System Improvement",
+                  "level": "L4",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "node_id": "L2_Nadf8c478",
+              "label": "Airport Cargo-Infrastructure Improvement",
+              "level": "L2",
+              "children": []
+            },
+            {
+              "node_id": "L2_Nb80d9c6e",
+              "label": "Air-Cargo Hub Collection-and-Distribution Capacity Enhancement",
+              "level": "L3",
+              "children": [
+                {
+                  "node_id": "L3_N8b934feb",
+                  "label": "Passenger and Cargo Route-Network Optimization",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L3_N7c0dd099",
+                  "label": "Cargo-Hub Position Strengthening",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L3_N14530829",
+                  "label": "Airport Collection-and-Distribution Capacity Enhancement",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L3_N06f95f57",
+                  "label": "Passenger-and-Cargo Aviation Hub Development",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L3_Ne96a4ba3",
+                  "label": "Basic Air-Cargo Support Capacity Enhancement",
+                  "level": "L4",
+                  "children": [
+                    {
+                      "node_id": "L4_Nf737d76d",
+                      "label": "Ground Integrated-Transport Capacity Matching",
+                      "level": "L5",
+                      "children": []
+                    },
+                    {
+                      "node_id": "L4_N4b0d0e0c",
+                      "label": "Layout Optimization of Customs-Designated Supervision Sites at Airport Ports of Entry",
+                      "level": "L5",
+                      "children": []
+                    },
+                    {
+                      "node_id": "L4_Nef2378d9",
+                      "label": "Diversified Qualification Types for Airport Ports of Entry",
+                      "level": "L5",
+                      "children": []
+                    },
+                    {
+                      "node_id": "L4_N848f47e5",
+                      "label": "Coordinated Improvement of Airport Air-Cargo Support Facilities and Equipment",
+                      "level": "L5",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "node_id": "L2_Nb80d9c6e_BR_fdd38b",
+                  "label": "Route-Network Development",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L4_N30b235c2",
+                  "label": "Differentiated Airport Functional Positioning",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L4_N255c1775",
+                  "label": "Passenger-and-Cargo Hub Development",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L4_Nc38e3e2b",
+                  "label": "Core Resource Gap Mitigation",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L4_N3220a070",
+                  "label": "Integrated Domestic and International Route-Network Development",
+                  "level": "L4",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "node_id": "L3_Nea54495c",
+              "label": "Major Airport Cargo-Project Development",
+              "level": "L3",
+              "children": []
+            },
+            {
+              "node_id": "L3_Nbccd8d12",
+              "label": "Airport Peak-Hour Capacity Expansion",
+              "level": "L3",
+              "children": []
+            },
+            {
+              "node_id": "L3_N5c977f92",
+              "label": "Base Cargo-Carrier Attraction and Cultivation",
+              "level": "L3",
+              "children": []
+            },
+            {
+              "node_id": "L3_Nbf6e7bf3",
+              "label": "Cargo Route-Network Improvement",
+              "level": "L3",
+              "children": []
+            }
+          ]
+        },
+        {
+          "node_id": "L1_N6e836104_BR_7c2433",
+          "label": "Logistics System and Connectivity",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L2_N3d4844b8",
+              "label": "Air-Logistics Connectivity Enhancement",
+              "level": "L3",
+              "children": [
+                {
+                  "node_id": "L3_N965cfc12",
+                  "label": "Global Route-Network Connectivity Enhancement",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L3_N252b74e4",
+                  "label": "Air-Logistics Cargo-Source Market Expansion",
+                  "level": "L4",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "node_id": "L2_N60c3ab56",
+              "label": "Multimodal Logistics System Development",
+              "level": "L3",
+              "children": [
+                {
+                  "node_id": "L3_N60c3ab56",
+                  "label": "Integrated Multimodal Logistics System Development",
+                  "level": "L3",
+                  "children": []
+                },
+                {
+                  "node_id": "L3_N85bf292e",
+                  "label": "E-Commerce System Support",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L2_N60c3ab56_BR_cc3c6f",
+                  "label": "E-Commerce Logistics Coordination",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L4_N85bf292e",
+                  "label": "E-Commerce System Development Acceleration",
+                  "level": "L4",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "node_id": "L2_N4db8aea7",
+              "label": "Transit Cargo-Volume Growth",
+              "level": "L3",
+              "children": []
+            }
+          ]
+        },
+        {
+          "node_id": "L1_N6e836104_BR_e7aeb0",
+          "label": "Resource and Operational Support",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L2_Nb22f5139",
+              "label": "Hub Operating Environment Improvement",
+              "level": "L3",
+              "children": []
+            },
+            {
+              "node_id": "L2_N5e2fe781",
+              "label": "Air-Ground Resource Support Strengthening",
+              "level": "L3",
+              "children": []
+            },
+            {
+              "node_id": "L2_Nfeea0571",
+              "label": "International Air-Cargo Transfer and Distribution Center Establishment",
+              "level": "L3",
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "node_id": "L1_N70e79b29",
+      "label": "Market Players & Networking",
+      "level": "L1",
+      "children": [
+        {
+          "node_id": "L1_N70e79b29_BR_6c0dca",
+          "label": "Market-Player Attraction and Cultivation",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L1_N70e79b29_BR_6c0dca_BR_f11806",
+              "label": "Market-Player Cultivation",
+              "level": "L3",
+              "children": [
+                {
+                  "node_id": "L2_N466127b4",
+                  "label": "Cultivation of Diverse Business Operators",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L2_N709fdde1",
+                  "label": "Market-Player Cultivation",
+                  "level": "L4",
+                  "children": [
+                    {
+                      "node_id": "L3_N33c0e278",
+                      "label": "Headquarters-Based Freight-Forwarder Attraction and Cultivation",
+                      "level": "L5",
+                      "children": []
+                    },
+                    {
+                      "node_id": "L3_Nb2d030f0",
+                      "label": "Leading Logistics Enterprise Cultivation",
+                      "level": "L5",
+                      "children": []
+                    },
+                    {
+                      "node_id": "L3_N22dcecc8",
+                      "label": "Leading Cargo-Enterprise Attraction and Cultivation",
+                      "level": "L5",
+                      "children": []
+                    },
+                    {
+                      "node_id": "L3_N9a9d4b5c",
+                      "label": "Diverse Market-Player Development Support",
+                      "level": "L5",
+                      "children": []
+                    },
+                    {
+                      "node_id": "L3_Nca0d54be",
+                      "label": "Leading Enterprise Attraction and Cultivation",
+                      "level": "L5",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "node_id": "L2_N3782a8fc",
+                  "label": "Key Market-Player Cultivation",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L1_N70e79b29_BR_ab4348",
+                  "label": "Market-Player Cultivation",
+                  "level": "L4",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "node_id": "L1_N70e79b29_BR_6c0dca_BR_8b6dc1",
+              "label": "Special Programs for Market-Player Attraction and Cultivation",
+              "level": "L3",
+              "children": [
+                {
+                  "node_id": "L2_N172cd711",
+                  "label": "High-Quality Market-Player Aggregation",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L2_Naaad89dc",
+                  "label": "Key Market-Player Attraction",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L1_N70e79b29_BR_946648",
+                  "label": "Freight-Forwarder Attraction and Cultivation",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L1_N70e79b29_BR_710c1d",
+                  "label": "E-Commerce Logistics Enterprise Attraction and Cultivation",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L1_N70e79b29_BR_946648_BR_1416e5",
+                  "label": "Freight-Forwarder Attraction and Cultivation",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L1_N70e79b29_BR_710c1d_BR_aff596",
+                  "label": "Enterprise Attraction and Cultivation",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L4_N2d19c279",
+                  "label": "High-Quality Freight-Forwarder Attraction and Cultivation",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L4_N3bc888c0",
+                  "label": "Large E-Commerce Logistics Enterprise Attraction and Cultivation",
+                  "level": "L4",
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "node_id": "L1_N70e79b29_BR_02c746",
+          "label": "Market Expansion and Promotion",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L2_N10f72f08",
+              "label": "Incremental Market-Business Expansion",
+              "level": "L3",
+              "children": [
+                {
+                  "node_id": "L3_N3ba23cb1",
+                  "label": "Cargo Transfer Service Expansion",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L4_Nb4e3c0ce",
+                  "label": "Diversified Transfer-Service Development",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L4_N0d91d293",
+                  "label": "Cargo Service Extension",
+                  "level": "L4",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "node_id": "L1_N70e79b29_BR_ab8219",
+              "label": "Air-Cargo Market Promotion",
+              "level": "L3",
+              "children": [
+                {
+                  "node_id": "L1_N70e79b29_BR_ab8219_BR_5cff45",
+                  "label": "Market Promotion Implementation",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L4_N162d5723",
+                  "label": "Domestic and International Air-Cargo Market Promotion",
+                  "level": "L4",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "node_id": "L1_N70e79b29_BR_23b40d",
+              "label": "Market Promotion Support",
+              "level": "L3",
+              "children": [
+                {
+                  "node_id": "L3_Ncc6e46eb",
+                  "label": "Market Promotion Strengthening",
+                  "level": "L4",
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "node_id": "L1_N70e79b29_BR_6c0dca_7ecc",
+          "label": "Market-Player Attraction and Cultivation",
+          "level": "L2",
+          "children": []
+        },
+        {
+          "node_id": "L1_N70e79b29_BR_ec0720",
+          "label": "Air-Cargo Network",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L1_N70e79b29_BR_c48137",
+              "label": "Cargo Route Network",
+              "level": "L3",
+              "children": [
+                {
+                  "node_id": "L2_N08a346fe",
+                  "label": "International Route-Network Development",
+                  "level": "L4",
+                  "children": [
+                    {
+                      "node_id": "L3_N4c90cbd7",
+                      "label": "International Air-Cargo Route Improvement",
+                      "level": "L5",
+                      "children": [
+                        {
+                          "node_id": "L4_Nb11795db",
+                          "label": "Routes to Key Trading Cities",
+                          "level": "L6",
+                          "children": []
+                        },
+                        {
+                          "node_id": "L4_N945a64d3",
+                          "label": "Increased Frequencies to Cargo-Rich Regions",
+                          "level": "L6",
+                          "children": []
+                        },
+                        {
+                          "node_id": "L4_Na37f8214",
+                          "label": "Alignment of International Cargo Routes with Manufacturing Demand",
+                          "level": "L6",
+                          "children": []
+                        },
+                        {
+                          "node_id": "L4_Nb967aed3",
+                          "label": "International Airport Cooperation",
+                          "level": "L6",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "node_id": "L3_Nf3b017a0",
+                      "label": "International Cargo Route Improvement",
+                      "level": "L5",
+                      "children": []
+                    },
+                    {
+                      "node_id": "L3_Nb0e7dd4f",
+                      "label": "Digital Infrastructure Development Acceleration",
+                      "level": "L5",
+                      "children": []
+                    },
+                    {
+                      "node_id": "L2_N08a346fe_BR_7db842",
+                      "label": "International Cargo-Service Expansion",
+                      "level": "L5",
+                      "children": []
+                    },
+                    {
+                      "node_id": "L4_Nea99104a",
+                      "label": "Scale Expansion of Cross-Border E-Commerce and International Air Cargo",
+                      "level": "L5",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "node_id": "L2_N8c3b0cad",
+                  "label": "Global Cargo Route-Network Development",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L2_N8e687f9d",
+                  "label": "Global Air-Cargo Network Development",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L2_Nd0b47c6e",
+                  "label": "Global International Route-Network Development",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L2_Nbfebbffa",
+                  "label": "High-Quality Route-Network Development",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L2_N926fa20a",
+                  "label": "Cargo Route-Network Optimization and Expansion",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L3_N74ff71bd",
+                  "label": "Industry Resource Supply Strengthening",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L3_Nccfe417c",
+                  "label": "International Air-Cargo Route Supply Strengthening",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L3_N86ef6403",
+                  "label": "International Cargo Flight-Slot Supply Strengthening",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L3_N9ecfe06c",
+                  "label": "International Cargo Transfer-Function Enhancement",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L3_Nc594b785",
+                  "label": "Air-Cargo Segment Expansion",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L3_N65606e29",
+                  "label": "Ground Cargo-Collection Network Strengthening",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L2_N926fa20a_BR_40d163",
+                  "label": "Sensitive Cargo Transport",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L3_N303eccc1",
+                  "label": "High-Quality Transfer Route-Network Development",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L3_N198ad664",
+                  "label": "Transfer Route Development",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L2_Nbfebbffa_BR_cc65d1",
+                  "label": "Route-Network Configuration",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L4_Ne0f95b19",
+                  "label": "Sensitive Air-Cargo Transport Service Development",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L4_N27d838ea",
+                  "label": "Dual-Fan Route-Network Configuration",
+                  "level": "L4",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "node_id": "L1_N70e79b29_BR_2ba091",
+              "label": "Air-Cargo Capacity Enhancement",
+              "level": "L3",
+              "children": [
+                {
+                  "node_id": "L2_N9a2b3002",
+                  "label": "Scheduled All-Cargo Route Operation by Air-Cargo Market Players",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L2_Nd77a7607",
+                  "label": "Airport Cargo Consolidation by Air-Cargo Market Players",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L2_N9ef25cc0",
+                  "label": "Air-Cargo Volume Growth",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L2_N69b20189",
+                  "label": "Base Cargo-Carrier Establishment",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L2_Ne4cef915",
+                  "label": "All-Cargo Aircraft Capacity Expansion",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L2_N13abaa5a",
+                  "label": "Cargo Support Capacity Enhancement",
+                  "level": "L4",
+                  "children": [
+                    {
+                      "node_id": "L3_Nb67e0092",
+                      "label": "International Cargo Transfer-Function Enhancement",
+                      "level": "L5",
+                      "children": []
+                    },
+                    {
+                      "node_id": "L3_Ned79e54c",
+                      "label": "Service Support Capacity Strengthening",
+                      "level": "L5",
+                      "children": []
+                    },
+                    {
+                      "node_id": "L3_Nd3c80123",
+                      "label": "Cargo Corridor Development Acceleration",
+                      "level": "L5",
+                      "children": []
+                    },
+                    {
+                      "node_id": "L3_Nb328f7fc",
+                      "label": "Cargo Corridor and Facility Development",
+                      "level": "L5",
+                      "children": [
+                        {
+                          "node_id": "L4_N9596affd",
+                          "label": "Airport Cargo-Zone Planning and Development",
+                          "level": "L6",
+                          "children": []
+                        },
+                        {
+                          "node_id": "L4_Nc0927f0b",
+                          "label": "Cargo-Infrastructure Planning and Development",
+                          "level": "L6",
+                          "children": []
+                        },
+                        {
+                          "node_id": "L4_N2720f054",
+                          "label": "Airport Facility Gap Mitigation",
+                          "level": "L6",
+                          "children": []
+                        },
+                        {
+                          "node_id": "L4_Ndfac356a",
+                          "label": "Cargo-Aircraft Stand Planning and Allocation",
+                          "level": "L6",
+                          "children": []
+                        },
+                        {
+                          "node_id": "L4_N5fc249ab",
+                          "label": "Landside Road Planning and Allocation",
+                          "level": "L6",
+                          "children": []
+                        },
+                        {
+                          "node_id": "L4_N6bfccf65",
+                          "label": "Airside Road and Supporting Office-Facility Planning",
+                          "level": "L6",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "node_id": "L2_N13abaa5a_BR_9f83a3",
+                      "label": "Air-Cargo Hub Development",
+                      "level": "L5",
+                      "children": []
+                    },
+                    {
+                      "node_id": "L4_Ne346220c",
+                      "label": "International Air-Cargo Transfer and Response Capacity Enhancement",
+                      "level": "L5",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "node_id": "L2_N68c2aa93",
+                  "label": "Cargo-Source Organization Capacity Enhancement",
+                  "level": "L4",
+                  "children": [
+                    {
+                      "node_id": "L3_Nc56580b0",
+                      "label": "Transport Capacity Supply Enhancement",
+                      "level": "L5",
+                      "children": []
+                    },
+                    {
+                      "node_id": "L3_N8f8e91cf",
+                      "label": "Cargo-Source and Capacity Organization Enhancement",
+                      "level": "L5",
+                      "children": []
+                    },
+                    {
+                      "node_id": "L3_N4da94e7a",
+                      "label": "Cargo-Source Organization Expansion",
+                      "level": "L5",
+                      "children": []
+                    },
+                    {
+                      "node_id": "L2_N68c2aa93_BR_1322ba",
+                      "label": "Cargo-Source Expansion",
+                      "level": "L5",
+                      "children": []
+                    },
+                    {
+                      "node_id": "L4_Na2b3c84a",
+                      "label": "Industrial-Park Cargo-Source Expansion",
+                      "level": "L5",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "node_id": "L3_N2d02331f",
+                  "label": "Cargo-Capacity Development by Market Players",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L3_N571de1aa",
+                  "label": "Cargo-Airline Attraction and Cooperation",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L3_N29e43ee4",
+                  "label": "All-Cargo Charter Base Development",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L2_N69b20189_BR_05fd1b",
+                  "label": "Cargo-Aviation Cooperation",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L4_N219c5452",
+                  "label": "Cargo Airport Alliance Formation",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L4_N61514be4",
+                  "label": "All-Cargo Charter Service Expansion",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L4_N8d005590",
+                  "label": "Emergency Logistics Charter Service System Improvement",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L3_N94978a33",
+                  "label": "Passenger Belly-Hold Cargo Capacity Enhancement",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L2_Ne4cef915_BR_f9b7ac",
+                  "label": "Capacity Enhancement Measures",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L4_N31c774ef",
+                  "label": "Cargo-Airline Cooperation Strengthening",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L4_N94978a33",
+                  "label": "Passenger Belly-Hold Cargo and Mail Volume Enhancement",
+                  "level": "L4",
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "node_id": "L1_N70e79b29_BR_2ba3df",
+          "label": "Platform and Logistics Innovation",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L1_N70e79b29_BR_a56c84",
+              "label": "Industrial Platform Development",
+              "level": "L3",
+              "children": [
+                {
+                  "node_id": "L3_Na1b5b8e4",
+                  "label": "International Air Logistics Center Platform Development",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L3_N595f8c05",
+                  "label": "Cold-Chain Logistics Industry Improvement",
+                  "level": "L4",
+                  "children": [
+                    {
+                      "node_id": "L4_N7d2d45d8",
+                      "label": "Cold-Chain Logistics Infrastructure Development",
+                      "level": "L5",
+                      "children": []
+                    },
+                    {
+                      "node_id": "L4_N1c9477d5",
+                      "label": "Cold-Chain Logistics Standardization System Improvement",
+                      "level": "L5",
+                      "children": []
+                    },
+                    {
+                      "node_id": "L4_N70a840eb",
+                      "label": "Cold-Chain Logistics Regulatory System Improvement",
+                      "level": "L5",
+                      "children": []
+                    },
+                    {
+                      "node_id": "L4_Nc2b9cf21",
+                      "label": "Cold-Chain Logistics Credit System Improvement",
+                      "level": "L5",
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "node_id": "L1_N70e79b29_BR_167030",
+              "label": "Logistics Service and Business-Model Innovation",
+              "level": "L3",
+              "children": [
+                {
+                  "node_id": "L2_Nf64b0b03",
+                  "label": "Logistics Service Support Efficiency Improvement",
+                  "level": "L4",
+                  "children": [
+                    {
+                      "node_id": "L3_Nb394347b",
+                      "label": "Security Inspection Process Optimization and Simplification",
+                      "level": "L5",
+                      "children": []
+                    },
+                    {
+                      "node_id": "L3_N22d9d7b1",
+                      "label": "Port-of-Entry Customs-Clearance Efficiency Improvement",
+                      "level": "L5",
+                      "children": []
+                    },
+                    {
+                      "node_id": "L3_N62ed0091",
+                      "label": "Smart Logistics Development",
+                      "level": "L5",
+                      "children": []
+                    },
+                    {
+                      "node_id": "L2_Nf64b0b03_BR_2e222e",
+                      "label": "Logistics Park Development",
+                      "level": "L5",
+                      "children": []
+                    },
+                    {
+                      "node_id": "L4_Nbc7f4787",
+                      "label": "Bonded Logistics Park Development",
+                      "level": "L5",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "node_id": "L2_N2f32c229",
+                  "label": "Air-Logistics Service Capacity Enhancement",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L2_Nc3c2ff15",
+                  "label": "Multimodal Transport System Diversification",
+                  "level": "L4",
+                  "children": [
+                    {
+                      "node_id": "L3_Ne5a02d74",
+                      "label": "Transfer and Intermodal Function Enhancement",
+                      "level": "L5",
+                      "children": []
+                    },
+                    {
+                      "node_id": "L3_Na7c6a537",
+                      "label": "Multimodal Transport Development",
+                      "level": "L5",
+                      "children": []
+                    },
+                    {
+                      "node_id": "L3_Nc92a3618",
+                      "label": "Air-Ground Intermodal Service Development",
+                      "level": "L5",
+                      "children": []
+                    },
+                    {
+                      "node_id": "L3_N0f65b0c3",
+                      "label": "Cargo Participant Diversification",
+                      "level": "L5",
+                      "children": []
+                    },
+                    {
+                      "node_id": "L3_Nd290d812",
+                      "label": "Multimodal Transport Exploration",
+                      "level": "L5",
+                      "children": []
+                    },
+                    {
+                      "node_id": "L3_Nf8bb4ea7",
+                      "label": "Collection-and-Distribution System Development",
+                      "level": "L5",
+                      "children": []
+                    },
+                    {
+                      "node_id": "L2_Nc3c2ff15_BR_81365c",
+                      "label": "Multimodal Transport Network Development",
+                      "level": "L5",
+                      "children": [
+                        {
+                          "node_id": "L4_Na35280bb",
+                          "label": "Multimodal Logistics Network Development",
+                          "level": "L6",
+                          "children": []
+                        },
+                        {
+                          "node_id": "L4_N3ac13c17",
+                          "label": "Off-Site Cargo-Terminal Model Exploration",
+                          "level": "L6",
+                          "children": []
+                        },
+                        {
+                          "node_id": "L4_Na8ba2f4a",
+                          "label": "Multimodal Transport Exploration",
+                          "level": "L6",
+                          "children": []
+                        },
+                        {
+                          "node_id": "L4_N6bcc2030",
+                          "label": "Efficient Ground Distribution System for Air Logistics",
+                          "level": "L6",
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "node_id": "L2_Nd39445b0",
+                  "label": "Emerging Air-Logistics Business Development",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L2_N640a2992",
+                  "label": "Supply-Chain Management Optimization",
+                  "level": "L4",
+                  "children": [
+                    {
+                      "node_id": "L3_N640a2992",
+                      "label": "Further Supply-Chain Management Optimization",
+                      "level": "L5",
+                      "children": []
+                    },
+                    {
+                      "node_id": "L3_Nc97533ee",
+                      "label": "Airline Attraction for Capacity Enhancement",
+                      "level": "L5",
+                      "children": [
+                        {
+                          "node_id": "L4_Nfdd2124b",
+                          "label": "Cargo-Airline Attraction Acceleration",
+                          "level": "L6",
+                          "children": []
+                        },
+                        {
+                          "node_id": "L4_N1b595109",
+                          "label": "Express-Delivery Firm and Airline Attraction Acceleration",
+                          "level": "L6",
+                          "children": []
+                        },
+                        {
+                          "node_id": "L4_Na5c9f759",
+                          "label": "Route-Network Layout Driven by Capacity Development",
+                          "level": "L6",
+                          "children": []
+                        },
+                        {
+                          "node_id": "L4_N256f563d",
+                          "label": "Cargo-Airline Attraction",
+                          "level": "L6",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "node_id": "L3_N90c2cae1",
+                      "label": "Enterprise Operating Environment Optimization",
+                      "level": "L5",
+                      "children": []
+                    },
+                    {
+                      "node_id": "L2_N640a2992_BR_258f1f",
+                      "label": "Supply-Chain Platform Development",
+                      "level": "L5",
+                      "children": []
+                    },
+                    {
+                      "node_id": "L2_N640a2992_BR_b1b518",
+                      "label": "Supply-Chain Finance Support",
+                      "level": "L5",
+                      "children": []
+                    },
+                    {
+                      "node_id": "L2_N640a2992_BR_500031",
+                      "label": "Operating Environment Optimization",
+                      "level": "L5",
+                      "children": []
+                    },
+                    {
+                      "node_id": "L4_N6dc065d5",
+                      "label": "Supply-Chain Service Platform Establishment",
+                      "level": "L5",
+                      "children": []
+                    },
+                    {
+                      "node_id": "L4_Nf47f4823",
+                      "label": "Rapid Supply-Chain Finance Development",
+                      "level": "L5",
+                      "children": []
+                    },
+                    {
+                      "node_id": "L4_N90c2cae1",
+                      "label": "Enterprise Soft Operating Environment Optimization",
+                      "level": "L5",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "node_id": "L2_N0e93e380",
+                  "label": "Manufacturing Integration Promotion",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L2_N27ba78e2",
+                  "label": "Airport Economy Development",
+                  "level": "L4",
+                  "children": [
+                    {
+                      "node_id": "L3_N27ba78e2",
+                      "label": "Airport Economy Development",
+                      "level": "L5",
+                      "children": []
+                    },
+                    {
+                      "node_id": "L3_Nc3e4e468",
+                      "label": "Airport Economy Development",
+                      "level": "L5",
+                      "children": []
+                    },
+                    {
+                      "node_id": "L3_N82cdf37d",
+                      "label": "Air-to-Air Transfer Business Scaling",
+                      "level": "L5",
+                      "children": []
+                    },
+                    {
+                      "node_id": "L3_N18ada171",
+                      "label": "Cross-Border E-Commerce Development",
+                      "level": "L5",
+                      "children": []
+                    },
+                    {
+                      "node_id": "L3_Nd551ce89",
+                      "label": "Air-Cargo Transfer and Consolidation Business Development",
+                      "level": "L5",
+                      "children": []
+                    },
+                    {
+                      "node_id": "L3_Naeed249a",
+                      "label": "Investment Attraction Strengthening",
+                      "level": "L5",
+                      "children": []
+                    },
+                    {
+                      "node_id": "L2_N27ba78e2_BR_3c6003",
+                      "label": "Air-Cargo Investment Attraction",
+                      "level": "L5",
+                      "children": []
+                    },
+                    {
+                      "node_id": "L4_Na1c24377",
+                      "label": "Cross-Border E-Commerce Industrial Park Development",
+                      "level": "L5",
+                      "children": []
+                    },
+                    {
+                      "node_id": "L4_N5e94e625",
+                      "label": "Digital Transformation of Cross-Border E-Commerce Enterprises",
+                      "level": "L5",
+                      "children": []
+                    },
+                    {
+                      "node_id": "L4_N6834f90a",
+                      "label": "Cross-Border E-Commerce Park Development",
+                      "level": "L5",
+                      "children": []
+                    },
+                    {
+                      "node_id": "L4_N8bd3a8a5",
+                      "label": "Transfer Hardware Facility Support Acceleration",
+                      "level": "L5",
+                      "children": []
+                    },
+                    {
+                      "node_id": "L4_Nd788e769",
+                      "label": "Domestic and International Air-Cargo Investment Attraction",
+                      "level": "L5",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "node_id": "L3_N0e93e380",
+                  "label": "Manufacturing Integration Promotion",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L2_N0e93e380_BR_1a4623",
+                  "label": "Integration Promotion Measures",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L4_N0e93e380",
+                  "label": "Manufacturing Integration Strengthening",
+                  "level": "L4",
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "node_id": "L1_N6be998d8",
+      "label": "Customs Efficiency",
+      "level": "L1",
+      "children": [
+        {
+          "node_id": "L2_Ne455f9ae",
+          "label": "Free Trade Zone Empowerment of Airport Economy",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_Ne455f9ae",
+              "label": "Pilot Free Trade Zone Advantages for Airport Economy Development",
+              "level": "L3",
+              "children": []
+            },
+            {
+              "node_id": "L3_Nfb48b97b",
+              "label": "Integrated Customs Clearance and Free Trade Zone Linkage",
+              "level": "L3",
+              "children": []
+            },
+            {
+              "node_id": "L2_Ne455f9ae_BR_b74a14",
+              "label": "Zone Linkage Development",
+              "level": "L3",
+              "children": []
+            },
+            {
+              "node_id": "L4_Nfb48b97b",
+              "label": "Linkage between Integrated Customs-Clearance Bases and Airport Subzones of Pilot Free Trade Zones",
+              "level": "L3",
+              "children": []
+            }
+          ]
+        },
+        {
+          "node_id": "L1_N6be998d8_BR_8df89b",
+          "label": "Airport Port-of-Entry Optimization",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_N7e9ff5f6",
+              "label": "Aviation Port-of-Entry Facilitation Enhancement",
+              "level": "L3",
+              "children": [
+                {
+                  "node_id": "L4_N9273a814",
+                  "label": "Three-in-One Joint Supervision Model Establishment",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L4_Nfa586cf7",
+                  "label": "Digitalization of Customs-Clearance Operations at Airport Ports of Entry",
+                  "level": "L4",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "node_id": "L1_N6be998d8_BR_8df89b_BR_ff1d64",
+              "label": "Customs-Clearance Efficiency Improvement",
+              "level": "L3",
+              "children": []
+            },
+            {
+              "node_id": "L2_N9e86e873",
+              "label": "Airport Port-of-Entry Operational Efficiency Improvement",
+              "level": "L2",
+              "children": []
+            },
+            {
+              "node_id": "L2_Nbde783bd",
+              "label": "Aviation Port-of-Entry Service Environment Optimization",
+              "level": "L2",
+              "children": []
+            },
+            {
+              "node_id": "L2_N0109e16a",
+              "label": "Aviation Port-of-Entry Service Function and Environment Optimization",
+              "level": "L3",
+              "children": [
+                {
+                  "node_id": "L3_N8283673b",
+                  "label": "Aviation Port-of-Entry Function Diversification",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L3_N53ff6178",
+                  "label": "Port-of-Entry Customs-Clearance Facilitation Enhancement",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L3_N4b540045",
+                  "label": "Integrated Customs-Clearance Base Development and Operation",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L3_N1da589d2",
+                  "label": "Functional Integration of Ports of Entry and Comprehensive Bonded Zones",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L2_N0109e16a_BR_448437",
+                  "label": "Customs-Clearance Facilitation",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L4_N8648b9f1",
+                  "label": "Traditional Supervision Model Reform",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L4_N5edfd835",
+                  "label": "One-Stop Customs-Clearance Operation Model",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L4_N34f6aab4",
+                  "label": "Customs Single-Window Development",
+                  "level": "L4",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "node_id": "L2_N227589e0",
+              "label": "Port-of-Entry Service Efficiency Improvement",
+              "level": "L2",
+              "children": []
+            },
+            {
+              "node_id": "L4_N6c65c54a",
+              "label": "Airport Port-of-Entry Customs-Clearance Efficiency Improvement",
+              "level": "L3",
+              "children": []
+            }
+          ]
+        },
+        {
+          "node_id": "L1_N6be998d8_BR_8df89b_f5a4",
+          "label": "Airport Port-of-Entry Optimization",
+          "level": "L2",
+          "children": []
+        },
+        {
+          "node_id": "L1_N6be998d8_BR_995bce",
+          "label": "Fee Reduction and Customs-Clearance Facilitation",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L2_N33b2d022",
+              "label": "Port-of-Entry and Cargo-Terminal Handling Fee Reduction",
+              "level": "L3",
+              "children": []
+            },
+            {
+              "node_id": "L1_N6be998d8_BR_b1e228",
+              "label": "Customs-Clearance Facilitation",
+              "level": "L2",
+              "children": []
+            },
+            {
+              "node_id": "L3_Nce212504",
+              "label": "Port-of-Entry Customs-Clearance Facilitation Enhancement",
+              "level": "L3",
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "node_id": "L1_N6bbea948",
+      "label": "Smart & Green Transition",
+      "level": "L1",
+      "children": [
+        {
+          "node_id": "L2_Ne1879105",
+          "label": "Hub Digital-Intelligence Enhancement",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_N1b187997",
+              "label": "Air-Cargo Digital-Intelligence Enhancement",
+              "level": "L3",
+              "children": []
+            },
+            {
+              "node_id": "L3_N09522c48",
+              "label": "Smart Platform Development",
+              "level": "L3",
+              "children": [
+                {
+                  "node_id": "L4_N96f6c2a8",
+                  "label": "Integrated Smart Air-Logistics Service Platform Development",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L4_Na35a474b",
+                  "label": "Strategic Investor Introduction",
+                  "level": "L4",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "node_id": "L4_N6e9da33c",
+              "label": "End-to-End Air-Cargo Location Tracking",
+              "level": "L3",
+              "children": []
+            },
+            {
+              "node_id": "L4_N6b11fc79",
+              "label": "Air-Cargo Community Development",
+              "level": "L3",
+              "children": []
+            }
+          ]
+        },
+        {
+          "node_id": "L2_Na75f0b05",
+          "label": "Hub Green Development Enhancement",
+          "level": "L2",
+          "children": []
+        },
+        {
+          "node_id": "L2_Nc8ab6162",
+          "label": "Smart Resilience Enhancement",
+          "level": "L2",
+          "children": []
+        },
+        {
+          "node_id": "L2_Nfdcfd3c4",
+          "label": "Efficient Smart Cargo Management",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_Nfc162f8c",
+              "label": "Emerging Technology Application Strengthening",
+              "level": "L3",
+              "children": []
+            },
+            {
+              "node_id": "L3_N70eeee1d",
+              "label": "Operational Management Capacity Enhancement",
+              "level": "L3",
+              "children": []
+            },
+            {
+              "node_id": "L3_Ne42076c0",
+              "label": "Smart Cargo Technology Application",
+              "level": "L3",
+              "children": []
+            },
+            {
+              "node_id": "L3_Ne55e384d",
+              "label": "Electronic Documentation Development",
+              "level": "L3",
+              "children": [
+                {
+                  "node_id": "L4_Ne55e384d",
+                  "label": "Electronic and Standardized Documentation Development",
+                  "level": "L4",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "node_id": "L2_Nfdcfd3c4_BR_84f4d0",
+              "label": "Cargo Visibility",
+              "level": "L3",
+              "children": [
+                {
+                  "node_id": "L4_Nea0a385e",
+                  "label": "Cargo Status Visibility",
+                  "level": "L4",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "node_id": "L2_Nfdcfd3c4_BR_a78b7b",
+              "label": "Capital Introduction",
+              "level": "L3",
+              "children": [
+                {
+                  "node_id": "L4_N48c963e1",
+                  "label": "Capital Introduction",
+                  "level": "L4",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "node_id": "L4_N08407b0e",
+              "label": "Business Capacity Strengthening",
+              "level": "L3",
+              "children": []
+            },
+            {
+              "node_id": "L4_N1244f6cb",
+              "label": "Document Standardization Development",
+              "level": "L3",
+              "children": []
+            }
+          ]
+        },
+        {
+          "node_id": "L1_N6bbea948_BR_3d6bc6",
+          "label": "Air-Cargo Transition",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_N5b8fd671",
+              "label": "Green and Low-Carbon Air-Cargo Development",
+              "level": "L3",
+              "children": []
+            },
+            {
+              "node_id": "L3_Nbf5cb6ef",
+              "label": "Air-Cargo Safety and Resilience Enhancement",
+              "level": "L3",
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "node_id": "L1_N52f6895e",
+      "label": "Regional Industry Coordination",
+      "level": "L1",
+      "children": [
+        {
+          "node_id": "L2_Nc81ee0b8",
+          "label": "Cargo Hinterland Expansion",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_Nc5166684",
+              "label": "Cargo Collection and Consolidation Capacity Enhancement",
+              "level": "L3",
+              "children": []
+            },
+            {
+              "node_id": "L3_N3494c85c",
+              "label": "ASEAN E-Commerce Service Expansion",
+              "level": "L3",
+              "children": [
+                {
+                  "node_id": "L4_N3494c85c",
+                  "label": "Core Service Provision for ASEAN Cross-Border E-Commerce",
+                  "level": "L4",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "node_id": "L2_Nc81ee0b8_BR_a92ee4",
+              "label": "ASEAN E-Commerce Services",
+              "level": "L3",
+              "children": []
+            }
+          ]
+        },
+        {
+          "node_id": "L2_N6d9c5da7",
+          "label": "Business- and Industry-Friendly Environment Development",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_Nb1103d45",
+              "label": "Information Resource Interconnection and Sharing",
+              "level": "L3",
+              "children": []
+            },
+            {
+              "node_id": "L3_N792037db",
+              "label": "Cargo Security Inspection Process Optimization and Simplification",
+              "level": "L3",
+              "children": []
+            },
+            {
+              "node_id": "L3_N42402ab1",
+              "label": "Port-of-Entry Customs-Clearance Facilitation Enhancement",
+              "level": "L3",
+              "children": []
+            }
+          ]
+        },
+        {
+          "node_id": "L2_Na5b73aaf",
+          "label": "Zone-Port Linkage Development",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_N724f0a0b",
+              "label": "Coordination with Key Industrial Parks",
+              "level": "L3",
+              "children": []
+            },
+            {
+              "node_id": "L3_Nc3d125b3",
+              "label": "Efficient Zone-Port Linkage Strengthening",
+              "level": "L3",
+              "children": []
+            },
+            {
+              "node_id": "L2_Na5b73aaf_BR_6c5234",
+              "label": "Zone-Port Linkage Projects",
+              "level": "L3",
+              "children": [
+                {
+                  "node_id": "L4_Naf94a663",
+                  "label": "Zone-Port Linkage Promotion",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L4_N0188902d",
+                  "label": "Cross-Border Industrial Park Development",
+                  "level": "L4",
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "node_id": "L2_N4f9516d8",
+          "label": "Airport Economy Development",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_Nf50b9a9d",
+              "label": "Airport Economy Development",
+              "level": "L3",
+              "children": []
+            },
+            {
+              "node_id": "L3_Nea04744e",
+              "label": "Linkage between International Airports and Surrounding Areas",
+              "level": "L3",
+              "children": []
+            },
+            {
+              "node_id": "L3_N2c29b561",
+              "label": "Air-Cargo Related Industry Development",
+              "level": "L3",
+              "children": []
+            },
+            {
+              "node_id": "L3_Nd93e3e25",
+              "label": "Airport Economy Development",
+              "level": "L3",
+              "children": []
+            },
+            {
+              "node_id": "L2_N4f9516d8_BR_a9e426",
+              "label": "Airport-Economy Industry Promotion",
+              "level": "L3",
+              "children": [
+                {
+                  "node_id": "L4_N5a060ef1",
+                  "label": "Airport-Economy Industrial Park Development Acceleration",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L4_N1513dd0d",
+                  "label": "Airport-Area Warehousing, Logistics, and Express-Delivery Cluster Development",
+                  "level": "L4",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "node_id": "L2_N4f9516d8_BR_ebb95b",
+              "label": "Aviation Maintenance Industry Support",
+              "level": "L3",
+              "children": [
+                {
+                  "node_id": "L4_Nc28ba84f",
+                  "label": "Aircraft Maintenance Industry Development Support",
+                  "level": "L4",
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "node_id": "L2_Nd825449f",
+          "label": "Industrial Chain Extension and Business-Model Diversification",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_N97559905",
+              "label": "Air-Logistics Chain Extension",
+              "level": "L3",
+              "children": [
+                {
+                  "node_id": "L4_Nd3a9b4af",
+                  "label": "Deep Cooperation with Express-Delivery Enterprises",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L4_Nf3f8f8c3",
+                  "label": "Door-to-Door Logistics Services",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L4_N832c0c49",
+                  "label": "China-ASEAN Cross-Border E-Commerce Integrated Service Platform",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L4_N198738ba",
+                  "label": "Fresh-Produce Distribution Center Development",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L4_N3fa16235",
+                  "label": "Fresh-Produce Processing Center Development",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L4_N69265178",
+                  "label": "Transfer Logistics Chain Development",
+                  "level": "L4",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "node_id": "L3_N32b417e2",
+              "label": "Fresh-Produce Trading Market Development",
+              "level": "L3",
+              "children": []
+            },
+            {
+              "node_id": "L2_Nd825449f_BR_4fe323",
+              "label": "Trading Center Development",
+              "level": "L3",
+              "children": [
+                {
+                  "node_id": "L4_N32b417e2",
+                  "label": "Fresh-Produce Trading Center Development",
+                  "level": "L4",
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "node_id": "L1_N604d4c42",
+      "label": "Resources Guarantee",
+      "level": "L1",
+      "children": [
+        {
+          "node_id": "L2_N649ec6c7",
+          "label": "Cargo Transport Support",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_N133b0ed2",
+              "label": "Collection-and-Distribution System Development",
+              "level": "L3",
+              "children": []
+            },
+            {
+              "node_id": "L3_N77a3b68b",
+              "label": "Collection-and-Distribution System Development",
+              "level": "L3",
+              "children": []
+            },
+            {
+              "node_id": "L3_N98ef0212",
+              "label": "Cargo Transport Organization Optimization",
+              "level": "L3",
+              "children": []
+            }
+          ]
+        },
+        {
+          "node_id": "L2_N9f46f3fd",
+          "label": "Aviation Resource Support",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_N8458a8a8",
+              "label": "Route-Network Layout Improvement",
+              "level": "L3",
+              "children": []
+            }
+          ]
+        },
+        {
+          "node_id": "L2_Nbd50000d",
+          "label": "Service Support Capacity Enhancement",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_N84a28744",
+              "label": "Efficient and Convenient Business Environment",
+              "level": "L3",
+              "children": []
+            },
+            {
+              "node_id": "L3_Nb148a883",
+              "label": "Facility and Equipment Supply Enhancement",
+              "level": "L3",
+              "children": []
+            }
+          ]
+        },
+        {
+          "node_id": "L2_N306e9a75",
+          "label": "Basic Capacity Support",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_N07990008",
+              "label": "Infrastructure Development Acceleration",
+              "level": "L3",
+              "children": []
+            },
+            {
+              "node_id": "L3_N3ab0a1a9",
+              "label": "Infrastructure Development Acceleration",
+              "level": "L3",
+              "children": []
+            }
+          ]
+        },
+        {
+          "node_id": "L2_Nff3b5230",
+          "label": "Air-Logistics Resource and Factor Aggregation",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_Na5cf0ba6",
+              "label": "Air-Logistics Supporting Facility Improvement",
+              "level": "L3",
+              "children": []
+            },
+            {
+              "node_id": "L3_N48dcd88a",
+              "label": "Base Airline Development Support",
+              "level": "L3",
+              "children": []
+            },
+            {
+              "node_id": "L3_N9815851a",
+              "label": "Airworthiness Industry Cultivation",
+              "level": "L3",
+              "children": []
+            }
+          ]
+        },
+        {
+          "node_id": "L2_N24b2144b",
+          "label": "Intensified Policy Support",
+          "level": "L2",
+          "children": [
+            {
+              "node_id": "L3_Nc21e1f2f",
+              "label": "Fiscal Reward and Subsidy Mechanism Improvement",
+              "level": "L3",
+              "children": []
+            },
+            {
+              "node_id": "L3_N71ce64b1",
+              "label": "Preferential Policy Support",
+              "level": "L3",
+              "children": []
+            },
+            {
+              "node_id": "L3_Ne6cde812",
+              "label": "Supporting Policy Improvement",
+              "level": "L3",
+              "children": [
+                {
+                  "node_id": "L4_N59784fee",
+                  "label": "Policy Support for Dual Networks and Dual Hubs",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L4_Nada24d28",
+                  "label": "Policy Support for Two-Hub Development",
+                  "level": "L4",
+                  "children": []
+                },
+                {
+                  "node_id": "L4_N6c7fdcaf",
+                  "label": "Policy Support for E-Commerce Development",
+                  "level": "L4",
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
