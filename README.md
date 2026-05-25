@@ -2,7 +2,7 @@
 
 This repository contains the replication package for the ATRS 2026 PolicyTreeBuilder experiment.
 
-The public replication version is the final 353-node Round C v4 tree used for the paper. The code, prompts, YAML configs, source inputs, intermediate outputs, final tree files, and figures in this package were rebuilt from the Round C v4 project archive that produced the 353-node tree.
+The public replication version is the final 353-node Round C v4 tree used for the paper. The code, prompts, YAML configs, source inputs, intermediate outputs, final tree files, and visualization scripts in this package were rebuilt from the Round C v4 project archive that produced the 353-node tree.
 
 ## Final Version
 
@@ -27,7 +27,8 @@ The older 317-node package is not part of the ATRS 2026 replication version. It 
 - `data/source/`: source inputs for the 353-node run.
 - `data/intermediate_outputs/`: intermediate Round C v4 outputs and provenance logs.
 - `data/final_tree/`: final 353-node tree and final tabular outputs.
-- `figures/`: figures generated from the 353-node Round C v4 outputs.
+- `scripts/split_final_tree_by_admin_revised_0509.py`: split the final tree into provincial, city-level, and per-administrative-unit JSON trees.
+- `scripts/visualize_radial_tree_v6_style_0510.py`: render final and administrative tree JSON files as radial visualizations.
 - `SCRIPT_PROVENANCE.tsv`: source and public hashes for the Round C v4 scripts after repository path normalization.
 
 ## Setup

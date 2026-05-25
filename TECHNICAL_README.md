@@ -41,7 +41,7 @@ The Round C v4 pipeline follows this sequence:
 5. Define and classify L1 categories with `scripts/step2_8_define_l1.py` and `scripts/step2_8_classify_levels.py`.
 6. Build the coarse tree with Step 3 merge/link scripts and `scripts/step3_build_coarse_tree.py`.
 7. Refine the tree with Step 4 skeleton, shaping, polishing, and final override scripts.
-8. Split and visualize administrative trees with Step 5/6 scripts when needed.
+8. Split administrative trees with `scripts/split_final_tree_by_admin_revised_0509.py` and render radial visualizations with `scripts/visualize_radial_tree_v6_style_0510.py` when needed.
 
 Intermediate outputs are stored in `data/intermediate_outputs/`. The fixed final publication tree is stored in `data/final_tree/`.
 
