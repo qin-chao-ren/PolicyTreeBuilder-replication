@@ -44,10 +44,10 @@ ROOT = HERE.parent
 LOG_DIR = ROOT / "data" / "intermediate_outputs" / "logs"
 OPS_LOG = ROOT / "data" / "intermediate_outputs" / "v4_operations_log.jsonl"
 PROMPT_CLASSIFY = ROOT / "prompts" / "step3_classify_assign.md"
-ENV_FILE = ROOT / "configs" / "roundC_v4.env"
+ENV_FILE = ROOT / "configs" / ".env"
 
 ALLOWED = {("L4", "L3"), ("L3", "L2")}
-HARD_ASSIGN_THRESHOLD = 0.92 
+HARD_ASSIGN_THRESHOLD = 0.92
 
 def _load_env():
     if not ENV_FILE.exists():
@@ -62,7 +62,7 @@ def _load_env():
 
 def _mk_llm_config(lcfg: dict) -> LLMConfig:
     primary = str(lcfg.get("primary") or os.getenv("PRIMARY_LLM_MODEL") or "qwen3-max")
-    secondary = primary 
+    secondary = primary
     os.environ.setdefault("OPENAI_BASE_URL", os.getenv("PRIMARY_LLM_BASE_URL", "https://api.openai.com/v1"))
     if os.getenv("PRIMARY_LLM_API_KEY") and not os.getenv("OPENAI_API_KEY"):
         os.environ["OPENAI_API_KEY"] = os.getenv("PRIMARY_LLM_API_KEY", "")
@@ -123,7 +123,7 @@ def _load_layer(outdir: Path, level: str) -> Tuple[pd.DataFrame, pd.DataFrame]:
     nodes_path = outdir / f"v4_nodes_{level}.csv"
     mem_path = outdir / f"v4_membership_{level}.csv"
     if not nodes_path.exists() or not mem_path.exists():
-        return pd.DataFrame(), pd.DataFrame() 
+        return pd.DataFrame(), pd.DataFrame()
     nodes = pd.read_csv(nodes_path, dtype=str)
     mem = pd.read_csv(mem_path, dtype=str)
     return nodes, mem
@@ -161,7 +161,7 @@ def run_vertical_link(config_path: Path, from_level: str, to_level: str, l1_cate
 
     cfg = yaml.safe_load(config_path.read_text(encoding="utf-8"))
     paths = cfg.get("paths", {})
-    outdir = Path(paths.get("outdir", ROOT / "data" / "intermediate_outputs"))
+    outdir = Path(paths.get("outdir", ROOT / "roundC_v4" / "outputs"))
     corpus_path = Path(paths.get("corpus", outdir / "v4_corpus_calibrated.csv"))
     emb_path = Path(paths.get("embeddings", outdir / "v4_embeddings.parquet"))
     pairs_path = Path(paths.get("pairs", outdir / "v4_rerank_edges.csv"))
@@ -187,7 +187,7 @@ def run_vertical_link(config_path: Path, from_level: str, to_level: str, l1_cate
 
     f_nodes, f_mem = _load_layer(outdir, from_level)
     t_nodes, t_mem = _load_layer(outdir, to_level)
-    
+
     if f_nodes.empty:
         print(f"[WARN] {from_level} 节点为空，跳过。", file=sys.stderr)
         return
@@ -222,7 +222,7 @@ def run_vertical_link(config_path: Path, from_level: str, to_level: str, l1_cate
             f"[WARN] 缺少 {from_level} (child) 节点，跳过：L1={l1_category or 'ALL'}",
             file=sys.stderr,
         )
-        return 
+        return
 
     f_centroids = {nid: vector_centroid(f_members_map.get(nid, []), emb) for nid in child_ids}
     t_centroids = {nid: vector_centroid(t_members_map.get(nid, []), emb) for nid in parent_ids}
@@ -243,7 +243,7 @@ def run_vertical_link(config_path: Path, from_level: str, to_level: str, l1_cate
         clabel = f_labels.get(child_id, "")
         if not members:
             continue
-        
+
         # 准备候选
         cand_rows = []
         for pid in parent_ids:
@@ -261,21 +261,21 @@ def run_vertical_link(config_path: Path, from_level: str, to_level: str, l1_cate
         decision_type = ""
 
         # --- 决策逻辑 ---
-        
+
         # 1. [直通车] 候选池为空 -> 自动新建
         if not parent_ids:
-            create_new = {"label": clabel} 
+            create_new = {"label": clabel}
             conf = 1.0
             reason = "No existing parents available (Auto-init)."
             decision_type = "auto_create_first"
-            
+
         # 2. [直通车] Hard Assign (Top1 > 0.92) -> 直接分配
         elif cands and cands[0][1] >= HARD_ASSIGN_THRESHOLD:
             assign_to = cands[0][0]
             conf = 1.0
             reason = f"Hard Assign (Score {cands[0][1]:.2f} >= {HARD_ASSIGN_THRESHOLD})"
             decision_type = "hard_assign"
-            
+
         # 3. [慢车道] 调用 LLM 裁决
         else:
             child_titles = [sample_title.get(sid, "") for sid in members[:8]]
@@ -290,7 +290,7 @@ def run_vertical_link(config_path: Path, from_level: str, to_level: str, l1_cate
                 "\n返回 JSON：{\"assign_to\": \"<parent_id>\"|null, \"create_new\": {\"label\": \"...\"}|null, \"confidence\": 0-1, \"reason\": \"...\"}"
             )
             margin = cands[0][1] - cands[1][1] if len(cands) >= 2 else (cands[0][1] if cands else 0.0)
-            
+
             adj = adjudicate(
                 llm_cfg,
                 PROMPT_CLASSIFY.read_text(encoding="utf-8"),
@@ -300,11 +300,11 @@ def run_vertical_link(config_path: Path, from_level: str, to_level: str, l1_cate
                 evidence_score_primary=margin,
                 evidence_score_secondary=0.0,
             )
-            
+
             obj = adj.get("final")
             if not obj:
                 obj = adj.get("primary", {}).get("json") or {}
-            
+
             assign_to = obj.get("assign_to")
             create_new = obj.get("create_new")
             conf = float(obj.get("confidence") or 0.0)
@@ -330,13 +330,13 @@ def run_vertical_link(config_path: Path, from_level: str, to_level: str, l1_cate
                 }
             )
             applied = True
-        
+
         elif create_new:
             parent_id = make_node_id(_level_to_T(to_level), members)
             label = str(create_new.get("label") or clabel or f"NEW_{to_level}")
             child_row = f_nodes[f_nodes["node_id"] == child_id]
             child_l1 = child_row["l1_category"].iloc[0] if not child_row.empty else (l1_category or "")
-            
+
             new_parents.append(
                 {
                     "node_id": parent_id,
@@ -357,7 +357,7 @@ def run_vertical_link(config_path: Path, from_level: str, to_level: str, l1_cate
             parent_ids.append(parent_id)
             t_labels[parent_id] = label
             t_centroids[parent_id] = vector_centroid(members, emb)
-            
+
             links_rows.append(
                 {
                     "child_id": child_id,
@@ -407,7 +407,7 @@ def run_vertical_link(config_path: Path, from_level: str, to_level: str, l1_cate
         # 为了保证 Edges 的完整性，我们需要重新计算（或者追加）Edges
         # 这里为了安全起见，我们将新父节点构成的子图的 Edges 计算出来并追加。
         # 这是一个折中方案：确保新节点有边，且不删除旧边。
-        
+
         # 重新加载（包含了刚才写入的新节点）的全量 membership，确保计算准确（可选，为了速度只计算新增）
         # 为了速度，我们只计算新节点相关的边
         node_members_new = {nid: set(sids) for nid, sids in new_parent_members.items()}
@@ -416,11 +416,11 @@ def run_vertical_link(config_path: Path, from_level: str, to_level: str, l1_cate
         # 我们合并一下：
         for nid, sids in t_members_map.items():
             node_members_new[nid] = set(sids)
-            
+
         new_edges_df = contract_edges(node_members_new, pairs)
         new_edges_df["human_action"] = "keep"
         new_edges_df["human_notes"] = ""
-        
+
         _append_with_dedup(new_edges_df, outdir / f"v4_edges_{to_level}.csv", ["node_a", "node_b"])
 
     log_path = LOG_DIR / f"step3_vertical_link_{from_level}_to_{to_level}{'_' + l1_category if l1_category else ''}.log"
@@ -474,7 +474,7 @@ def main():
         return
 
     cfg = yaml.safe_load(config_path.read_text(encoding="utf-8"))
-    outdir = Path(cfg.get("paths", {}).get("outdir", ROOT / "data" / "intermediate_outputs"))
+    outdir = Path(cfg.get("paths", {}).get("outdir", ROOT / "roundC_v4" / "outputs"))
     assign = _load_assignments(outdir)
     if not assign:
         run_vertical_link(config_path, args.from_level, args.to_level, None)

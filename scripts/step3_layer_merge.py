@@ -39,7 +39,7 @@ ROOT = HERE.parent
 LOG_DIR = ROOT / "data" / "intermediate_outputs" / "logs"
 OPS_LOG = ROOT / "data" / "intermediate_outputs" / "v4_operations_log.jsonl"
 PROMPT_MERGE = ROOT / "prompts" / "step3_merge_decision.md"
-ENV_FILE = ROOT / "configs" / "roundC_v4.env"
+ENV_FILE = ROOT / "configs" / ".env"
 
 
 def build_high_graph(atom_ids: List[str], pairs: pd.DataFrame, high_thr: float, mutual_required: bool) -> Dict[str, set]:
@@ -92,15 +92,15 @@ def _mk_llm_config(lcfg: dict) -> LLMConfig:
     # [修改 1] 强制单模型逻辑
     # 优先读取 config 中的 primary，其次读取环境变量，最后兜底
     primary = str(lcfg.get("primary") or os.getenv("PRIMARY_LLM_MODEL") or "qwen3-max")
-    
+
     # 将 secondary 强制设置为与 primary 相同
     # 这样 common_llm 中的 adjudicate 即使执行双重检查，也是同一模型，避免思路打架
-    secondary = primary 
-    
+    secondary = primary
+
     os.environ.setdefault("OPENAI_BASE_URL", os.getenv("PRIMARY_LLM_BASE_URL", "https://api.openai.com/v1"))
     if os.getenv("PRIMARY_LLM_API_KEY") and not os.getenv("OPENAI_API_KEY"):
         os.environ["OPENAI_API_KEY"] = os.getenv("PRIMARY_LLM_API_KEY", "")
-        
+
     return LLMConfig(
         primary=primary,
         secondary=secondary, # 此时 secondary == primary
@@ -184,7 +184,7 @@ def _append_with_dedup(df_new: pd.DataFrame, path: Path, subset: List[str]) -> p
 def run_layer_merge_for_partition(config_path: Path, level_L: str, l1_category: str | None):
     cfg = yaml.safe_load(config_path.read_text(encoding="utf-8"))
     paths = cfg.get("paths", {})
-    outdir = Path(paths.get("outdir", ROOT / "outputs"))
+    outdir = Path(paths.get("outdir", ROOT / "data" / "intermediate_outputs"))
     corpus_path = Path(paths.get("corpus", outdir / "v4_corpus_calibrated.csv"))
     pairs_path = Path(paths.get("pairs", outdir / "v4_rerank_edges.csv"))
 
@@ -231,7 +231,7 @@ def run_layer_merge_for_partition(config_path: Path, level_L: str, l1_category: 
     for comp in comps:
         members = sorted(set(comp))
         titles = [id2title.get(a, "") for a in members]
-        
+
         label: str = ""
         conf: float = 1.0
         provenance: str = ""
@@ -250,8 +250,8 @@ def run_layer_merge_for_partition(config_path: Path, level_L: str, l1_category: 
             {
                 "members": members,
                 "label": label,
-                "confidence": conf, 
-                "provenance": provenance, 
+                "confidence": conf,
+                "provenance": provenance,
             }
         )
 
@@ -282,7 +282,7 @@ def run_layer_merge_for_partition(config_path: Path, level_L: str, l1_category: 
         titles = [id2title.get(x, "") for x in mems[:12]]
         stats_line = f"样本数={len(mems)}; 边p75={row['score_p75']:.2f}, mean={row['score_mean']:.2f}, max={row['score_max']:.2f}"
         user = f"层级：{level_L}\n候选成员：\n" + "\n".join([f"- {t}" for t in titles]) + f"\n{stats_line}\n"
-        
+
         # 这里 adjudicate 会使用 llm_cfg，其中 secondary 已被强制设为 primary
         adj = adjudicate(
             llm_cfg,
@@ -312,10 +312,10 @@ def run_layer_merge_for_partition(config_path: Path, level_L: str, l1_category: 
             all_members.extend(clusters[i]["members"])
             confs.append(clusters[i]["confidence"])
             provs.append(clusters[i]["provenance"])
-        
+
         unique_members = sorted(set(all_members))
         node_id = make_node_id(_level_to_T(level_L), unique_members)
-        
+
         # [修改 3] 最终生成节点时，若只有1个成员，再次跳过 LLM 起名
         if len(unique_members) == 1:
             label = id2title.get(unique_members[0], "")
@@ -326,11 +326,11 @@ def run_layer_merge_for_partition(config_path: Path, level_L: str, l1_category: 
             provenance_final = "merge-llm" if any(p == "merge-llm" for p in provs) else ("merge-high" if any(p == "merge-high" for p in provs) else "seed-existing")
 
         confidence = float(np.clip(np.nanmean(confs) if confs else lconf, 0.6, 1.0))
-        
+
         node_l1 = default_l1
         if assign and not node_l1 and all_members:
             node_l1 = assign.get(all_members[0], "")
-            
+
         final_nodes.append(
             {
                 "node_id": node_id,
@@ -395,7 +395,7 @@ def main():
         return
 
     cfg = yaml.safe_load(config_path.read_text(encoding="utf-8"))
-    outdir = Path(cfg.get("paths", {}).get("outdir", ROOT / "outputs"))
+    outdir = Path(cfg.get("paths", {}).get("outdir", ROOT / "data" / "intermediate_outputs"))
     assign = _load_assignments(outdir)
     if not assign:
         run_layer_merge_for_partition(config_path, args.level, None)

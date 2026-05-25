@@ -27,7 +27,7 @@ from sklearn.preprocessing import normalize
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
-OUT_DIR_DEFAULT = ROOT / "outputs"
+OUT_DIR_DEFAULT = ROOT / "data" / "intermediate_outputs"
 LOG_DIR_DEFAULT = OUT_DIR_DEFAULT / "logs"
 
 
@@ -248,7 +248,7 @@ def rerank_api_call(
     headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
     # 判断是否为阿里 DashScope 接口
     is_dashscope = "dashscope.aliyuncs.com" in (endpoint or "")
-    
+
     for attempt in range(1, max_retries + 1):
         try:
             # ==========================================
@@ -269,7 +269,7 @@ def rerank_api_call(
 
                 docs_str = [_clip(d if isinstance(d, str) else str(d)) for d in documents]
                 q_str = _clip(query or "")
-                
+
                 # 阿里要求 top_n 参数
                 topn = max(1, min(len(docs_str), 20))
 
@@ -277,7 +277,7 @@ def rerank_api_call(
                 body = {
                     "model": model,
                     "input": {
-                        "query": q_str, 
+                        "query": q_str,
                         "documents": docs_str
                     },
                     "parameters": {
@@ -285,20 +285,20 @@ def rerank_api_call(
                         "return_documents": False
                     },
                 }
-                
+
                 data = _call(body)
-                
+
                 # [关键修复] 解析阿里返回的嵌套结构: output -> results
                 items = data.get("output", {}).get("results", [])
                 scores: List[float] = [0.0] * len(docs_str)
-                
+
                 # 阿里返回的数据通常带有 index，需要按 index 填回
                 for it in items:
                     idx = it.get("index")
                     sc = it.get("relevance_score", it.get("score", 0.0))
                     if isinstance(idx, int) and 0 <= idx < len(scores):
                         scores[idx] = float(sc)
-                
+
                 return scores
 
             # ==========================================
@@ -308,17 +308,17 @@ def rerank_api_call(
                 body = {"model": model, "query": query, "documents": documents}
                 # 某些接口(如 BGE)可能需要 explicit top_n
                 body["top_n"] = len(documents)
-                
+
                 resp = requests.post(endpoint, headers=headers, json=body, timeout=timeout_s)
                 resp.raise_for_status()
                 data = resp.json()
-                
+
                 # 通用解析: results 或 data
                 items = data.get("results", []) or data.get("data", [])
                 scores = [0.0] * len(documents)
-                
+
                 has_index = any(isinstance(it, dict) and ("index" in it) for it in items)
-                
+
                 if has_index:
                     for it in items:
                         if not isinstance(it, dict): continue
@@ -348,21 +348,21 @@ def rerank_api_call(
                     print(f"   >>> Body: {e.response.text}")
                 except:
                     pass
-            
+
             if attempt == max_retries:
                 print(f"   [FAIL] All retries failed. Returning None.")
                 return None
-            
+
             import time
             time.sleep(1.0)
-    
+
     return None
 
 
 def main() -> None:
     ap = argparse.ArgumentParser(description="Round C v4 - Step 2 Embed & NN")
     ap.add_argument("--corpus", default=None, help="corpus csv; defaults to v4_corpus_filtered/v4_cluster_corpus_cleaned")
-    ap.add_argument("--env", default=str(ROOT / "configs" / "roundC_v4.env"))
+    ap.add_argument("--env", default=str(ROOT / "configs" / ".env"))
     ap.add_argument("--outdir", default=str(OUT_DIR_DEFAULT))
 
     ap.add_argument("--embed-text-template", choices=["title_plus_path", "title_only", "path_only"], default="title_plus_path")

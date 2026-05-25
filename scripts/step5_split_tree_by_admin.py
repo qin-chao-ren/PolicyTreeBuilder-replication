@@ -11,7 +11,7 @@ from typing import Dict, List, Set, Optional
 import pandas as pd
 
 # === 1. 路径配置 ===
-DEFAULT_OUTDIR = Path(r"<LOCAL_SOURCE_ROOT>/data\intermediate_outputs")
+DEFAULT_OUTDIR = Path(r"data/intermediate_outputs")
 ADMIN_MAP_FILE = Path(r"data/source/admin_mapping/roundA_final_overview_scored_selected1120.csv")
 
 GLOBAL_TREE_FILE = DEFAULT_OUTDIR / "v4_tree_coarse_global.json"
@@ -38,7 +38,7 @@ def load_admin_mapping() -> Dict[str, Dict]:
     """加载属性映射"""
     print(">>> 1. 加载属性映射...")
     doc_admin_map = {}
-    
+
     # 1. 读取 RoundA 映射表
     with open(ADMIN_MAP_FILE, "r", encoding="utf-8-sig") as f:
         reader = csv.DictReader(f)
@@ -50,12 +50,12 @@ def load_admin_mapping() -> Dict[str, Dict]:
                     "level": row.get("admin_level", ""),
                     "name": row.get("admin_name", "")
                 }
-    
+
     # 2. 读取语料库 (关键修改：使用 utf-8-sig 防止 BOM 导致列名错误)
     sample_admin_map = {}
     with open(CORPUS_FILE, "r", encoding="utf-8-sig") as f:
         reader = csv.DictReader(f)
-        
+
         # --- 调试信息：检查列名 ---
         headers = reader.fieldnames
         if "sample_id" not in headers:
@@ -64,20 +64,20 @@ def load_admin_mapping() -> Dict[str, Dict]:
             actual_sid_col = next((h for h in headers if "sample_id" in h), None)
         else:
             actual_sid_col = "sample_id"
-            
+
         actual_doc_col = "doc_id" if "doc_id" in headers else next((h for h in headers if "doc_id" in h), None)
         # ------------------------
 
         for row in reader:
             sid = row.get(actual_sid_col)
             did = row.get(actual_doc_col)
-            
+
             if sid: sid = sid.strip()
             if did: did = did.strip()
-            
+
             if sid and did and did in doc_admin_map:
                 sample_admin_map[sid] = doc_admin_map[did]
-    
+
     print(f"    成功关联 {len(sample_admin_map)} 个样本的属性信息。")
     return sample_admin_map
 
@@ -86,25 +86,25 @@ def load_all_memberships() -> Dict[str, Dict[str, Set[str]]]:
     print(">>> 2. 加载树节点成员...")
     all_members = {}
     total_samples_in_tree = set()
-    
+
     for level, path in MEMBERSHIP_FILES.items():
         if not path.exists():
             print(f"    [WARN] {level} 成员表缺失: {path}")
             all_members[level] = {}
             continue
-            
+
         # pandas 读取通常比较稳健
         try:
             df = pd.read_csv(path, dtype=str)
             node_samples = {}
             count = 0
-            
+
             # 自动清洗列名空格
             df.columns = df.columns.str.strip()
-            
+
             nid_col = "node_id"
             mid_col = "member_id" if "member_id" in df.columns else "sample_id"
-            
+
             if nid_col in df.columns and mid_col in df.columns:
                 for nid, grp in df.groupby(nid_col):
                     sids = set(grp[mid_col].astype(str).str.strip().tolist())
@@ -116,7 +116,7 @@ def load_all_memberships() -> Dict[str, Dict[str, Set[str]]]:
         except Exception as e:
             print(f"    [ERROR] 读取 {level} 失败: {e}")
             all_members[level] = {}
-        
+
     print(f"    树结构中总共包含 {len(total_samples_in_tree)} 个唯一的样本 ID。")
     return all_members, total_samples_in_tree
 
@@ -124,7 +124,7 @@ def prune_tree(node: Dict, valid_samples: Set[str], all_members: Dict[str, Dict[
     """递归剪枝"""
     node_level = str(node.get("level", "")).upper()
     node_id = str(node.get("node_id"))
-    
+
     # 1. 自身是否命中
     is_direct_hit = False
     if node_level in all_members:
@@ -136,12 +136,12 @@ def prune_tree(node: Dict, valid_samples: Set[str], all_members: Dict[str, Dict[
     # 2. 递归检查子节点
     valid_children = []
     original_children = node.get("children", []) or []
-    
+
     for child in original_children:
         result = prune_tree(child, valid_samples, all_members)
         if result:
             valid_children.append(result)
-    
+
     # 3. 决定是否保留
     if is_direct_hit or valid_children:
         new_node = node.copy()
@@ -152,22 +152,22 @@ def prune_tree(node: Dict, valid_samples: Set[str], all_members: Dict[str, Dict[
 
 def main():
     print(f"=== 开始生成分层树 (输出目录: {DEFAULT_OUTDIR}) ===")
-    
+
     # 1. 加载数据
     global_tree = load_json(GLOBAL_TREE_FILE)
     if not global_tree: return
-    
+
     sample_map = load_admin_mapping()
     all_members, tree_samples = load_all_memberships()
-    
+
     # 2. 准备过滤器
     print(">>> 3. 准备过滤器...")
     prov_samples = {sid for sid, info in sample_map.items() if "省级" in info["level"]}
     city_samples = {sid for sid, info in sample_map.items() if "市级" in info["level"]}
-    
+
     prov_intersect = prov_samples.intersection(tree_samples)
     city_intersect = city_samples.intersection(tree_samples)
-    
+
     print(f"    [统计] 原始映射中 '省级' 样本数: {len(prov_samples)}")
     print(f"    [统计] 实际上树的 '省级' 样本数: {len(prov_intersect)}")
     print(f"    [统计] 原始映射中 '市级' 样本数: {len(city_samples)}")
@@ -210,21 +210,21 @@ def main():
         name = info["name"]
         if name:
             name_groups.setdefault(name, set()).add(sid)
-    
+
     sub_dir = DEFAULT_OUTDIR / "trees_by_admin"
     sub_dir.mkdir(exist_ok=True)
     count = 0
-    
+
     for name, sids in name_groups.items():
         if not sids.intersection(tree_samples):
             continue
-            
+
         safe_name = "".join([c for c in name if c.isalnum() or c in (' ','_','-')])
         admin_tree = prune_tree(global_tree, sids, all_members)
         if admin_tree:
             save_json(sub_dir / f"tree_{safe_name}.json", admin_tree)
             count += 1
-            
+
     print(f"    ✅ 已生成 {count} 个具体行政单位的树文件")
     print("\n=== 全部完成 ===")
 

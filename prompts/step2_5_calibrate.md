@@ -46,7 +46,7 @@
 
 **示例（仅用于理解；实际回答仍只输出 JSON）**：
 
-> 主体粒度：meso；例外：包含一个宏观 H1  
+> 主体粒度：meso；例外：包含一个宏观 H1
 ```json
 {
   "majority_granularity": "meso",

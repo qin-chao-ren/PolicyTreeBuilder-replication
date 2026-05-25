@@ -24,7 +24,7 @@ from utils.llm_client import load_env_file
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
-OUT_DIR_DEFAULT = ROOT / 'outputs'
+OUT_DIR_DEFAULT = ROOT / 'data' / 'intermediate_outputs'
 LOG_DIR_DEFAULT = OUT_DIR_DEFAULT / 'logs'
 
 
@@ -43,7 +43,7 @@ def main():
     ap = argparse.ArgumentParser(description='Round C v4 · Step 2.8 classify documents to L1 (3-round)')
     ap.add_argument('--l1-def', type=str, default=str(OUT_DIR_DEFAULT / 'v4_l1_definition.json'))
     ap.add_argument('--corpus', type=str, default=str(OUT_DIR_DEFAULT / 'v4_corpus_calibrated.csv'))
-    ap.add_argument('--env', type=str, default=str(ROOT / 'configs' / 'roundC_v4.env'))
+    ap.add_argument('--env', type=str, default=str(ROOT / 'configs' / '.env'))
     ap.add_argument('--outdir', type=str, default=str(OUT_DIR_DEFAULT))
     ap.add_argument('--limit', type=int, default=0, help='仅处理前 N 行，0 表示全部')
     args = ap.parse_args()
@@ -65,7 +65,7 @@ def main():
     # --- 1. 读取 L1 定义 ---
     l1_obj = json.loads(Path(args.l1_def).read_text(encoding='utf-8'))
     l1_list: List[Dict[str, object]] = list(l1_obj.get('categories') or [])
-    
+
     # 记录本次运行中生成的 {新名称: 新ID} 映射，防止同名新建多次分配不同 ID
     created_l1_map: Dict[str, str] = {}
 
@@ -130,14 +130,14 @@ def main():
     # 逐文档三轮
     for doc_id, g in df.groupby('doc_id', sort=False):
         g = g.sort_values('_blk')
-        
+
         # [结构判定 H1]
         heads = g[g['final_level'] == 'H1'].index.tolist()
         if not heads:
             if g.index.tolist():
                 heads = [g.index.tolist()[0]]
             else:
-                continue 
+                continue
 
         idxs = g.index.tolist()
         sections: List[List[int]] = []
@@ -147,14 +147,14 @@ def main():
             sections.append(idxs[start_pos:end_pos])
 
         unresolved: List[List[int]] = []
-        
+
         # --- Round 1: 顶层判定 ---
         for sec in sections:
             hrow = df.loc[sec[0]]
             sec_top_level = str(hrow.get('calibrated_level') or '')
-            
+
             best, conf, obj = judge_l1(str(hrow.get('cleaned_title') or ''))
-            
+
             if best:
                 if sec_top_level == 'T1':
                     review_rows.append({
@@ -207,7 +207,7 @@ def main():
         round3_tasks: List[Tuple[int, List[int]]] = []
 
         for sec in unresolved:
-            hrow = df.loc[sec[0]] 
+            hrow = df.loc[sec[0]]
             sec_top_level = str(hrow.get('calibrated_level') or '')
             next_tn = tnum(sec_top_level) + 1
             next_t = f'T{next_tn}' if next_tn <= 4 else None
@@ -215,14 +215,14 @@ def main():
             if not next_t:
                 round3_tasks.append((sec[0], sec))
                 continue
-            
+
             sub = df.loc[sec]
             cheads = sub[sub['calibrated_level'] == next_t].index.tolist()
-            
+
             if not cheads:
                 round3_tasks.append((sec[0], sec))
                 continue
-            
+
             sub_idxs = sub.index.tolist()
             for h_i, h in enumerate(cheads):
                 # [H范围] 物理锁定
@@ -232,7 +232,7 @@ def main():
 
                 crow = df.loc[h]
                 best, conf, obj = judge_l1(str(crow.get('cleaned_title') or ''))
-                
+
                 if best:
                     assign_rows.append({
                         'doc_id': doc_id,
@@ -264,22 +264,22 @@ def main():
         for h_idx, section_idxs in round3_tasks:
             row = df.loc[h_idx]
             sec_top_level = str(row.get('calibrated_level') or '')
-            
+
             best, conf, obj = judge_l1(str(row.get('cleaned_title') or ''))
-            
+
             create_new = bool((obj or {}).get('create_new_l1'))
             discard = bool((obj or {}).get('discard'))
             notes = str((obj or {}).get('not_match_reason') or '')
-            
+
             # 决策逻辑变量
             final_decision = ""        # review.csv 中的 suggested_l1
             assigned_id_for_csv = ""   # node_assignments.csv 中的 assigned_l1_id
-            
+
             # [逻辑分支 1: 新建]
             if create_new:
                 new_name = str((obj or {}).get('new_l1_name') or '').strip()
                 new_kws = str((obj or {}).get('new_l1_keywords') or '')
-                
+
                 if not new_name:
                     # 如果 LLM 没给名字，退化为 best 或 Unknown
                     new_name = "Unknown_New_L1"
@@ -291,12 +291,12 @@ def main():
                     # 【核心修改】使用 Hash 生成，确保稳定且格式统一 (L1_N{hash})
                     new_id = f"L1_N{md5_8(new_name)}"
                     created_l1_map[new_name] = new_id
-                
+
                 # 设置输出
                 final_decision = new_id # Review 表直接显示新 ID
                 assigned_id_for_csv = new_id
                 notes = (notes + f"; New L1: {new_name} (ID={new_id})").strip('; ')
-                
+
                 if sec_top_level == 'T1':
                     notes += " (T1 head)"
 
@@ -319,7 +319,7 @@ def main():
                     else:
                         new_id = f"L1_N{md5_8(new_name)}"
                         created_l1_map[new_name] = new_id
-                    
+
                     final_decision = new_id
                     assigned_id_for_csv = new_id
                     notes += f"; Auto-created Unknown (ID={new_id})"
@@ -335,7 +335,7 @@ def main():
 
             # 2. 写入 Assignment 表 (Node CSV)
             if final_decision != 'discard' and assigned_id_for_csv:
-                
+
                 # 记录头 (Doc Assignment)
                 assign_rows.append({
                     'doc_id': row.get('doc_id',''),
@@ -346,7 +346,7 @@ def main():
                     'confidence': float(f"{conf:.4f}"),
                     'notes': f"Review: {notes}",
                 })
-                
+
                 # 记录物理范围内的所有子节点
                 for idx in section_idxs:
                     r = df.loc[idx]
@@ -365,15 +365,15 @@ def main():
     out_review = out_dir / 'v4_l1_classification_review.csv'
     pd.DataFrame(review_rows).to_csv(out_review, index=False, encoding='utf-8-sig')
     log_write(log_path, f"[WRITE] {out_review} rows={len(review_rows)}")
-    
+
     out_assign = out_dir / 'v4_l1_doc_assignments.csv'
     pd.DataFrame(assign_rows).to_csv(out_assign, index=False, encoding='utf-8-sig')
     log_write(log_path, f"[WRITE] {out_assign} rows={len(assign_rows)}")
-    
+
     out_nodes = out_dir / 'v4_l1_node_assignments.csv'
     pd.DataFrame(node_assign_rows).to_csv(out_nodes, index=False, encoding='utf-8-sig')
     log_write(log_path, f"[WRITE] {out_nodes} rows={len(node_assign_rows)}")
-    
+
     print(f'[WRITE] {out_review}')
     print(f'[WRITE] {out_assign}')
     print(f'[WRITE] {out_nodes}')

@@ -6,6 +6,7 @@ Step 3 · T2 -> L1 全局挂接（v4 · 三轮漏斗裁决版 · 配置增强）
 修改点：
 1. 增加配置读取优先级：CLI参数 > YAML配置 > 默认值。
 2. 支持从 YAML 中读取 global_link.hard_threshold 和 auto_accept_conf。
+3. [Fix] 补充缺失的 _append_with_dedup 函数。
 """
 from __future__ import annotations
 
@@ -34,10 +35,10 @@ ROOT = HERE.parent
 LOG_DIR = ROOT / "data" / "intermediate_outputs" / "logs"
 OPS_LOG = ROOT / "data" / "intermediate_outputs" / "v4_operations_log.jsonl"
 PROMPT_LINK = ROOT / "prompts" / "step3_link_t2_l1.md"
-ENV_FILE = ROOT / "configs" / "roundC_v4.env"
+ENV_FILE = ROOT / "configs" / ".env"
 
 # --- 默认配置 ---
-DEFAULT_HARD_THRESHOLD = 0.50 
+DEFAULT_HARD_THRESHOLD = 0.50
 DEFAULT_AUTO_ACCEPT_CONF = 0.85
 
 def _load_env():
@@ -52,7 +53,7 @@ def _load_env():
 
 def _mk_llm_config(lcfg: dict) -> LLMConfig:
     primary = str(lcfg.get("primary") or os.getenv("PRIMARY_LLM_MODEL") or "qwen3-max")
-    secondary = primary 
+    secondary = primary
     os.environ.setdefault("OPENAI_BASE_URL", os.getenv("PRIMARY_LLM_BASE_URL", "https://api.openai.com/v1"))
     if os.getenv("PRIMARY_LLM_API_KEY") and not os.getenv("OPENAI_API_KEY"):
         os.environ["OPENAI_API_KEY"] = os.getenv("PRIMARY_LLM_API_KEY", "")
@@ -75,7 +76,7 @@ def _log_line(path: Path, msg: str):
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("a", encoding="utf-8") as fh:
         fh.write(msg.rstrip() + "\n")
-    print(msg) 
+    print(msg)
 
 def _md5_8(s: str) -> str:
     return hashlib.md5(s.encode("utf-8")).hexdigest()[:8]
@@ -130,14 +131,36 @@ def _load_l3_context(outdir: Path) -> Dict[str, List[str]]:
         print(f"[WARN] Failed to load L3 context: {e}")
         return {}
 
+# --- [修复] 补充缺失的 helper 函数 ---
+def _append_with_dedup(new_df: pd.DataFrame, path: Path, subset: List[str]):
+    """
+    将 new_df 追加到 path 指定的 CSV 中，并根据 subset 列去重（保留最后一条）。
+    用于增量更新链接关系或节点表。
+    """
+    if new_df.empty:
+        return
+
+    if path.exists():
+        try:
+            existing = pd.read_csv(path, dtype=str)
+            combined = pd.concat([existing, new_df], ignore_index=True)
+        except EmptyDataError:
+            combined = new_df
+    else:
+        combined = new_df
+
+    # 去重：keep='last' 确保最新的决策覆盖旧的
+    combined = combined.drop_duplicates(subset=subset, keep="last")
+    safe_write_csv(combined, path)
+
 def run_link_t2_l1(config_path: Path, cli_hard_threshold: Optional[float]):
     # 1. 加载配置
     cfg = yaml.safe_load(config_path.read_text(encoding="utf-8"))
-    
+
     # 【逻辑修正】优先级：CLI参数 > YAML配置 > 默认值
     yaml_hard_thr = cfg.get("global_link", {}).get("hard_threshold")
     yaml_auto_conf = cfg.get("global_link", {}).get("auto_accept_conf")
-    
+
     # 确定 hard_threshold
     if cli_hard_threshold is not None:
         hard_threshold = cli_hard_threshold
@@ -145,14 +168,14 @@ def run_link_t2_l1(config_path: Path, cli_hard_threshold: Optional[float]):
         hard_threshold = float(yaml_hard_thr)
     else:
         hard_threshold = DEFAULT_HARD_THRESHOLD
-        
+
     # 确定 auto_accept_conf
     auto_accept_conf = float(yaml_auto_conf) if yaml_auto_conf is not None else DEFAULT_AUTO_ACCEPT_CONF
 
     print(f"[CONFIG] 最终参数: Hard Threshold = {hard_threshold}, Auto Accept Conf = {auto_accept_conf}")
-    
+
     paths = cfg.get("paths", {})
-    outdir = Path(paths.get("outdir", ROOT / "outputs"))
+    outdir = Path(paths.get("outdir", ROOT / "data" / "intermediate_outputs"))
     ensure_outdir(outdir)
     LOG_DIR.mkdir(parents=True, exist_ok=True)
     _load_env()
@@ -160,7 +183,7 @@ def run_link_t2_l1(config_path: Path, cli_hard_threshold: Optional[float]):
     # 2. 准备数据
     corpus = read_corpus(paths.get("corpus", outdir / "v4_corpus_calibrated.csv"))
     sample_title = {str(r["sample_id"]): str(r["cleaned_title"]) for _, r in corpus.iterrows()}
-    
+
     assign_df = pd.read_csv(outdir / "v4_l1_node_assignments.csv", dtype=str)
     valid_assign = assign_df[assign_df["assigned_l1_id"].notna() & (assign_df["assigned_l1_id"] != "")]
     physical_map = dict(zip(valid_assign["sample_id"], valid_assign["assigned_l1_id"]))
@@ -199,7 +222,7 @@ def run_link_t2_l1(config_path: Path, cli_hard_threshold: Optional[float]):
                 l1 = physical_map[m]
                 if l1 in l1_meta:
                     votes[l1] = votes.get(l1, 0) + 1
-        
+
         best_phy_l1 = None
         best_phy_ratio = 0.0
         if votes:
@@ -222,7 +245,7 @@ def run_link_t2_l1(config_path: Path, cli_hard_threshold: Optional[float]):
         for l1_id, meta in l1_meta.items():
             sim = jaccard_overlap(label, meta["label"])
             phy_cnt = votes.get(l1_id, 0)
-            score = (phy_cnt * 1.0) + sim 
+            score = (phy_cnt * 1.0) + sim
             cand_rows.append((l1_id, score, meta["label"], meta["keywords"]))
         cand_rows.sort(key=lambda x: x[1], reverse=True)
         top_cands = cand_rows[:5]
@@ -230,7 +253,7 @@ def run_link_t2_l1(config_path: Path, cli_hard_threshold: Optional[float]):
         # --- R2: 快速筛选 ---
         titles_sample = [sample_title.get(m, "") for m in members[:6]]
         cand_desc = [f"{i+1}) {c[2]} (ID:{c[0]})" for i, c in enumerate(top_cands)]
-        
+
         user_prompt_r2 = (
             f"待归类 L2: {label}\n"
             f"样本示例: {'; '.join(titles_sample)}\n"
@@ -241,7 +264,7 @@ def run_link_t2_l1(config_path: Path, cli_hard_threshold: Optional[float]):
 
         resp_r2 = call_json(llm_cfg.primary, PROMPT_LINK.read_text(encoding="utf-8"), user_prompt_r2)
         obj_r2 = resp_r2.get("json") or {}
-        
+
         r2_pass = False
         if obj_r2 and not obj_r2.get("create_new_l1"):
             conf = float(obj_r2.get("confidence") or 0)
@@ -275,12 +298,12 @@ def run_link_t2_l1(config_path: Path, cli_hard_threshold: Optional[float]):
 
         resp_r3 = call_json(llm_cfg.primary, PROMPT_LINK.read_text(encoding="utf-8"), user_prompt_r3)
         _write_jsonl(log_link, {"node": node_id, "round": 3, "resp": resp_r3})
-        
+
         obj_r3 = resp_r3.get("json") or {}
         create_new = bool(obj_r3.get("create_new_l1"))
         best_id = obj_r3.get("best_l1_id")
         reason = str(obj_r3.get("analysis") or obj_r3.get("not_match_reason") or "")
-        
+
         parent_id = None
         is_new_parent = False
 
@@ -294,7 +317,7 @@ def run_link_t2_l1(config_path: Path, cli_hard_threshold: Optional[float]):
                 base_id = f"L1_N{_md5_8(new_label)}"
                 parent_id = base_id
                 new_meta = {
-                    "label": new_label, "keywords": str(obj_r3.get("new_l1_keywords") or ""), 
+                    "label": new_label, "keywords": str(obj_r3.get("new_l1_keywords") or ""),
                     "definition": reason
                 }
                 l1_meta[parent_id] = new_meta
@@ -341,7 +364,7 @@ def main():
     # 将默认值设为 None，以便区分是否传入了参数
     parser.add_argument("--hard-threshold", type=float, default=None, help="覆盖 YAML 中的 hard_threshold 配置")
     args = parser.parse_args()
-    
+
     run_link_t2_l1(Path(args.config), args.hard_threshold)
 
 if __name__ == "__main__":

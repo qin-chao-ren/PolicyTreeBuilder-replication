@@ -45,37 +45,37 @@ def fix_recursive(node: Dict, parent_id: Optional[str], current_depth: int, stat
         if not node.get("node_id"):
             node["node_id"] = "TREE_ROOT"
             node["label"] = "全部分类"
-    
+
     # --- 2. 修正普通节点 (L1 - L4) ---
     else:
         # 强制计算目标层级：Depth 1 -> L1, Depth 2 -> L2...
         target_level = f"L{current_depth}"
-        
+
         # 更新 Level
         node["level"] = target_level
-        
+
         # [关键] 更新 Parent ID
         # 很多可视化错误是因为 parent_id 还是旧的（指向了更上层的祖先），导致连线跨层。
         # 这里我们强制把它指向当前的物理父节点。
         if parent_id:
             node["parent_id"] = parent_id
-            
+
         stats["processed"] += 1
 
     # --- 3. 递归 ---
     # 获取当前节点的 ID，作为下一层的 parent_id
     current_id = node.get("node_id")
-    
+
     # 防御性检查：如果节点没有 children 字段，初始化为空列表
     if "children" not in node:
         node["children"] = []
-        
+
     children = node_children(node)
-    
+
     # 如果层级过深 (超过 L4)，虽然保留数据，但标记一下警告（可选）
     if current_depth >= 4 and children:
         stats["deep_nodes"] += len(children)
-        
+
     for child in children:
         fix_recursive(child, current_id, current_depth + 1, stats)
 
@@ -96,7 +96,7 @@ def main():
     root = load_json(input_path)
 
     stats = {"processed": 0, "deep_nodes": 0}
-    
+
     # 启动递归：深度 0，无父节点
     fix_recursive(root, None, 0, stats)
 
@@ -106,7 +106,7 @@ def main():
     if stats['deep_nodes'] > 0:
         print(f" - [WARN] Nodes deeper than L4 found: {stats['deep_nodes']} (Converted to L5+)")
     print("-" * 30)
-    
+
     save_json(output_path, root)
     print(f"Fixed tree saved to: {output_path}")
 

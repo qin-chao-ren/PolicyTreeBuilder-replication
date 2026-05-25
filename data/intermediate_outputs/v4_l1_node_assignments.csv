@@ -1,4 +1,4 @@
-﻿doc_id,sample_id,assigned_l1_id,round,source_head,head_level,confidence,notes
+doc_id,sample_id,assigned_l1_id,round,source_head,head_level,confidence,notes
 DF0009,DF0009_00014_01,L1_N6e836104,1,DF0009_00014_01,T2,0.88,
 DF0009,DF0009_00017_01,L1_N6e836104,1,DF0009_00017_01,T2,0.88,
 DF0009,DF0009_00022_01,L1_N70e79b29,1,DF0009_00022_01,T2,0.88,

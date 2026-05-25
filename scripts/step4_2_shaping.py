@@ -1,52 +1,63 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Step 4.2 · Shaping (Refactored)
-功能：结构塑形（层级跳跃修复 + 扇出平衡）
-架构：
-  - 依赖 utils.tree_manager 维护动态拓扑
-  - 依赖 utils.step4_shared 处理环境与IO
-  - 迭代式修复：while changed -> loop，直到结构稳定
+Step 4.2 · Shaping (Fixed Version + Stable Paths)
+功能：结构塑形
+修复内容：深度压平、提升为兄弟、层级跳跃修复
 """
 
 import argparse
 import time
 import hashlib
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, List
 
-from common_utils import call_json
+from common_llm import call_json
 from utils.step4_shared import (
-    Step4Env, 
-    load_tree, 
-    dump_tree, 
-    append_jsonl
+    Step4Env, load_tree, dump_tree, append_jsonl
 )
 from utils.tree_manager import TreeManager
 
-PROMPT_BALANCE = Path("prompts/step4_balance_structure.md")
+# ==========================================
+# 1. 路径锚点 (Path Anchors) - 保留你的配置
+# ==========================================
+HERE = Path(__file__).resolve().parent
+PROJECT_ROOT = HERE.parent  # roundC_v4/
 
+# 2. 关键资源路径
+ENV_PATH = PROJECT_ROOT / "configs" / ".env"
+
+# 3. Prompt 路径
+PROMPT_BALANCE = PROJECT_ROOT / "prompts" / "step4_balance_structure.md"
+
+# ==========================================
+
+# 常量配置
 LEVEL_MAP = {"L1": 1, "L2": 2, "L3": 3, "L4": 4}
+MAX_DEPTH = 4
+MAX_FANOUT = 7
+MAX_ROUNDS = 10
 
-def get_level_num(lvl: str) -> int:
-    return LEVEL_MAP.get(str(lvl).upper(), 99)
-
-def get_next_level(lvl: str) -> str:
-    n = min(get_level_num(lvl) + 1, 4)
+def get_next_level(lvl):
+    n = min(LEVEL_MAP.get(str(lvl).upper(), 99) + 1, 4)
     return f"L{n}"
 
-def generate_bridge_id(parent_id: str, label: str, suffix: str = "BR") -> str:
-    """生成稳定的中间节点 ID"""
-    raw = f"{parent_id}_{label}_{suffix}"
-    # 使用 Hash 缩短 ID 长度，保持整洁
-    h = hashlib.md5(raw.encode()).hexdigest()[:6]
-    return f"{parent_id}_{suffix}_{h}"
+def generate_bridge_id(pid, lbl):
+    h = hashlib.md5(f"{pid}_{lbl}_BR".encode()).hexdigest()[:6]
+    return f"{pid}_BR_{h}"
 
-def describe_node_simple(node: Dict, child_count: int) -> str:
-    return (
-        f"ID={node['node_id']} · level={node.get('level')} · label={node.get('label','')}\n"
-        f"子节点数量={child_count}"
-    )
+def describe_node(node, count):
+    return f"ID={node['node_id']} · level={node.get('level')} · label={node.get('label','')}\n子节点数={count}"
+
+def calc_depth(tm, nid):
+    d = 0
+    curr = nid
+    while curr:
+        p = tm.get_parent_id(curr)
+        if not p: break
+        d += 1
+        curr = p
+    return d
 
 class ShapingProcess:
     def __init__(self, env: Step4Env, tm: TreeManager):
@@ -55,194 +66,129 @@ class ShapingProcess:
         self.tm = tm
         self.ops_log = env.outdir / "v4_operations_log.jsonl"
         self.llm_log = env.log_dir / "llm_step4_shaping.jsonl"
-        
-        # Trace Map 在 4.2 通常为空，但为了兼容性保留
-        self.trace_map = {} 
+        self.trace_map = {}
 
     def run(self):
-        # 1. 修复层级跳跃 (L2 -> L4)
         print("[Step 4.2] Starting Jump Fix...")
-        self._iterate_fix(self._check_and_fix_jump, "jump_fix")
+        self._iterate(self._fix_jump, "jump_fix")
 
-        # 2. 修复过大扇出 (>7)
         print("[Step 4.2] Starting Fanout Balance...")
-        self._iterate_fix(self._check_and_fix_fanout, "fanout_balance")
+        self._iterate(self._fix_fanout, "fanout_balance")
 
-    def _iterate_fix(self, fix_func, stage_name: str, max_rounds=5):
-        """
-        通用迭代修复循环
-        由于修复操作（插入节点、移动节点）会改变树结构，
-        我们需要多次扫描直到没有变更，或者达到最大轮数。
-        """
-        for round_idx in range(max_rounds):
+        print("[Step 4.2] Starting Depth Flattening (New)...")
+        self._iterate(self._fix_depth, "depth_flatten")
+
+    def _iterate(self, func, name):
+        for i in range(MAX_ROUNDS):
             changed = False
-            # 获取当前所有非叶子节点 ID 的快照
-            candidates = [nid for nid in self.tm.get_all_node_ids() if self.tm.get_children(nid)]
-            
-            print(f"  > Round {round_idx+1}: Scanning {len(candidates)} nodes...")
-            
-            for parent_id in candidates:
-                # 动态检查：节点可能在上一轮循环被改变
-                if not self.tm.exists(parent_id): continue
-                
-                # 执行具体的修复逻辑
-                if fix_func(parent_id):
-                    changed = True
-            
-            if not changed:
-                print(f"  > Round {round_idx+1}: Converged.")
-                break
+            candidates = [n for n in self.tm.get_all_node_ids() if self.tm.get_children(n)]
+            print(f"  > Round {i+1}: Scanning {len(candidates)} nodes...")
+            for pid in candidates:
+                if not self.tm.exists(pid): continue
+                if func(pid): changed = True
+            if not changed: break
 
-    def _format_context(self, parent_id: str, children: List[Dict], scenario: str) -> str:
-        parent = self.tm.get_node(parent_id)
-        child_desc = "\n".join([
-            f"- {ch['node_id']} · {ch.get('label','')} · level={ch.get('level')}"
-            for ch in children
-        ])
-        return (
-            f"# 场景：{scenario}\n"
-            f"# 父节点\n{describe_node_simple(parent, len(children))}\n"
-            f"# 子节点列表 (Top {len(children)})\n{child_desc}\n"
-        )
+    def _fmt_ctx(self, pid, children, scene):
+        p = self.tm.get_node(pid)
+        c_desc = "\n".join([f"- {c['node_id']} · {c.get('label','')} · level={c.get('level')}" for c in children])
+        return f"# 场景：{scene}\n# 父节点\n{describe_node(p, len(children))}\n# 子节点\n{c_desc}\n"
 
-    # --- Logic: Jump Fix ---
-    
-    def _check_and_fix_jump(self, parent_id: str) -> bool:
-        parent = self.tm.get_node(parent_id)
-        p_level_num = get_level_num(parent.get("level", ""))
-        
-        # 找出跳跃的子节点 (Gap > 1)
-        jump_children = []
-        for ch in self.tm.get_children(parent_id):
-            c_level_num = get_level_num(ch.get("level", ""))
-            if c_level_num - p_level_num > 1:
-                jump_children.append(ch)
-        
-        if not jump_children:
-            return False
+    # 逻辑1：层级跳跃
+    def _fix_jump(self, pid):
+        p = self.tm.get_node(pid)
+        p_lvl = LEVEL_MAP.get(str(p.get("level")).upper(), 99)
+        jumps = [c for c in self.tm.get_children(pid)
+                 if LEVEL_MAP.get(str(c.get("level")).upper(), 99) - p_lvl > 1]
 
-        # 构造 Prompt
-        scenario = f"层级跳跃 level_gap > 1 (父{parent.get('level')} -> 子{[c.get('level') for c in jump_children]})"
-        context = self._format_context(parent_id, jump_children, scenario)
-        
-        resp = call_json(self.llm.primary, PROMPT_BALANCE.read_text(encoding="utf-8"), context)
-        
-        append_jsonl(self.llm_log, {
-            "ts": int(time.time()), "case": "jump_fix", "parent": parent_id,
-            "children_count": len(jump_children), "resp": resp
-        })
-        
-        return self._apply_llm_decision(parent_id, resp.get("json", {}), "jump_fix")
+        if not jumps: return False
 
-    # --- Logic: Fanout Balance ---
+        ctx = self._fmt_ctx(pid, jumps, "层级跳跃(Level Gap > 1)")
+        resp = call_json(self.llm.primary, PROMPT_BALANCE.read_text(encoding="utf-8"), ctx)
+        append_jsonl(self.llm_log, {"ts":int(time.time()), "case":"jump", "parent":pid, "resp":resp})
+        return self._apply(pid, resp.get("json", {}), "jump")
 
-    def _check_and_fix_fanout(self, parent_id: str) -> bool:
-        children = self.tm.get_children(parent_id)
-        if len(children) <= 7:
-            return False
-            
-        # 构造 Prompt
-        scenario = f"扇出过大 (Children={len(children)} > 7)，考虑分组"
-        # 仅取前 25 个子节点放入 Prompt，避免 Token 爆炸
-        context = self._format_context(parent_id, children[:25], scenario)
-        
-        resp = call_json(self.llm.primary, PROMPT_BALANCE.read_text(encoding="utf-8"), context)
-        
-        append_jsonl(self.llm_log, {
-            "ts": int(time.time()), "case": "fanout_balance", "parent": parent_id,
-            "fanout": len(children), "resp": resp
-        })
-        
-        return self._apply_llm_decision(parent_id, resp.get("json", {}), "fanout_balance")
+    # 逻辑2：扇出过大
+    def _fix_fanout(self, pid):
+        children = self.tm.get_children(pid)
+        if len(children) <= MAX_FANOUT: return False
 
-    # --- Logic: Apply Actions ---
+        ctx = self._fmt_ctx(pid, children[:30], f"扇出过大({len(children)}>{MAX_FANOUT})")
+        resp = call_json(self.llm.primary, PROMPT_BALANCE.read_text(encoding="utf-8"), ctx)
+        append_jsonl(self.llm_log, {"ts":int(time.time()), "case":"fanout", "parent":pid, "resp":resp})
+        return self._apply(pid, resp.get("json", {}), "fanout")
 
-    def _apply_llm_decision(self, parent_id: str, result: Dict, stage: str) -> bool:
-        action = result.get("action", "keep")
-        parent_node = self.tm.get_node(parent_id)
-        did_change = False
-        
-        # Action 1: Insert Bridge (单子节点桥接) or Create Groups (多子节点分组)
-        if action in ["insert_bridge", "create_groups"]:
-            groups = result.get("groups") or []
-            
-            for grp in groups:
-                bridge_label = grp.get("bridge_label")
-                target_child_ids = grp.get("child_ids") or []
-                
-                # 过滤：确保子节点确实在当前父节点下
-                valid_children = [
-                    cid for cid in target_child_ids 
-                    if self.tm.get_parent_id(cid) == parent_id
-                ]
-                
-                if not valid_children or not bridge_label:
-                    continue
-                
-                # 1. 创建 Bridge 节点
-                new_id = generate_bridge_id(parent_id, bridge_label)
-                new_level = get_next_level(parent_node.get("level", "L1"))
-                
-                new_node = {
-                    "node_id": new_id,
-                    "label": bridge_label,
-                    "level": new_level,
-                    "children": [] # TreeManager 会处理
-                }
-                
-                if self.tm.add_child_node(parent_id, new_node):
-                    # 2. 将子节点移动到 Bridge 下
-                    for cid in valid_children:
-                        self.tm.move_node(cid, new_id)
-                    
-                    did_change = True
-                    append_jsonl(self.ops_log, {
-                        "ts": int(time.time()), "step": "step4_2", "stage": stage,
-                        "op": "create_bridge", "parent": parent_id, "bridge": new_id, 
-                        "children_moved": len(valid_children)
-                    })
+    # 逻辑3：深度压平 (New)
+    def _fix_depth(self, pid):
+        depth = calc_depth(self.tm, pid)
+        if depth < MAX_DEPTH: return False
 
-        # Action 2: Lift Children (提升子节点到爷爷下)
-        lift_ids = result.get("lift_children") or []
-        if lift_ids:
-            for cid in lift_ids:
-                if self.tm.get_parent_id(cid) != parent_id: continue
-                
-                # 使用 Safe Promote
-                if self.tm.promote_child_safe(cid):
-                    did_change = True
-                    append_jsonl(self.ops_log, {
-                        "ts": int(time.time()), "step": "step4_2", "stage": stage,
-                        "op": "lift_child", "child": cid, "old_parent": parent_id
-                    })
+        children = self.tm.get_children(pid)
+        gpid = self.tm.get_parent_id(pid)
+        if not gpid: return False
 
-        return did_change
+        # 简单策略：如果子节点少，直接拍平给爷爷
+        if len(children) <= 3:
+            print(f"    [Flatten] Node {pid} (depth={depth}) -> lifting {len(children)} children to grandparent")
+            for c in children: self.tm.move_node(c["node_id"], gpid)
+            self.tm.remove_node(pid)
+            append_jsonl(self.ops_log, {"op":"flatten", "node":pid, "depth":depth})
+            return True
+        return False
+
+    def _apply(self, pid, res, stage):
+        act = res.get("action", "keep")
+        changed = False
+
+        # 1. Bridge/Group
+        if act in ["insert_bridge", "create_groups"]:
+            # 深度保护：如果已经太深，禁止创建 Bridge
+            if calc_depth(self.tm, pid) >= MAX_DEPTH - 1:
+                print(f"    [Skip Bridge] Parent {pid} too deep.")
+            else:
+                groups = res.get("groups") or []
+                for grp in groups:
+                    lbl = grp.get("bridge_label")
+                    cids = grp.get("child_ids", [])
+                    valid = [c for c in cids if self.tm.get_parent_id(c) == pid]
+                    if not valid or not lbl: continue
+
+                    nid = generate_bridge_id(pid, lbl)
+                    nlvl = get_next_level(self.tm.get_node(pid).get("level", "L1"))
+                    if self.tm.add_child_node(pid, {"node_id":nid, "label":lbl, "level":nlvl, "children":[]}):
+                        for c in valid: self.tm.move_node(c, nid)
+                        changed = True
+                        append_jsonl(self.ops_log, {"op":"create_bridge", "parent":pid, "bridge":lbl})
+
+        # 2. Lift as Sibling (New)
+        lift = res.get("lift_as_sibling") or res.get("lift_children") or []
+        if lift:
+            gpid = self.tm.get_parent_id(pid)
+            if gpid:
+                for c in lift:
+                    if self.tm.get_parent_id(c) == pid:
+                        self.tm.move_node(c, gpid)
+                        changed = True
+                        append_jsonl(self.ops_log, {"op":"lift_sibling", "child":c, "new_parent":gpid})
+
+        return changed
 
 def main():
-    parser = argparse.ArgumentParser(description="Round C v4 · Step4.2 Shaping")
+    parser = argparse.ArgumentParser(description="Round C v4 · Step4.2 Shaping (Fixed)")
     parser.add_argument("--input", required=True)
     parser.add_argument("--output", required=True)
     parser.add_argument("--config", required=True)
     args = parser.parse_args()
 
-    # 1. 初始化
-    env = Step4Env(args.config, "configs/roundC_v4.env")
-    
-    # 2. 加载数据
-    raw_tree = load_tree(Path(args.input))
-    tm = TreeManager(raw_tree)
-    
-    # 3. 执行处理
-    processor = ShapingProcess(env, tm)
-    processor.run()
-    
-    # 4. 导出
-    dump_tree(Path(args.output), tm.root)
-    
-    # 导出空 Trace 保持兼容 (4.2 主要是 Move/Add，没有 Merge 导致的 ID 消失)
-    trace_path = env.outdir / "v4_trace_4_2.json"
-    trace_path.write_text("{}", encoding="utf-8")
-    
+    # 【修改点】使用锚点定义的 ENV_PATH
+    env = Step4Env(args.config, str(ENV_PATH))
+
+    raw = load_tree(Path(args.input))
+    proc = ShapingProcess(env, TreeManager(raw))
+    proc.run()
+
+    dump_tree(Path(args.output), proc.tm.root)
+    # 兼容性 Trace
+    (env.outdir / "v4_trace_4_2.json").write_text("{}", encoding="utf-8")
     print(f"[DONE] Shaping Completed. Tree saved to {args.output}")
 
 if __name__ == "__main__":

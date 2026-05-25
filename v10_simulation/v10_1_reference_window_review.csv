@@ -1,4 +1,4 @@
-﻿node_id,track,tool_nature,parent_title,pau_final,pau_std_v10,guard_tags_v10,owner_window_size_v10,normalization_log_v10
+node_id,track,tool_nature,parent_title,pau_final,pau_std_v10,guard_tags_v10,owner_window_size_v10,normalization_log_v10
 TA_001,track_a,,（一）提升货运设施保障能力。,货运设施保障能力,货运设施保障能力,,20,原结构已符合规范，方向性动词与宾语边界清晰，保守保留原样。
 TA_002,track_a,,1.加强基础设施建设。,基础设施建设,基础设施建设,,20,保持原components结构，M保留政策动词，pau维持O+A标准格式，未触发特殊规则。
 TA_003,track_a,,2.提升装备专业化水平。,装备专业化水平,装备专业化水平,,20,结构已符合规范，方向动词与宾语边界清晰，保守保留原样。

@@ -1,28 +1,21 @@
-# Local-only frozen source archive
+# Local-only archives and staging
 _local_archive/
+*.zip
+*.rar
 
 # Secrets and local environment files
 .env
 *.env
-!*.env.example
-configs/*.env
-!configs/*.env.example
-gemini_key.txt
-qwen_key.txt
+!configs/.env.example
+*key*.txt
 
 # Python/runtime artifacts
 __pycache__/
-*.py[cod]
-*.pyo
-.pytest_cache/
-.mypy_cache/
-.ruff_cache/
+*.pyc
 .venv/
 venv/
 
-# Logs and temporary files
-*.log
-logs/
-data/**/logs/
-.tmp/
-tmp/
+# Non-public source packages
+policy_tree_eval/
+roundC_v4/
+outputs_1123/

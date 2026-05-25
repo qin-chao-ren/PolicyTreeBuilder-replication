@@ -1,4 +1,4 @@
-﻿version: "v5.2.0"
+version: "v5.2.0"
 
 input:
   corpus_path: "roundC_v5_1/v5_example_diverse.csv"

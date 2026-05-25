@@ -1,4 +1,4 @@
-﻿sample_id,source_sample_id,doc_id,block_idx,final_level,raw_title,path_text,cleaned_title,skip_reason,clean_source,variant_idx,llm_status,llm_attempts,num_variants_per_source
+sample_id,source_sample_id,doc_id,block_idx,final_level,raw_title,path_text,cleaned_title,skip_reason,clean_source,variant_idx,llm_status,llm_attempts,num_variants_per_source
 DF0009_00014_01,DF0009_00014,DF0009,14,H1,二、加快完善枢纽规划布局,,加快完善枢纽规划布局,,llm,1,ok,1,1
 DF0009_00017_01,DF0009_00017,DF0009,17,H1,三、加快推进基础设施建设,,加快推进基础设施建设,,llm,1,ok,1,1
 DF0009_00022_01,DF0009_00022,DF0009,22,H1,四、积极培育多元经营主体,,积极培育多元经营主体,,llm,1,ok,1,1

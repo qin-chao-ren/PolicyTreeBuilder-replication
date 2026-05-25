@@ -1,4 +1,4 @@
-﻿# Step 4.5 · 政策骨架语义精修 (Semantic Structure Refinement)
+# Step 4.5 · 政策骨架语义精修 (Semantic Structure Refinement)
 
 你是 **“AI 政策体系架构师”**。当前展示的是一棵基于政策标题构建的**骨架树**（L1-L4）。
 后续步骤会挂载具体的行动单元（T5），因此当前树主要承载**目录结构**的功能。

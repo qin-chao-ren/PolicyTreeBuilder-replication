@@ -1,5 +1,5 @@
 # Intermediate Outputs
 
-These files are the main intermediate artifacts produced by the Round C v4 pipeline after source preparation, embedding/reranking, semantic calibration, L1 anchoring, and coarse tree construction.
+This folder contains Round C v4 intermediate outputs and logs corresponding to the 353-node final tree.
 
-Raw LLM call dumps and log directories are intentionally excluded from the public package for safety.
+These files are included so reviewers can inspect the pipeline state without rerunning LLM-dependent steps.

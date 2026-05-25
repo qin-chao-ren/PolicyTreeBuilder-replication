@@ -1,100 +1,86 @@
 # PolicyTreeBuilder Replication Package
 
-This repository contains the public replication package for the paper:
+This repository contains the replication package for the ATRS 2026 PolicyTreeBuilder experiment.
 
-**PolicyTreeBuilder: An LLM-assisted framework for constructing hierarchical policy-action trees from Chinese air-cargo policy documents**
+The public replication version is the final 353-node Round C v4 tree used for the paper. The code, prompts, YAML configs, source inputs, intermediate outputs, final tree files, and figures in this package were rebuilt from the Round C v4 project archive that produced the 353-node tree.
 
-The package is organized for review and auditability. It includes the source input used by the main Round C v4 run, prompts, scripts, intermediate artifacts, final tree outputs, and visualizations. Private API keys, local environment files, raw log directories, and local-only archives are excluded from Git.
+## Final Version
 
-## Repository Structure
+Final tree file: `data/final_tree/v4_tree_final.json`
 
-```text
-PolicyTreeBuilder-replication/
-|-- assets/                         # L1 sample assets used by the pipeline
-|-- configs/                        # YAML configs and .env examples only
-|-- data/
-|   |-- source/                     # Public source inputs for replication
-|   |-- intermediate_outputs/       # Main Round C v4 intermediate artifacts
-|   |-- final_tree/                 # Final policy-action tree and audit files
-|   `-- historical_outputs_1120/    # Historical output archive, not main path
-|-- figures/                        # Rendered tree visualizations
-|-- prompts/                        # Prompt templates used by the pipeline
-|-- scripts/                        # Processing, tree-building, and visualization scripts
-|-- v10_simulation/                 # Additional reference-normalization simulation materials
-|-- requirements.txt                # Lightweight dependency list
-|-- requirements-lock.txt           # Exact package versions from the author's Python 3.12.7 environment
-|-- TECHNICAL_README.md             # Detailed Round C v4 technical workflow
-|-- replication_package.md          # File index and replication notes
-`-- run_v4_pipeline.ps1             # PowerShell pipeline entrypoint, path-normalized for this repo
-```
+Expected structure:
 
-## Environment
+- Nodes: 353
+- Edges: 352
+- Leaf nodes: 272
+- Maximum depth: 6
+- Repository SHA256 for `data/final_tree/v4_tree_final.json`: `9242d4961e417ffa1e30e728d82e73bf669e4facdedd12f4f03f10d19b157983`
+- Source archive extracted-file SHA256 before repository LF normalization: `6ee8e666dfc5bb7b8611a42c96c8ac93f766290b290115529686f9f3ca67918b`
 
-The original development environment used Python 3.12.7 on Windows.
+The older 317-node package is not part of the ATRS 2026 replication version. It is retained only as a local superseded archive and is not uploaded.
+
+## Repository Layout
+
+- `scripts/`: Round C v4 pipeline scripts from the 353-node source version.
+- `prompts/`: LLM prompt templates used by the pipeline.
+- `configs/`: YAML pipeline configs and a safe `.env.example` template.
+- `data/source/`: source inputs for the 353-node run.
+- `data/intermediate_outputs/`: intermediate Round C v4 outputs and provenance logs.
+- `data/final_tree/`: final 353-node tree and final tabular outputs.
+- `figures/`: figures generated from the 353-node Round C v4 outputs.
+- `v10_simulation/`: supplementary simulation materials retained from the previous package; not part of the main 353-node tree-building pipeline.
+- `SCRIPT_PROVENANCE.tsv`: source and public hashes for the Round C v4 scripts after repository path normalization.
+
+## Setup
+
+Use Python 3.12 or later. The original local environment used Python 3.12.x.
 
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
-python -m pip install -r requirements.txt
+pip install -r requirements.txt
 ```
 
-For closer reproduction of the author's environment:
+For exact local package versions from the previous review environment, see `requirements-lock.txt`.
+
+To run LLM-dependent steps, copy the template and fill in local credentials:
 
 ```powershell
-python -m pip install -r requirements-lock.txt
+Copy-Item configs\.env.example configs\.env
 ```
 
-## API Configuration
+Do not commit `configs/.env`.
 
-The public repository does not include real API keys. To rerun LLM-dependent steps:
+## Main Reproduction Path
 
-1. Copy `configs/roundC_v4.env.example` to `configs/roundC_v4.env`.
-2. Fill in the OpenAI-compatible base URLs, API keys, model names, embedding model, and reranker endpoint.
-3. Keep `configs/roundC_v4.env` local. It is ignored by Git.
+The provided final outputs are already included. To rerun the main pipeline from the source input, use the commands documented in `TECHNICAL_README.md` and the template `run_v4_pipeline.ps1`.
 
-`configs/roundC.env.example` is included for older helper code that still reads the legacy Round C environment format.
-
-## Main Replication Path
-
-Primary source input:
+Primary input:
 
 ```text
 data/source/roundB_types_merged1121.csv
 ```
 
-Precomputed outputs:
-
-```text
-data/intermediate_outputs/
-data/final_tree/
-figures/
-```
-
-Key final outputs:
+Main output:
 
 ```text
 data/final_tree/v4_tree_final.json
-data/final_tree/v4_tree_final_flat.csv
-data/final_tree/v4_tree_levels.csv
-data/final_tree/v4_final_audit.json
 ```
 
-For the detailed technical workflow, see `TECHNICAL_README.md`.
+Historical/test input retained for traceability:
 
-To rerun after configuring API credentials, review and run:
-
-```powershell
-.\run_v4_pipeline.ps1
+```text
+data/source/roundB_types_merged1113_test.csv
 ```
 
-Some commands are intentionally commented in the pipeline file so reviewers can run stages selectively.
+Administrative mapping source:
 
-## Known Optional or Historical Inputs
+```text
+data/source/admin_mapping/roundA_final_overview_scored_selected1120.csv
+```
 
-- `data/source/admin_mapping/roundA_final_overview_scored_selected1120.csv` is not included yet. Place it there when available. It is only required for administrative-unit split/visualization scripts.
-- `data/historical_outputs_1120/` is preserved as a historical output archive. Its metadata references `roundB_types_merged1113_test.csv`, which was not found under `<LOCAL_SEARCH_ROOT>` during packaging, so it is not treated as the primary reproducible path.
-- Raw LLM call dumps and log directories are excluded from the public package for safety. Structural operation logs and audit files needed for review are retained where appropriate.
+## Notes For Reviewers
 
-## Local Paper Snapshot
+`policy_tree_eval` is not included in this public package. It was kept locally only as a consistency check: its input tree matches the 353-node final tree by extracted-file SHA256, but its scores were not used in the paper's main results.
 
-On the author's local machine, `_local_archive/roundC_v4_paper_snapshot_2026-05-17.zip` and `_local_archive/MANIFEST.sha256` preserve the exact `roundC_v4` folder snapshot used to build this public package. `_local_archive/` is intentionally ignored by Git and is not part of the public release.
+See `PUBLICATION_SNAPSHOT.md` for the fixed publication snapshot and `replication_package.md` for the file index.

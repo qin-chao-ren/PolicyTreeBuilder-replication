@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import Dict, List, Optional
 
 # 默认路径配置
-DEFAULT_OUTDIR = Path("data/intermediate_outputs")
+DEFAULT_OUTDIR = Path("outputs")
 CORPUS_FILE = DEFAULT_OUTDIR / "v4_cluster_corpus_cleaned.csv"
 MEMBERSHIP_FILES = [
     DEFAULT_OUTDIR / "v4_membership_L4.csv",
@@ -58,19 +58,19 @@ class LineageTracker:
         """加载最终树，建立 ID -> Path 的索引，用于验证节点是否存活"""
         if not tree_path.exists():
             raise FileNotFoundError(f"Tree file not found: {tree_path}")
-        
+
         with open(tree_path, "r", encoding="utf-8") as f:
             root = json.load(f)
-        
+
         def dfs(node, path_stack):
             node_id = node.get("node_id")
             label = node.get("label", "ROOT")
             current_path = path_stack + [label]
-            
+
             if node_id:
                 self.valid_final_ids.add(node_id)
                 self.final_paths[node_id] = " / ".join(current_path)
-            
+
             for child in node.get("children", []):
                 dfs(child, current_path)
 
@@ -97,7 +97,7 @@ class LineageTracker:
 
     def _process_log_entry(self, entry: Dict):
         op = entry.get("op", "").lower()
-        
+
         # === Case A: Step 4.1/4.3 Standard Merge ===
         # 字段通常是: winner, loser
         if op in ["merge", "cross_merge", "absorb_child"]:
@@ -105,7 +105,7 @@ class LineageTracker:
             loser = entry.get("loser") or entry.get("child") # absorb_child uses 'child'
             # 尝试获取 winner
             winner = entry.get("winner") or entry.get("parent") # absorb_child uses 'parent'
-            
+
             # === Case B: Step 4.5 Structure Audit ===
             # 字段是: node_id (被合并者), merge_into (目标)
             if not loser and not winner:
@@ -183,21 +183,21 @@ def main():
     print("[5/5] Generating Lineage Report...")
     success_count = 0
     orphan_count = 0
-    
+
     with open(OUTPUT_FILE, "w", encoding="utf-8", newline="") as f:
         writer = csv.writer(f)
         writer.writerow([
-            "sample_id", 
-            "original_title", 
-            "initial_node_id", 
-            "final_node_id", 
-            "final_path_label", 
+            "sample_id",
+            "original_title",
+            "initial_node_id",
+            "final_node_id",
+            "final_path_label",
             "status"
         ])
 
         for sid, meta in sample_map.items():
             init_id = meta["initial_node"]
-            
+
             if not init_id:
                 # 可能是 Step 1.5 过滤掉的 T0
                 writer.writerow([sid, meta["title"], "N/A", "N/A", "N/A", "FILTERED_EARLY"])
@@ -205,7 +205,7 @@ def main():
 
             # 核心：解析最终 ID
             final_id = tracker.resolve_id(init_id)
-            
+
             # 检查状态
             if final_id in tracker.valid_final_ids:
                 path_str = tracker.final_paths[final_id]
@@ -216,7 +216,7 @@ def main():
                 path_str = "N/A"
                 status = "ORPHAN"
                 orphan_count += 1
-            
+
             writer.writerow([sid, meta["title"], init_id, final_id, path_str, status])
 
     print("-" * 30)
@@ -228,4 +228,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    

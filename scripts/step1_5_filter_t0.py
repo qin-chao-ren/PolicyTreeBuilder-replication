@@ -21,7 +21,7 @@ import pandas as pd
 
 HERE = Path(__file__).resolve().parent  # 指向 .../scripts 目录
 ROOT = HERE.parent
-OUT_DIR_DEFAULT = ROOT / "outputs"
+OUT_DIR_DEFAULT = ROOT / "data" / "intermediate_outputs"
 DEFAULT_CORPUS = OUT_DIR_DEFAULT / "v4_cluster_corpus_cleaned.csv"
 DEFAULT_OUT = OUT_DIR_DEFAULT / "v4_corpus_filtered.csv"
 

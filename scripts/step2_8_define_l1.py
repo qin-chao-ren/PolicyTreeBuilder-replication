@@ -20,7 +20,7 @@ Step 2.8 · 定义 L1 顶层类别（v4）
 - 日志：data/intermediate_outputs/logs/step2_8_define_l1.log
 
 python scripts/step2_8_define_l1.py `
---env configs/roundC_v4.env `
+--env configs/.env `
 --calibrated data/intermediate_outputs/v4_corpus_calibrated.csv `
 --assets-dir assets/l1_samples `
 --outdir data/intermediate_outputs `
@@ -42,7 +42,7 @@ from utils.llm_client import load_env_file
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
-OUT_DIR_DEFAULT = ROOT / 'outputs'
+OUT_DIR_DEFAULT = ROOT / 'data' / 'intermediate_outputs'
 LOG_DIR_DEFAULT = OUT_DIR_DEFAULT / 'logs'
 
 
@@ -104,7 +104,7 @@ def main():
     ap = argparse.ArgumentParser(description='Round C v4 · Step 2.8 Define L1')
     ap.add_argument('--calibrated', type=str, default=str(OUT_DIR_DEFAULT / 'v4_corpus_calibrated.csv'))
     ap.add_argument('--assets-dir', type=str, default=str(ROOT / 'assets' / 'l1_samples'))
-    ap.add_argument('--env', type=str, default=str(ROOT / 'configs' / 'roundC_v4.env'))
+    ap.add_argument('--env', type=str, default=str(ROOT / 'configs' / '.env'))
     ap.add_argument('--outdir', type=str, default=str(OUT_DIR_DEFAULT))
     ap.add_argument('--model', type=str, default=None)
     ap.add_argument('--version', type=str, default=None, help='版本号（未提供则使用YYYYMMDDHHMM）')

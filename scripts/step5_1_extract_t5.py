@@ -7,9 +7,9 @@ Step 5.1 · Extract T5 Action Units (With Traceability & De-duplication)
 - Generates unique IDs linked to source block range.
 
 python scripts/step5_1_extract_t5.py `
-  --source "data/source/roundB_types_merged1121.csv" `
+  --source "roundB_outputs/roundB_types_merged1121.csv" `
   --output "data/intermediate_outputs/v4_units_t5_raw.csv" `
-  --env "configs/roundC_v4.env"
+  --env "configs/.env"
 """
 import argparse
 import json
@@ -89,10 +89,10 @@ SYSTEM_PROMPT = step5_1_prompt = {
 def setup_logging(out_dir: Path):
     log_dir = out_dir / "logs"
     log_dir.mkdir(parents=True, exist_ok=True)
-    
+
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     log_file = log_dir / f"step5_1_extract_{timestamp}.log"
-    
+
     # 配置 logging
     logging.basicConfig(
         level=logging.INFO,
@@ -101,7 +101,7 @@ def setup_logging(out_dir: Path):
             logging.FileHandler(log_file, encoding='utf-8'),
             # 如果你想在屏幕上也看到刷屏的日志，可以解开下面这行，
             # 但这会打断 tqdm 进度条，建议只保留 FileHandler
-            # logging.StreamHandler() 
+            # logging.StreamHandler()
         ]
     )
     print(f"[LOG] Detailed logs will be saved to: {log_file}")
@@ -114,12 +114,12 @@ def build_tasks(df: pd.DataFrame):
     返回：待处理的任务列表。
     """
     tasks = []
-    
+
     # 状态变量
     current_h = None  # 当前最近的标题 (H1-H4)
     na_buffer = []    # 连续 NA 的缓存
     buffer_start_idx = -1 # 缓存开始的 block_idx
-    
+
     # 确保按顺序处理
     # 转换辅助列用于排序
     df['block_idx_int'] = df['block_idx'].astype(int)
@@ -134,12 +134,12 @@ def build_tasks(df: pd.DataFrame):
             #buffer_start_idx 已经是 int 了，可以直接计算
             end_idx = buffer_start_idx + len(na_buffer) - 1
             source_range = f"{buffer_start_idx}-{end_idx}"
-            
+
             tasks.append({
                 "doc_id": current_h['doc_id'],
                 "parent_title_text": current_h['text'],
                 # 关键：这是为了挂接树，使用 Title 的第一个分身 ID
-                "anchor_parent_id": current_h['source_id'] + "_01", 
+                "anchor_parent_id": current_h['source_id'] + "_01",
                 "content_text": merged_text,
                 "source_block_start": buffer_start_idx,
                 "source_block_range": source_range
@@ -152,14 +152,14 @@ def build_tasks(df: pd.DataFrame):
     for _, row in df.iterrows():
         level = str(row['final_level']).upper()
         text = str(row['block_text']).strip()
-        
+
         if not text: continue
 
         # 如果遇到标题 (H1-H4)
         if level.startswith("H"):
             # 1. 先把之前的 NA 缓存处理掉 (Flush)
             flush_buffer()
-            
+
             # 2. 更新当前标题指针
             # source_id 格式: doc_id + block_idx (5位)
             sid = f"{row['doc_id']}_{str(row['block_idx']).zfill(5)}"
@@ -168,7 +168,7 @@ def build_tasks(df: pd.DataFrame):
                 "source_id": sid,
                 "doc_id": row['doc_id']
             }
-            
+
         # 如果遇到内容 (NA)
         elif level == "NA":
             if current_h:
@@ -176,12 +176,12 @@ def build_tasks(df: pd.DataFrame):
                     # [修正点]：强制转换为 int
                     buffer_start_idx = int(row['block_idx'])
                 na_buffer.append(text)
-                
+
             # 如果 current_h 为空（比如文档开头就是 NA），则忽略或挂到 ROOT（视需求而定）
 
     # 循环结束后，别忘了 flush 最后一组
     flush_buffer()
-    
+
     return tasks
 
 def generate_t5_id(doc_id, start_block_idx, seq_num):
@@ -200,12 +200,12 @@ def main():
 
     # 初始化
     load_env_file(args.env)
-    llm_model = os.getenv("PRIMARY_LLM_MODEL", "gpt-4o") 
-    
+    llm_model = os.getenv("PRIMARY_LLM_MODEL", "gpt-4o")
+
     # 设置日志
     output_path = Path(args.output)
     logger = setup_logging(output_path.parent)
-    
+
     logger.info("=== Step 5.1 Start ===")
     logger.info(f"Source: {args.source}")
     logger.info(f"Model: {llm_model}")
@@ -213,10 +213,10 @@ def main():
     print(f"[INFO] Loading source: {args.source}")
     # keep_default_na=False 告诉 pandas：不要把 "NA" 当作空值，它就是个字符串 "NA"
     df = pd.read_csv(args.source, dtype=str, keep_default_na=False)
-    
+
     # --- 修改点 2: 打印一下前几行的 level 看看是什么 ---
     print(f"[DEBUG] Preview of loaded levels: {df['final_level'].unique()[:10]}")
-    
+
     # 1. 构建任务
     print("[INFO] Merging consecutive NA blocks...")
     tasks = build_tasks(df)
@@ -224,18 +224,18 @@ def main():
     print(f"[INFO] Generated {len(tasks)} extraction tasks.")
 
     results = []
-    
+
     # 使用 tqdm 显示进度条，同时在循环内部写日志
     for i, task in enumerate(tqdm(tasks, desc="Extracting")):
         doc_id = task['doc_id']
         range_str = task['source_block_range']
         parent_title = task['parent_title_text']
-        
+
         # === LOG: 发送前 ===
         logger.info(f"[{i+1}/{len(tasks)}] REQ -> Doc: {doc_id} | Range: {range_str} | Title: {parent_title[:20]}...")
-        
+
         user_content = f"**上级标题**：{parent_title}\n**具体内容**：\n{task['content_text']}"
-        
+
         try:
             # 调用 LLM
             resp, data = chat_json(
@@ -245,12 +245,12 @@ def main():
                 temperature=0.1,
                 max_tokens=1000
             )
-            
+
             if resp.ok and isinstance(data, dict):
                 units = data.get("policy_units", [])
                 # === LOG: 成功收到 ===
                 logger.info(f"[{i+1}/{len(tasks)}] RES <- OK. Extracted {len(units)} units.")
-                
+
                 for idx, u in enumerate(units, start=1):
                     t5_id = generate_t5_id(doc_id, task['source_block_start'], idx)
                     results.append({
@@ -278,7 +278,7 @@ def main():
 
     out_df = pd.DataFrame(results)
     out_df.to_csv(output_path, index=False, encoding="utf-8-sig")
-    
+
     # 删除临时文件
     temp_out = output_path.with_suffix('.tmp.csv')
     if temp_out.exists():

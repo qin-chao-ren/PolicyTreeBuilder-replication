@@ -152,7 +152,7 @@ class TreeManager:
 
         self.remove_node(loser_id)
         return True
-    
+
     def add_child_node(self, parent_id: str, new_node_data: Dict) -> bool:
         """
         在指定父节点下注册一个全新的节点。
@@ -160,7 +160,7 @@ class TreeManager:
         """
         if parent_id not in self.index:
             return False
-            
+
         # 1. 清洗与检查 ID
         nid = str(new_node_data.get("node_id") or new_node_data.get("tree_id"))
         if not nid:
@@ -169,20 +169,20 @@ class TreeManager:
             # 防止 ID 冲突，如果有冲突，自动添加随机后缀 (Fail-Safe)
             import uuid
             nid = f"{nid}_{str(uuid.uuid4())[:4]}"
-        
+
         new_node_data["node_id"] = nid
         if "tree_id" in new_node_data:
             del new_node_data["tree_id"]
-        
+
         # 确保 children 列表存在
         new_node_data.setdefault("children", [])
-        
+
         # 2. 注册索引
         self.index[nid] = new_node_data
         self.parent_map[nid] = parent_id
-        
+
         # 3. 挂载到父节点
         parent = self.index[parent_id]
         parent.setdefault("children", []).append(new_node_data)
-        
+
         return True

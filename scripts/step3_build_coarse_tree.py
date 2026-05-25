@@ -142,7 +142,7 @@ def main():
     args = parser.parse_args()
 
     cfg = yaml.safe_load(Path(args.config).read_text(encoding="utf-8"))
-    outdir = Path(cfg.get("paths", {}).get("outdir", ROOT / "outputs"))
+    outdir = Path(cfg.get("paths", {}).get("outdir", ROOT / "data" / "intermediate_outputs"))
     ensure_outdir(outdir)
     corpus_path = Path(cfg.get("paths", {}).get("corpus", outdir / "v4_corpus_calibrated.csv"))
     emit_samples = args.emit_samples == "yes"

@@ -1,46 +1,28 @@
-# Replication Package Description
+# Replication Package Index
 
-This file describes the public review package for PolicyTreeBuilder.
+This repository is organized for review of the ATRS 2026 353-node PolicyTreeBuilder result.
 
-## 1. Source Input
+## Core Files
 
-- `data/source/roundB_types_merged1121.csv`: source file used by the main Round C v4 run.
-- `data/source/admin_mapping/`: placeholder for the optional administrative mapping file used only by administrative split/visualization scripts.
-- `data/source/missing_optional/`: notes on historical inputs referenced by archived output metadata but not found during packaging.
+| Path | Purpose |
+| --- | --- |
+| `data/source/roundB_types_merged1121.csv` | Primary Round B input for the Round C v4 pipeline. |
+| `data/source/admin_mapping/roundA_final_overview_scored_selected1120.csv` | Administrative mapping source used for administrative tree splitting. |
+| `data/intermediate_outputs/` | Intermediate Round C v4 outputs, logs, embeddings, and trace files. |
+| `data/final_tree/v4_tree_final.json` | Final 353-node policy tree used for ATRS 2026. |
+| `figures/` | Figures generated from the 353-node Round C v4 outputs. |
+| `scripts/` | Round C v4 source scripts from the 353-node source version. |
+| `prompts/` | LLM prompt templates used by Round C v4. |
+| `configs/` | YAML configs and safe environment template. |
+| `SCRIPT_PROVENANCE.tsv` | Hash mapping from extracted Round C v4 source scripts to public path-normalized scripts. |
 
-## 2. Prompts and Configuration
+## Version Notes
 
-- `prompts/`: prompt templates for title cleaning, semantic calibration, L1 anchoring, tree construction, and final structure adjustment.
-- `configs/*.yaml`: public YAML configuration files with repository-relative paths.
-- `configs/*.env.example`: environment templates. Real `.env` files are intentionally excluded.
+- The 353-node tree is the final paper version.
+- The 317-node tree is superseded and is not part of this public package.
+- `policy_tree_eval` is local-only and not part of the public replication package.
+- `v10_simulation/` is supplementary and not required for rebuilding the 353-node tree.
 
-## 3. Scripts
+## Generated Manifest
 
-- `scripts/`: Round C v4 processing scripts and utility modules.
-- `run_v4_pipeline.ps1`: path-normalized PowerShell entrypoint for staged reruns.
-- `v10_simulation/`: supplementary reference-normalization simulation materials.
-- `TECHNICAL_README.md`: cleaned technical workflow adapted from the original Round C v4 technical README.
-
-## 4. Intermediate Outputs
-
-- `data/intermediate_outputs/`: main intermediate artifacts from the Round C v4 pipeline.
-- Raw LLM call dumps and log directories are excluded from the public package for safety.
-
-## 5. Final Tree and Figures
-
-- `data/final_tree/v4_tree_final.json`: final hierarchical policy-action tree.
-- `data/final_tree/v4_tree_final_flat.csv`: flattened final tree.
-- `data/final_tree/v4_tree_levels.csv`: final tree level table.
-- `data/final_tree/v4_final_audit.json`: final audit report.
-- `figures/`: rendered visualizations.
-
-## 6. Historical Output Archive
-
-- `data/historical_outputs_1120/`: archived historical run. This is included for auditability but is not the primary replication path because its metadata references a missing source file, `roundB_types_merged1113_test.csv`.
-
-## 7. Reproducibility Notes
-
-- Python version in the author's environment: 3.12.7.
-- `requirements.txt` gives the concise dependency set.
-- `requirements-lock.txt` gives exact installed package versions.
-- Local-only frozen source snapshot and SHA256 manifest are stored under `_local_archive/` on the author's machine and ignored by Git.
+`FILE_INDEX.tsv` lists public files with size and SHA256 after repository preparation.

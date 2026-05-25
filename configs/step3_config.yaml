@@ -19,7 +19,7 @@ global_link:
   # Round 1: 物理硬链接阈值 (Step 2.8 物理占比 > 0.5 则直接锁定)
   # 推荐值: 0.40 - 0.60
   hard_threshold: 0.50
-  
+
   # Round 2: 快速语义匹配的自动通过置信度
   # 若 LLM 确信度 > 此值且不新建，则直接通过，无需进入审计轮
   auto_accept_conf: 0.85

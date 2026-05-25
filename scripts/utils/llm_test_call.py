@@ -5,7 +5,7 @@ LLM 调用测试脚本（V4）
 
 示例（PowerShell）：
   python scripts/utils/llm_test_call.py `
-    --env configs/roundC_v4.env `
+    --env configs/.env `
     --role primary `
     --user "请用不超过 8 个字回答：你好世界"
 
@@ -41,7 +41,7 @@ def _pick_env(keys: tuple[str, ...]) -> str | None:
 
 def main() -> None:
     ap = argparse.ArgumentParser(description="LLM quick test caller (V4)")
-    ap.add_argument("--env", type=str, default="configs/roundC_v4.env")
+    ap.add_argument("--env", type=str, default="configs/.env")
     ap.add_argument(
         "--role",
         type=str,

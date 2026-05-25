@@ -32,7 +32,7 @@ import pandas as pd
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
-OUT_DIR_DEFAULT = ROOT / "outputs"
+OUT_DIR_DEFAULT = ROOT / "data" / "intermediate_outputs"
 LOG_DIR_DEFAULT = OUT_DIR_DEFAULT / "logs"
 PROMPT_DEFAULT = ROOT / "prompts" / "step2_5_calibrate.md"
 
@@ -247,7 +247,7 @@ def main() -> None:
     ap = argparse.ArgumentParser(description="Round C V4 · Step 2.5 Calibrate Levels")
     ap.add_argument("--corpus", type=str, default=str(OUT_DIR_DEFAULT / "v4_corpus_filtered.csv"))
     ap.add_argument("--outdir", type=str, default=str(OUT_DIR_DEFAULT))
-    ap.add_argument("--env", type=str, default=str(ROOT / "configs" / "roundC_v4.env"))
+    ap.add_argument("--env", type=str, default=str(ROOT / "configs" / ".env"))
     ap.add_argument("--mode", type=str, choices=("llm", "rule"), default="llm")
     ap.add_argument("--model", type=str, default=None, help="LLM 模型（默认读取 PRIMARY_LLM_MODEL）")
     ap.add_argument("--prompt", type=str, default=str(PROMPT_DEFAULT))

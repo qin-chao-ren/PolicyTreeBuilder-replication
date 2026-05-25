@@ -1,4 +1,8 @@
-﻿from __future__ import annotations
+'''
+python scripts\run_v5_step2.py --config configs\v5_pau_config.yaml --env configs/.env
+'''
+
+from __future__ import annotations
 
 import argparse
 import asyncio

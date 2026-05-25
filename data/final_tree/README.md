@@ -1,8 +1,7 @@
-# Final Tree Outputs
+# Final Tree
 
-Primary files:
+This folder contains the fixed ATRS 2026 final 353-node tree outputs.
 
-- `v4_tree_final.json`: final hierarchical policy-action tree.
-- `v4_tree_final_flat.csv`: flattened final tree for tabular review.
-- `v4_tree_levels.csv`: level summary for the final tree.
-- `v4_final_audit.json`: final structural audit and adjustment report.
+Primary file: `v4_tree_final.json`.
+
+Expected structure: 353 nodes, 352 edges, 272 leaf nodes, maximum depth 6.

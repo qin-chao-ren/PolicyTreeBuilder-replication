@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 统一的 LLM 调用辅助（v4）
-- 提供 load_env_file：读取 env 并注入环境变量。
+- 提供 load_env_file：读取 env 并注入 OPENAI_BASE_URL / OPENAI_API_KEY 等。
 - 提供 chat_json：基于 scripts/common_llm.call_json 的轻量封装，返回 (ChatResult, json_obj)。
 """
 from __future__ import annotations
@@ -27,7 +27,7 @@ class ChatResult:
 
 def load_env_file(path: str | Path) -> None:
     """
-    读取 env 文件，按 KEY=VALUE 写入 os.environ（若变量尚不存在）。
+    读取 env 文件，按 “KEY=VALUE” 写入 os.environ（若变量不存在）。
     """
     p = Path(path)
     if not p.exists():

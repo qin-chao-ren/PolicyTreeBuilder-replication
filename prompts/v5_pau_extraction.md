@@ -153,7 +153,7 @@ USER_PROMPT_TEMPLATE = """
 输出: {{"pau_list":[{{"O":"航空货运网络","S_scope":["全球"],...}}]}}
 要点: 航空货运是固定词，不拆。
 
-输入: 提升枢纽智慧绿色水平  
+输入: 提升枢纽智慧绿色水平
 输出: 拆为2个PAU，S_focus分别为[智慧]和[绿色]
 要点: 智慧/绿色是战略方向，非废话。
 
@@ -192,7 +192,7 @@ def extract_json_from_response(text: str) -> dict:
         text = text.split('```json')[1].split('```')[0]
     elif '```' in text:
         text = text.split('```')[1].split('```')[0]
-    
+
     # 尝试解析
     try:
         return json.loads(text.strip())

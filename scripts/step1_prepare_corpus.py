@@ -12,7 +12,7 @@ Step 1 · 标题清洗（v4 迁移实现，贴近 v2 行为）
 
 python scripts/step1_prepare_corpus.py `
 --source your_roundB_source.csv `
---env configs/roundC_v4.env `
+--env configs/.env `
 --outdir data/intermediate_outputs `
 --llm-clean yes `
 --debug-dump-llm no
@@ -31,7 +31,7 @@ from utils.llm_client import chat_json, load_env_file
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
-OUT_DIR_DEFAULT = ROOT / 'outputs'
+OUT_DIR_DEFAULT = ROOT / 'data' / 'intermediate_outputs'
 LOG_DIR_DEFAULT = OUT_DIR_DEFAULT / 'logs'
 
 
@@ -165,11 +165,11 @@ def post_sanitize(title: str, max_len: int) -> str:
     智能截断：优先在语义边界处截断，保留完整的动宾结构。
     """
     s = keep_zh_alnum(title).strip()
-    
+
     # 如果本身就不超长，直接返回
     if len(s) <= max_len:
         return s
-    
+
     # 定义语义边界词（优先在这些位置截断）
     boundary_markers = [
         ('的', 1),      # "推进XX的YY" → 保留"推进XX的"
@@ -181,31 +181,31 @@ def post_sanitize(title: str, max_len: int) -> str:
         ('等', 1),      # "XX等YY" → 保留"XX等"
         ('相关', 2),    # "XX相关YY" → 保留"XX相关"
     ]
-    
+
     # 尝试在语义边界处截断
     for marker, offset in boundary_markers:
         search_text = s[:max_len + 5]
         last_pos = search_text.rfind(marker)
-        
+
         if last_pos > 0:
             cut_pos = last_pos + offset
             candidate = s[:cut_pos].strip()
-            
+
             if 8 <= len(candidate) <= max_len:
                 has_verb = any(v in candidate for v in ['推进', '加强', '完善', '优化', '建设', '提升', '发展', '实施', '支持', '鼓励', '促进', '构建', '打造', '开展'])
                 if has_verb:
                     return candidate
-    
+
     # 保留动宾结构
     common_verbs = ['推进', '加强', '完善', '优化', '建设', '提升', '发展', '实施', '支持', '鼓励', '促进', '构建', '打造', '开展', '建立', '健全', '落实', '深化', '新设立', '新增', '新建']
-    
+
     for verb in common_verbs:
         verb_pos = s.find(verb)
         if verb_pos >= 0:
             candidate = s[verb_pos:verb_pos + max_len]
             if len(candidate) >= 8:
                 return candidate
-    
+
     # 兜底
     min_len = min(12, max_len)
     if len(s) < min_len:
@@ -250,7 +250,7 @@ def to_bool_cluster(v: str) -> bool:
 def main():
     ap = argparse.ArgumentParser(description='Round C v4 · Step 1 Prepare Corpus')
     ap.add_argument('--source', required=True, help='输入CSV，至少包含 sample_id 与 title 或 cleaned_title 字段')
-    ap.add_argument('--env', default=str(ROOT / 'configs' / 'roundC_v4.env'))
+    ap.add_argument('--env', default=str(ROOT / 'configs' / '.env'))
     ap.add_argument('--outdir', default=str(OUT_DIR_DEFAULT))
     ap.add_argument('--title-col', default='cleaned_title')
     ap.add_argument('--raw-title-col', default='title')
@@ -273,13 +273,13 @@ def main():
     log_path = LOG_DIR_DEFAULT / 'step1_prepare_corpus.log'
 
     df = pd.read_csv(args.source, dtype=str)
-    
+
     # 1. V2 - 增加 iscol (to_cluster) 过滤
     required = ['doc_id','block_idx','block_text','final_level']
     for c in required:
         if c not in df.columns:
             raise ValueError(f'missing required column: {c}')
-    
+
     iscol = detect_iscluster_col(df) # 依赖步骤一的全局函数
     if iscol:
         log_write(log_path, f"[INFO] Detected 'to_cluster' column: {iscol}")
@@ -287,15 +287,15 @@ def main():
     else:
         log_write(log_path, f"[WARN] 'to_cluster' column not found, processing all rows.")
         mask_cluster = pd.Series([True] * len(df))
-    
+
     mask_level = df['final_level'].str.match(r'^H[1-4]$', na=False)
     dfh = df[mask_cluster & mask_level].copy()
     if dfh.empty:
         log_write(log_path, f"[WARN] DataFrame is empty after H1-H4 and 'to_cluster' filtering.")
-    
+
     # 2. V2 - 增加 _should_skip 逻辑
     skip_kw = [x.strip() for x in args.skip_keywords.split(',') if x.strip()]
-    
+
     def _should_skip(title: str) -> bool:
         t = (title or '').strip()
         if not t:
@@ -308,15 +308,15 @@ def main():
             if t == pref or t.startswith(pref):
                 return True
         return False
-    
+
     dfh['block_idx_num'] = dfh['block_idx'].astype(str).str.extract(r'(\d+)').fillna('0').astype(int)
     dfh.sort_values(['doc_id','block_idx_num'], inplace=True)
-    
+
     # 为 V2 的 build_path_text_filtered 准备 _should_skip 标记
     dfh['_should_skip'] = dfh['block_text'].apply(_should_skip)
-    
+
     rows = dfh.to_dict('records')
-    
+
     # 3. V2 - 替换 build_path_text_filtered 实现
     def build_path_text_filtered(rows: List[Dict[str,str]]) -> List[str]:
         import re as _re

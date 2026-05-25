@@ -37,7 +37,7 @@ def preprocess_tree_depth(node, current_depth=0):
     """
     node['_depth'] = current_depth
     max_d = current_depth
-    
+
     if node.get('children'):
         for child in node['children']:
             child_d = preprocess_tree_depth(child, current_depth + 1)
@@ -55,15 +55,15 @@ def build_adaptive_layout(root_data, max_depth):
     """构建自适应布局"""
     nodes = []
     edges = []
-    
+
     # 动态参数设置
     # 半径步长：每加一层，半径增加的距离
-    RADIUS_STEP = 200  
+    RADIUS_STEP = 200
     if max_depth > 6: RADIUS_STEP = 180 # 层级太深稍微紧凑一点
-    
+
     def assign_pos(node, start_angle, end_angle, parent_pos=None):
         depth = node['_depth']
-        
+
         # 1. 计算位置
         if depth == 0: # ROOT
             pos = (0, 0)
@@ -72,17 +72,17 @@ def build_adaptive_layout(root_data, max_depth):
             radius = depth * RADIUS_STEP
             angle = (start_angle + end_angle) / 2
             pos = (radius * math.cos(angle), radius * math.sin(angle))
-        
+
         # 2. 动态样式
         # 字体大小随深度递减，最小不小于6
         font_size = max(14 - depth * 1.5, 5)
         # 节点大小随深度递减
         node_size = max(800 - depth * 100, 50)
-        
+
         # 颜色：使用 colormap (viridis) 根据深度生成颜色
         color_val = depth / max_depth if max_depth > 0 else 0
         color = cm.viridis(color_val) # 你也可以换成 cm.coolwarm, cm.plasma 等
-        
+
         nodes.append({
             'label': node.get('label', ''),
             'pos': pos,
@@ -92,11 +92,11 @@ def build_adaptive_layout(root_data, max_depth):
             'size': node_size,
             'font_size': font_size
         })
-        
+
         # 添加边
         if parent_pos is not None:
             edges.append((parent_pos, pos))
-        
+
         # 3. 递归处理子节点
         children = node.get('children', [])
         if children:
@@ -104,7 +104,7 @@ def build_adaptive_layout(root_data, max_depth):
             if total_leaves > 0:
                 angle_span = end_angle - start_angle
                 angle_per_leaf = angle_span / total_leaves
-                
+
                 curr_angle = start_angle
                 for child in children:
                     c_leaves = count_leaves(child)
@@ -118,25 +118,25 @@ def build_adaptive_layout(root_data, max_depth):
 
 def plot_adaptive_tree(nodes, edges, max_depth, radius_step):
     """绘制函数"""
-    
+
     # 动态计算画布大小
     # 假设每层半径200，9层就是1800半径，直径3600。
     # 为了保证清晰度，画布尺寸(inch) = 直径 / DPI * 缩放因子
     # 这是一个非常巨大的图，我们设置得大一点
-    canvas_size = max(20, max_depth * 4) 
+    canvas_size = max(20, max_depth * 4)
     fig, ax = plt.subplots(1, 1, figsize=(canvas_size, canvas_size))
     ax.set_aspect('equal')
     fig.patch.set_facecolor('#FAFAFA')
     ax.set_facecolor('#FAFAFA') # 稍微带点灰的白，护眼
-    
+
     # 1. 绘制同心圆参考线
     for d in range(1, max_depth + 1):
         r = d * radius_step
-        circle = plt.Circle((0, 0), r, fill=False, edgecolor='#dddddd', 
+        circle = plt.Circle((0, 0), r, fill=False, edgecolor='#dddddd',
                           linestyle='--', linewidth=1, alpha=0.5)
         ax.add_patch(circle)
         # 添加层级标记
-        ax.text(0, -r, f"Level {d}", ha='center', va='center', 
+        ax.text(0, -r, f"Level {d}", ha='center', va='center',
                 color='#999999', fontsize=8, alpha=0.7)
 
     # 2. 绘制连线 (贝塞尔曲线或直线，这里用直线保证性能)
@@ -147,20 +147,20 @@ def plot_adaptive_tree(nodes, edges, max_depth, radius_step):
     for node in nodes:
         x, y = node['pos']
         depth = node['depth']
-        
+
         # 绘制点
-        ax.scatter(x, y, s=node['size'], color=node['color'], 
+        ax.scatter(x, y, s=node['size'], color=node['color'],
                   edgecolor='white', linewidth=1, zorder=10, alpha=0.9)
-        
+
         # 绘制文字
         if depth == 0:
             # 根节点文字
-            ax.text(x, y, node['label'], ha='center', va='center', 
+            ax.text(x, y, node['label'], ha='center', va='center',
                    fontsize=16, fontweight='bold', color='white')
         else:
             # 计算文字旋转角度
             deg = math.degrees(node['angle'])
-            
+
             # 逻辑：左半边的字左对齐，右半边的字右对齐，防止倒着读
             if 90 < deg <= 270:
                 rotation = deg + 180
@@ -170,7 +170,7 @@ def plot_adaptive_tree(nodes, edges, max_depth, radius_step):
                 rotation = deg
                 ha = 'left'
                 text_offset_x = (node['size']**0.5 / 2 + 5)
-            
+
             # 稍微偏移一点，不要压在点上
             # 这里做一个简化的偏移计算，沿着半径方向
             offset_dist = 15 + node['size']/20
@@ -179,8 +179,8 @@ def plot_adaptive_tree(nodes, edges, max_depth, radius_step):
 
             # 如果是最后一层，字可能会很密，把字稍微放远一点或者改颜色
             text_color = '#333333'
-            
-            ax.text(text_x, text_y, node['label'], 
+
+            ax.text(text_x, text_y, node['label'],
                    ha=ha, va='center', rotation=rotation, rotation_mode='anchor',
                    fontsize=node['font_size'], color=text_color)
 
@@ -204,28 +204,28 @@ def main():
 
     print("1. 正在加载数据...")
     data = load_json_data(args.input)
-    
+
     print("2. 正在分析树结构深度...")
     max_depth = preprocess_tree_depth(data)
     print(f"   检测到最大层级深度: {max_depth}")
-    
+
     print("3. 计算布局坐标...")
     nodes, edges, step = build_adaptive_layout(data, max_depth)
-    
+
     print("4. 正在绘图 (由于节点较多，这可能需要几秒钟)...")
     fig = plot_adaptive_tree(nodes, edges, max_depth, step)
-    
+
     if not os.path.exists(args.output):
         os.makedirs(args.output)
-    
+
     save_path = os.path.join(args.output, 'adaptive_tree_viz3.png')
     svg_path = os.path.join(args.output, 'adaptive_tree_viz3.svg')
-    
+
     print(f"5. 保存图片至: {save_path}")
     # 增加 dpi 以获得高清大图
     fig.savefig(save_path, dpi=300, bbox_inches='tight', facecolor='#FAFAFA')
     fig.savefig(svg_path, format='svg', bbox_inches='tight')
-    
+
     print("完成！请打开图片查看细节。")
     # plt.show() # 如果图太大，弹窗可能会卡死，建议直接看文件
 

@@ -1,0 +1,140 @@
+doc_id,block_idx,block_text,raw_type,rule_type_label,rule_level,match_pattern_id,llm_type_label,llm_level,pattern_family,reason,final_type_label,final_level,provenance,ends_with_colon,has_binder_phrase,window_index,win_abs_start,win_abs_end,是否聚类
+DF0009,11,"　　一、科学统筹推进枢纽建设
+",p,heading,H1,,heading,H1,B,DOCFAM=B|SYM_B_CN,heading,H1,llm_primary,FALSE,FALSE,0,0,2417,是
+DF0009,14,"　　二、加快完善枢纽规划布局
+",p,heading,H1,,heading,H1,B,DOCFAM=B|SYM_B_CN,heading,H1,llm_primary,FALSE,FALSE,0,0,2417,是
+DF0009,17,"　　三、加快推进基础设施建设
+",p,heading,H1,,heading,H1,B,DOCFAM=B|SYM_B_CN,heading,H1,llm_primary,FALSE,FALSE,0,0,2417,是
+DF0009,22,"　　四、积极培育多元经营主体
+",p,heading,H1,,heading,H1,B,DOCFAM=B|SYM_B_CN,heading,H1,llm_primary,FALSE,FALSE,0,0,2417,是
+DF0009,25,"　　五、大力拓展增量市场业务
+",p,heading,H1,,heading,H1,B,DOCFAM=B|SYM_B_CN,heading,H1,llm_primary,FALSE,FALSE,0,0,2417,是
+DF0009,28,"　　六、扎实做好货物运输保障
+",p,heading,H1,,heading,H1,B,DOCFAM=B|SYM_B_CN,heading,H1,llm_primary,FALSE,FALSE,1,1617,3518,是
+DF0009,32,"　　七、提升枢纽智慧绿色水平
+",p,heading,H1,,heading,H1,B,DOCFAM=B|SYM_B_CN,heading,H1,llm_primary,FALSE,FALSE,1,1617,3518,是
+DF0009,36,"　　八、继续做好航空资源保障
+",p,heading,H1,,heading,H1,B,DOCFAM=B|SYM_B_CN,heading,H1,llm_primary,FALSE,FALSE,1,1617,3518,是
+DF0009,39,"　　九、全面改善枢纽运营环境
+",p,heading,H1,,heading,H1,B,DOCFAM=B|SYM_B_CN,heading,H1,llm_primary,FALSE,FALSE,1,1617,3518,是
+DF0403,12,"一、鼓励航空货运市场主体开行全货机定期航线，构建覆盖全球的货运航线网络
+",p,heading,H1,,heading,H1,B,SYM_B_CN,heading,H1,llm_primary,FALSE,FALSE,0,0,2528,是
+DF0403,19,"二、鼓励航空货运市场主体向成都机场集货，促进航空货量、中转货量增长
+",p,heading,H1,,heading,H1,B,SYM_B_CN,heading,H1,llm_primary,FALSE,FALSE,0,0,2528,是
+DF0403,27,"三、鼓励在成都新设立基地货运航空公司，增加全货机运力
+",p,heading,H1,,heading,H1,B,DOCFAM=B|SYM_B_CN,heading,H1,llm_primary,FALSE,FALSE,1,1729,3027,是
+DF0403,32,"四、鼓励在成都新设立国际航空货运转运（分拨）中心，提升航空货运枢纽集疏运能力
+",p,heading,H1,,heading,H1,B,DOCFAM=B|SYM_B_CN,heading,H1,llm_primary,FALSE,FALSE,1,1729,3027,是
+DF0403,38,"五、提升空港口岸作业效率，减免口岸及货站操作处置费用
+",p,heading,H1,,heading,H1,B,DOCFAM=B|SYM_B_CN,heading,H1,llm_primary,FALSE,FALSE,1,1729,3027,是
+DF1176,22,"四、工作举措
+",p,heading,H1,,heading,H1,B,DOCFAM=B|SYM_B_CN,heading,H1,llm_primary,FALSE,FALSE,0,0,2023,是
+DF1176,23,"　　（一）聚集航空物流资源要素
+",p,heading,H2,,heading,H2,B,DOCFAM=B|SYM_B_PAREN,heading,H2,llm_primary,FALSE,FALSE,0,0,2023,是
+DF1176,24,　　1．助力基地航空公司发展。,p,heading,H3,,heading,H3,B,DOCFAM=B|SYM_B_ARABIC|SHORTLINE,heading,H3,llm_primary,FALSE,FALSE,0,0,2023,是
+DF1176,26,　　2．大力培育适航产业。,p,heading,H3,,heading,H3,B,DOCFAM=B|SYM_B_ARABIC|SHORTLINE,heading,H3,llm_primary,FALSE,FALSE,0,0,2023,是
+DF1176,28,"　　（二）优化航空口岸服务环境
+",p,heading,H2,,heading,H2,B,DOCFAM=B|SYM_B_PAREN,heading,H2,llm_primary,FALSE,FALSE,0,0,2023,是
+DF1176,29,　　3．丰富航空口岸功能。,p,heading,H3,,heading,H3,B,DOCFAM=B|SYM_B_ARABIC|SHORTLINE,heading,H3,llm_primary,FALSE,FALSE,0,0,2023,是
+DF1176,31,　　4．提升口岸通关便利化。,p,heading,H3,,heading,H3,B,DOCFAM=B|SYM_B_ARABIC|SHORTLINE,heading,H3,llm_primary,FALSE,FALSE,0,0,2023,是
+DF1176,33,"　　（三）增强航空物流服务能力
+",p,heading,H2,,heading,H2,B,DOCFAM=B|SYM_B_PAREN,heading,H2,llm_primary,FALSE,FALSE,1,1223,3324,是
+DF1176,34,　　5．加快国际航空物流中心载体建设。,p,heading,H3,,heading,H3,B,DOCFAM=B|SYM_B_ARABIC|SHORTLINE,heading,H3,llm_primary,FALSE,FALSE,1,1223,3324,是
+DF1176,36,　　6．加快实施货运通道建设。,p,heading,H3,,heading,H3,B,DOCFAM=B|SYM_B_ARABIC|SHORTLINE,heading,H3,llm_primary,FALSE,FALSE,1,1223,3324,是
+DF1176,38,"　　（四）丰富多式联运体系
+",p,heading,H2,,heading,H2,B,DOCFAM=B|SYM_B_PAREN,heading,H2,llm_primary,FALSE,FALSE,1,1223,3324,是
+DF1176,39,　　7．做大空空中转业务。,p,heading,H3,,heading,H3,B,DOCFAM=B|SYM_B_ARABIC|SHORTLINE,heading,H3,llm_primary,FALSE,FALSE,1,1223,3324,是
+DF1176,41,　　8．做实空地联运业务。,p,heading,H3,,heading,H3,B,DOCFAM=B|SYM_B_ARABIC|SHORTLINE,heading,H3,llm_primary,FALSE,FALSE,1,1223,3324,是
+DF1176,43,"　　（五）提升航空物流通达能力
+",p,heading,H2,,heading,H2,B,DOCFAM=B|SYM_B_PAREN,heading,H2,llm_primary,FALSE,FALSE,1,1223,3324,是
+DF1176,44,　　9．增加机场高峰小时容量。,p,heading,H3,,heading,H3,B,DOCFAM=B|SYM_B_ARABIC|SHORTLINE,heading,H3,llm_primary,FALSE,FALSE,1,1223,3324,是
+DF1176,46,　　10．优化客货运航线网络。,p,heading,H3,,heading,H3,B,DOCFAM=B|SYM_B_ARABIC|SHORTLINE,heading,H3,llm_primary,FALSE,FALSE,1,1223,3324,是
+DF1176,48,"　　（六）强化组织推动和政策保障
+",p,heading,H2,,heading,H2,B,DOCFAM=B|SYM_B_PAREN,heading,H2,llm_primary,FALSE,FALSE,1,1223,3324,是
+DF1176,49,　　11．建立工作协调机制。,p,heading,H3,,heading,H3,B,DOCFAM=B|SYM_B_ARABIC|SHORTLINE,heading,H3,llm_primary,FALSE,FALSE,1,1223,3324,是
+DF1176,51,　　12．出台综合支持政策。,p,heading,H3,,heading,H3,B,DOCFAM=B|SYM_B_ARABIC|SHORTLINE,heading,H3,llm_primary,FALSE,FALSE,1,1223,3324,是
+DF1759,53,"三、重点任务
+",p,heading,H1,,heading,H1,B,DOCFAM=B|SYM_B_CN,heading,H1,llm_primary,FALSE,FALSE,2,4030,6759,是
+DF1759,54,"（一）构建优质航线网络。
+",p,heading,H2,,heading,H2,B,DOCFAM=B|SYM_B_PAREN,heading,H2,llm_primary,FALSE,FALSE,2,4030,6759,是
+DF1759,56,"1.完善国际货运航线。
+",p,heading,H3,,heading,H3,B,DOCFAM=B|SYM_B_ARABIC|SHORTLINE,heading,H3,llm_primary,FALSE,FALSE,2,4030,6759,是
+DF1759,57,立足中国一东盟航空货运市场，开通和加密贸易密切城市 及货源丰富地区航线。,p,heading,H4,,heading,H4,B,DOCFAM=B|SYM_B_ARABIC|SHORTLINE,heading,H4,llm_primary,FALSE,FALSE,2,4030,6759,是
+DF1759,59,引导国际货运航线布局与制造业需求对接，提升南宁国际 航空货运枢纽全球响应能力。,p,heading,H4,,heading,H4,B,DOCFAM=B|SYM_B_ARABIC|SHORTLINE,heading,H4,llm_primary,FALSE,FALSE,2,4030,6759,是
+DF1759,61,"2.积极打造中转航线。
+",p,heading,H3,,heading,H3,B,DOCFAM=B|SYM_B_ARABIC|SHORTLINE,heading,H3,llm_primary,FALSE,FALSE,2,4030,6759,是
+DF1759,62,发挥南宁区位优势，构建双扇形航线网络布局。,p,heading,H4,,heading,H4,B,DOCFAM=B|SYM_B_ARABIC|SHORTLINE,heading,H4,llm_primary,FALSE,FALSE,2,4030,6759,是
+DF1759,64,加强与国际机场合作，开展多形式、多渠道的中转业务。,p,heading,H4,,heading,H4,B,DOCFAM=B|SYM_B_ARABIC|SHORTLINE,heading,H4,llm_primary,FALSE,FALSE,2,4030,6759,是
+DF1759,74,"3.引进航司提升运力。
+",p,heading,H3,,heading,H3,B,DOCFAM=B|SYM_B_ARABIC|SHORTLINE,heading,H3,llm_primary,FALSE,FALSE,2,4030,6759,是
+DF1759,75,加快引进国内国际货运航司和快递企业航司，积极引进新 兴货运航司。,p,heading,H4,,heading,H4,B,DOCFAM=B|SYM_B_ARABIC|SHORTLINE,heading,H4,llm_primary,FALSE,FALSE,2,4030,6759,是
+DF1759,77,加强与货运航空公司的紧密合作，以运力发展带动航线布 局。,p,heading,H4,,heading,H4,B,DOCFAM=B|SYM_B_ARABIC|SHORTLINE,heading,H4,llm_primary,FALSE,FALSE,2,4030,6759,是
+DF1759,83,"（二）增强货运保障能力。
+",p,heading,H2,,heading,H2,B,SYM_B_PAREN,heading,H2,llm_primary,FALSE,FALSE,3,5960,8496,是
+DF1759,85,"1.加强货运设施建设。
+",p,heading,H3,,heading,H3,B,SYM_B_ARABIC|SHORTLINE,heading,H3,llm_primary,FALSE,FALSE,3,5960,8496,是
+DF1759,87,积极推进南宁机场各货运区规划建设。,p,heading,H4,,heading,H4,B,DOCFAM=B|SYM_B_ARABIC|SHORTLINE,heading,H4,llm_primary,FALSE,FALSE,2,4030,6759,是
+DF1759,89,稳步推进货运基础设施建设。,p,heading,H4,,heading,H4,B,DOCFAM=B|SYM_B_ARABIC|SHORTLINE,heading,H4,llm_primary,FALSE,FALSE,2,4030,6759,是
+DF1759,91,"2.完善货运功能配套。
+",p,heading,H3,,heading,H3,B,SYM_B_ARABIC|SHORTLINE,heading,H3,llm_primary,FALSE,FALSE,3,5960,8496,是
+DF1759,92,满足客户业务需求，补齐南宁机场设施短板。,p,heading,H4,,heading,H4,B,DOCFAM=B|SYM_B_ARABIC|SHORTLINE,heading,H4,llm_primary,FALSE,FALSE,2,4030,6759,是
+DF1759,94,完善货运保障配套工程，规划配置货机位、陆侧道路、空 侧道路、配套办公等设施。,p,heading,H4,,heading,H4,B,DOCFAM=B|SYM_B_ARABIC|SHORTLINE,heading,H4,llm_primary,FALSE,FALSE,2,4030,6759,是
+DF1759,96,推进临空区保税物流、跨境电商等园区建设。,p,heading,H4,,heading,H4,B,DOCFAM=B|SYM_B_ARABIC|SHORTLINE,heading,H4,llm_primary,FALSE,FALSE,2,4030,6759,是
+DF1759,118,"3.加快数字基建建设。
+",p,heading,H3,,heading,H3,B,SYM_B_ARABIC|SHORTLINE,heading,H3,llm_primary,FALSE,FALSE,4,7697,10359,是
+DF1759,120,"（三）提升货源组织能力。
+",p,heading,H2,,heading,H2,B,SYM_B_PAREN,heading,H2,llm_primary,FALSE,FALSE,4,7697,10359,是
+DF1759,122,"1．丰富货运参与主体。
+",p,heading,H3,,heading,H3,B,SYM_B_ARABIC|SHORTLINE,heading,H3,llm_primary,FALSE,FALSE,4,7697,10359,是
+DF1759,123,引育优质货运代理和大型电商物流企业。,p,heading,H4,,heading,H4,B,DOCFAM=B|SYM_B_ARABIC|SHORTLINE,heading,H4,llm_primary,FALSE,FALSE,2,4030,6759,是
+DF1759,125,"2.强化陆运集货网络。
+",p,heading,H3,,heading,H3,B,SYM_B_ARABIC|SHORTLINE,heading,H3,llm_primary,FALSE,FALSE,4,7697,10359,是
+DF1759,126,构建高效的航空物流地面集散体系。,p,heading,H4,,heading,H4,B,DOCFAM=B|SYM_B_ARABIC|SHORTLINE,heading,H4,llm_primary,FALSE,FALSE,2,4030,6759,是
+DF1759,128,延伸货运服务，探索异地货站模式。,p,heading,H4,,heading,H4,B,DOCFAM=B|SYM_B_ARABIC|SHORTLINE,heading,H4,llm_primary,FALSE,FALSE,2,4030,6759,是
+DF1759,130,"3.探索开展多式联运。
+",p,heading,H3,,heading,H3,B,SYM_B_ARABIC|SHORTLINE,heading,H3,llm_primary,FALSE,FALSE,4,7697,10359,是
+DF1759,131,借鉴先进经验，探索南宁机场开展多式联运。,p,heading,H4,,heading,H4,B,DOCFAM=B|SYM_B_ARABIC|SHORTLINE,heading,H4,llm_primary,FALSE,FALSE,2,4030,6759,是
+DF1759,138,"（四）智慧货运高效管理。
+",p,heading,H2,,heading,H2,B,SYM_B_PAREN,heading,H2,llm_primary,FALSE,FALSE,4,7697,10359,是
+DF1759,140,"1.推进智慧平台建设。
+",p,heading,H3,,heading,H3,B,SYM_B_ARABIC|SHORTLINE,heading,H3,llm_primary,FALSE,FALSE,4,7697,10359,是
+DF1759,141,加快构建智慧航空物流综合服务平台。,p,heading,H4,,heading,H4,B,DOCFAM=B|SYM_B_ARABIC|SHORTLINE,heading,H4,llm_primary,FALSE,FALSE,2,4030,6759,是
+DF1759,143,统筹单据电子化和标准化建设。,p,heading,H4,,heading,H4,B,DOCFAM=B|SYM_B_ARABIC|SHORTLINE,heading,H4,llm_primary,FALSE,FALSE,2,4030,6759,是
+DF1759,145,"2.加强新兴技术应用
+",p,heading,H3,,heading,H3,B,SYM_B_ARABIC|SHORTLINE,heading,H3,llm_primary,FALSE,FALSE,4,7697,10359,是
+DF1759,146,航空货运全流程定位追踪。,p,heading,H4,,heading,H4,B,DOCFAM=B|SYM_B_ARABIC|SHORTLINE,heading,H4,llm_primary,FALSE,FALSE,2,4030,6759,是
+DF1759,148,货物状态可视化。,p,heading,H4,,heading,H4,B,DOCFAM=B|SYM_B_ARABIC|SHORTLINE,heading,H4,llm_primary,FALSE,FALSE,2,4030,6759,是
+DF1759,150,"3.提升运营管理能力。
+",p,heading,H3,,heading,H3,B,SYM_B_ARABIC|SHORTLINE,heading,H3,llm_primary,FALSE,FALSE,5,9560,12176,是
+DF1759,151,打造良好的航空货运社区。,p,heading,H4,,heading,H4,B,DOCFAM=B|SYM_B_ARABIC|SHORTLINE,heading,H4,llm_primary,FALSE,FALSE,2,4030,6759,是
+DF1759,153,引入资金和战投，增强经营实力。,p,heading,H4,,heading,H4,B,DOCFAM=B|SYM_B_ARABIC|SHORTLINE,heading,H4,llm_primary,FALSE,FALSE,2,4030,6759,是
+DF1759,164,"（五）延伸产业丰富业态。
+",p,heading,H2,,heading,H2,B,SYM_B_PAREN|SHORTLINE,heading,H2,llm_primary,FALSE,FALSE,5,9560,12176,是
+DF1759,166,"1.延伸航空物流链条。
+",p,heading,H3,,heading,H3,B,SYM_B_ARABIC|SHORTLINE,heading,H3,llm_primary,FALSE,FALSE,5,9560,12176,是
+DF1759,167,"与快递企业深度合作，实现""门到门""的服务。",p,heading,H4,,heading,H4,B,DOCFAM=B|SYM_B_ARABIC|SHORTLINE,heading,H4,llm_primary,FALSE,FALSE,2,4030,6759,是
+DF1759,169,建设跨境产业园，打造中国一东盟跨境电商综合服务平台。,p,heading,H4,,heading,H4,B,DOCFAM=B|SYM_B_ARABIC|SHORTLINE,heading,H4,llm_primary,FALSE,FALSE,2,4030,6759,是
+DF1759,171,"简单加工等服务，成为东盟跨境电商的核心服务商。
+",p,heading,H4,,heading,H4,B,DOCFAM=B|SYM_B_ARABIC|SHORTLINE,heading,H4,llm_primary,FALSE,FALSE,2,4030,6759,是
+DF1759,172,"依托""中国东盟生鲜产业园""，打造生鲜集散中心、加工 中心、交易中心。",p,heading,H4,,heading,H4,B,DOCFAM=B|SYM_B_ARABIC|SHORTLINE,heading,H4,llm_primary,FALSE,FALSE,2,4030,6759,是
+DF1759,174,"2.加强港区高效联动。
+",p,heading,H3,,heading,H3,B,SYM_B_ARABIC|SHORTLINE,heading,H3,llm_primary,FALSE,FALSE,5,9560,12176,是
+DF1759,175,推动区港联动。,p,heading,H4,,heading,H4,B,DOCFAM=B|SYM_B_ARABIC|SHORTLINE,heading,H4,llm_primary,FALSE,FALSE,2,4030,6759,是
+ZY0103,20,"　　二、完善提升综合性机场货运设施能力和服务品质
+",p,heading,H1,,heading,H1,B,SYM_B_CN,heading,H1,llm_primary,FALSE,FALSE,0,0,2637,是
+ZY0103,21,　　（一）提高综合性机场现有货运设施能力和利用率。,p,heading,H2,,heading,H2,B,SYM_B_PAREN,heading,H2,llm_primary,FALSE,FALSE,0,0,2637,是
+ZY0103,23,　　（二）优化机场货物运输组织。,p,heading,H2,,heading,H2,B,SYM_B_PAREN,heading,H2,llm_primary,FALSE,FALSE,0,0,2637,是
+ZY0103,25,　　（三）提升机场货运服务品质。,p,heading,H2,,heading,H2,B,SYM_B_PAREN,heading,H2,llm_primary,FALSE,FALSE,0,0,2637,是
+ZY0103,27,　　（四）强化机场内外设施的协同联动。,p,heading,H2,,heading,H2,B,DOCFAM=B|SYM_B_PAREN,heading,H2,llm_primary,FALSE,FALSE,1,1837,4380,是
+ZY0103,29,"　　三、稳妥有序推进专业性货运枢纽机场建设
+",p,heading,H1,,heading,H1,B,DOCFAM=B|SYM_B_CN,heading,H1,llm_primary,FALSE,FALSE,1,1837,4380,是
+ZY0103,30,　　（一）充分遵循航空货运发展规律。,p,heading,H2,,heading,H2,B,DOCFAM=B|SYM_B_PAREN,heading,H2,llm_primary,FALSE,FALSE,1,1837,4380,是
+ZY0103,32,　　（二）符合民用运输机场布局规划。,p,heading,H2,,heading,H2,B,DOCFAM=B|SYM_B_PAREN,heading,H2,llm_primary,FALSE,FALSE,1,1837,4380,是
+ZY0103,34,　　（三）引入专业化航空运输企业。,p,heading,H2,,heading,H2,B,DOCFAM=B|SYM_B_PAREN,heading,H2,llm_primary,FALSE,FALSE,1,1837,4380,是
+ZY0103,36,　　（四）具备良好的发展条件。,p,heading,H2,,heading,H2,B,DOCFAM=B|SYM_B_PAREN,heading,H2,llm_primary,FALSE,FALSE,1,1837,4380,是
+ZY0103,38,"　　四、全面提升航空货运设施使用效能
+",p,heading,H1,,heading,H1,B,DOCFAM=B|SYM_B_CN,heading,H1,llm_primary,FALSE,FALSE,1,1837,4380,是
+ZY0103,39,　　（一）完善飞机引进政策。,p,heading,H2,,heading,H2,B,DOCFAM=B|SYM_B_PAREN,heading,H2,llm_primary,FALSE,FALSE,1,1837,4380,是
+ZY0103,41,　　（二）持续改善空域条件。,p,heading,H2,,heading,H2,B,DOCFAM=B|SYM_B_PAREN,heading,H2,llm_primary,FALSE,FALSE,1,1837,4380,是
+ZY0103,43,　　（三）培育航空货运企业。,p,heading,H2,,heading,H2,B,DOCFAM=B|SYM_B_PAREN,heading,H2,llm_primary,FALSE,FALSE,1,1837,4380,是
+ZY0103,45,　　（四）提升机场管理水平。,p,heading,H2,,heading,H2,B,DOCFAM=B|SYM_B_PAREN,heading,H2,llm_primary,FALSE,FALSE,1,1837,4380,是

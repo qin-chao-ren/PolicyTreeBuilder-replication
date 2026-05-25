@@ -7,18 +7,16 @@ Step 6 (Admin) · 批量可视化行政单位树
 
 import json
 import math
-import matplotlib
-
-matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
+import os
 import platform
 import argparse
 from pathlib import Path
 
 # === 1. 配置路径 (修改点) ===
 # 指向 Step 5 生成的具体行政单位树的文件夹
-INPUT_DIR = Path(r"<LOCAL_SOURCE_ROOT>/data\intermediate_outputs\trees_by_admin")
+INPUT_DIR = Path(r"data/intermediate_outputs/trees_by_admin")
 
 # 输出图片存放的文件夹
 OUTPUT_DIR = INPUT_DIR  # 默认存在同一个文件夹，也可以改为 Path(r"...\outputs\viz_admin")
@@ -56,9 +54,9 @@ def count_leaves(node):
 def build_adaptive_layout(root_data, max_depth):
     nodes = []
     edges = []
-    RADIUS_STEP = 200   
-    if max_depth > 6: RADIUS_STEP = 180 
-    
+    RADIUS_STEP = 200
+    if max_depth > 6: RADIUS_STEP = 180
+
     def assign_pos(node, start_angle, end_angle, parent_pos=None):
         depth = node['_depth']
         if depth == 0:
@@ -68,12 +66,12 @@ def build_adaptive_layout(root_data, max_depth):
             radius = depth * RADIUS_STEP
             angle = (start_angle + end_angle) / 2
             pos = (radius * math.cos(angle), radius * math.sin(angle))
-        
+
         font_size = max(16 - depth * 1.8, 6)
         node_size = max(900 - depth * 120, 60)
         color_val = depth / max_depth if max_depth > 0 else 0
-        color = cm.viridis(color_val) 
-        
+        color = cm.viridis(color_val)
+
         nodes.append({
             'label': node.get('label', ''),
             'pos': pos,
@@ -83,10 +81,10 @@ def build_adaptive_layout(root_data, max_depth):
             'size': node_size,
             'font_size': font_size
         })
-        
+
         if parent_pos is not None:
             edges.append((parent_pos, pos))
-        
+
         children = node.get('children', [])
         if children:
             total_leaves = sum(count_leaves(c) for c in children)
@@ -104,12 +102,12 @@ def build_adaptive_layout(root_data, max_depth):
     return nodes, edges, RADIUS_STEP
 
 def plot_adaptive_tree(nodes, edges, max_depth, radius_step, title_text):
-    canvas_size = max(24, max_depth * 4.5) 
+    canvas_size = max(24, max_depth * 4.5)
     fig, ax = plt.subplots(1, 1, figsize=(canvas_size, canvas_size))
     ax.set_aspect('equal')
     fig.patch.set_facecolor('#FFFFFF')
     ax.set_facecolor('#FFFFFF')
-    
+
     for d in range(1, max_depth + 1):
         r = d * radius_step
         circle = plt.Circle((0, 0), r, fill=False, edgecolor='#eeeeee', linestyle='-', linewidth=1.5, alpha=0.6)
@@ -123,7 +121,7 @@ def plot_adaptive_tree(nodes, edges, max_depth, radius_step, title_text):
         x, y = node['pos']
         depth = node['depth']
         ax.scatter(x, y, s=node['size'], color=node['color'], edgecolor='white', linewidth=1.5, zorder=10, alpha=0.85)
-        
+
         if depth == 0:
             ax.text(x, y, node['label'], ha='center', va='center', fontsize=18, fontweight='bold', color='white')
         else:
@@ -136,13 +134,13 @@ def plot_adaptive_tree(nodes, edges, max_depth, radius_step, title_text):
                 rotation = deg
                 ha = 'left'
                 text_offset_x = (node['size']**0.5 / 2 + 8)
-            
+
             offset_dist = 20 + node['size']/15
             text_x = x + math.cos(node['angle']) * offset_dist
             text_y = y + math.sin(node['angle']) * offset_dist
             text_color = '#222222' if depth < max_depth else '#555555'
-            
-            ax.text(text_x, text_y, node['label'], ha=ha, va='center', rotation=rotation, 
+
+            ax.text(text_x, text_y, node['label'], ha=ha, va='center', rotation=rotation,
                     rotation_mode='anchor', fontsize=node['font_size'], color=text_color, fontweight='medium')
 
     limit = (max_depth + 1) * radius_step
@@ -154,42 +152,29 @@ def plot_adaptive_tree(nodes, edges, max_depth, radius_step, title_text):
     return fig
 
 def main():
-    parser = argparse.ArgumentParser(description="批量可视化行政单位/分组树")
-    parser.add_argument("--input-dir", default=str(INPUT_DIR), help="包含树 JSON 的目录")
-    parser.add_argument("--output-dir", default=None, help="图片输出目录；默认与 input-dir 相同")
-    parser.add_argument("--pattern", default="*.json", help="未指定 --files 时使用的 glob 模式")
-    parser.add_argument("--files", nargs="*", default=None, help="只处理这些 JSON 文件名")
-    parser.add_argument("--dpi", type=int, default=300, help="输出 PNG 的 DPI")
-    args = parser.parse_args()
-
-    input_dir = Path(args.input_dir)
-    output_dir = Path(args.output_dir) if args.output_dir else input_dir
-
     print(f"=== 批量可视化行政单位树 ===")
-    print(f"输入目录: {input_dir}")
-    
-    if not input_dir.exists():
-        print(f"[错误] 找不到目录: {input_dir}")
+    print(f"输入目录: {INPUT_DIR}")
+
+    if not INPUT_DIR.exists():
+        print(f"[错误] 找不到目录: {INPUT_DIR}")
         print("请先运行 Step 5 生成这些文件。")
         return
 
-    if args.files:
-        json_files = [input_dir / name for name in args.files]
-    else:
-        json_files = sorted(input_dir.glob(args.pattern))
-    
+    # 自动扫描所有 json 文件
+    json_files = list(INPUT_DIR.glob("*.json"))
+
     if not json_files:
         print("[警告] 目录下没有找到 .json 文件！")
         return
 
     print(f"找到 {len(json_files)} 个树文件，开始处理...\n")
 
-    output_dir.mkdir(parents=True, exist_ok=True)
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
     for i, json_path in enumerate(json_files, 1):
         filename = json_path.name
         print(f"[{i}/{len(json_files)}] 处理: {filename}")
-        
+
         # 1. 加载
         try:
             data = load_json_data(json_path)
@@ -202,28 +187,23 @@ def main():
         if max_depth == 0:
             print("    ⚠️ 空树，跳过。")
             continue
-        
+
         # 3. 布局
         nodes, edges, step = build_adaptive_layout(data, max_depth)
-        
+
         # 4. 绘图标题 (去掉 tree_ 前缀和 .json 后缀)
         admin_name = filename.replace("tree_", "").replace(".json", "")
-        if "provincial" in admin_name:
-            title_str = "省级政策结构图"
-        elif "city" in admin_name:
-            title_str = "市级政策结构图"
-        else:
-            title_str = f"{admin_name} 政策结构图"
-        
+        title_str = f"{admin_name} 政策结构图"
+
         fig = plot_adaptive_tree(nodes, edges, max_depth, step, title_str)
-        
+
         # 5. 保存
         save_name = filename.replace('.json', '.png')
-        save_path = output_dir / save_name
-        
+        save_path = OUTPUT_DIR / save_name
+
         print(f"    保存至: {save_path}")
-        fig.savefig(save_path, dpi=args.dpi, bbox_inches='tight', facecolor='#FFFFFF')
-        
+        fig.savefig(save_path, dpi=300, bbox_inches='tight', facecolor='#FFFFFF')
+
         plt.close(fig)
 
     print("\n=== 全部完成 ===")

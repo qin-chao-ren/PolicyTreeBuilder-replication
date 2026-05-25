@@ -1,195 +1,681 @@
 {
-  "generated_at": 1763838109,
-  "input_tree": "data/intermediate_outputs/v4_tree_refined.json",
-  "output_tree": "data/intermediate_outputs/v4_tree_final.json",
+  "ts": 1767004906,
   "entries": [
     {
-      "l1_id": "L1_N6bbea948",
-      "l1_label": "智慧绿色转型",
-      "raw_operations": [
+      "l1_id": "L1_N762e6689",
+      "label": "战略规划与治理",
+      "raw_ops": [
         {
           "type": "merge",
-          "node_id": "L3_N1b187997",
-          "merge_into": "L3_N1b187997_BR",
-          "reason": "垂直冗余：L3(提升航空货运智慧化水平)与L2(智慧物流升级)语义高度重合，且未提供新的分类维度，应合并以扁平化结构。",
+          "node_id": "L3_N578f3b8a",
+          "merge_into": "L2_N578f3b8a",
+          "reason": "垂直冗余：L3(提升跨境电子商务国际货运服务能力)与父节点L2(提升国际货运服务能力)语义高度重叠（重复率76%），且未形成有效子分类，应合并以避免层级膨胀。",
           "confidence": 0.92
         },
         {
           "type": "merge",
-          "node_id": "L3_N5b8fd671",
-          "merge_into": "L3_N5b8fd671_BR",
-          "reason": "垂直冗余：L3(推动航空货运绿色低碳发展)是L2(绿色低碳转型)的直接复述，无新增语义，应合并。",
-          "confidence": 0.94
+          "node_id": "L3_N55fb6992",
+          "merge_into": "L1_N762e6689_BR_c43b41",
+          "reason": "垂直冗余：L3(加强规划顶层设计)与父节点L2(规划顶层设计)语义重复度高达85%，属于典型‘单脉传代+语义重复’场景，应坍缩为一层以符合奥卡姆剃刀原则。",
+          "confidence": 0.95
         },
         {
           "type": "merge",
-          "node_id": "L3_Nbf5cb6ef",
-          "merge_into": "L3_Nbf5cb6ef_BR",
-          "reason": "垂直冗余：L3(提升航空货运安全韧性水平)与L2(航空货运韧性)语义重复率达67%，属于无效中间层，应消除。",
+          "node_id": "L2_Nd5d2d592",
+          "merge_into": "L2_N242a428d",
+          "reason": "语义近似归并：L2(强化战略统筹引领)与L2(加强政策协同创新)均聚焦跨部门、跨层级的制度协调，前者偏方向、后者偏机制，但在本骨架中缺乏差异化子节点支撑，合并可减少顶层冗余，增强L2分类清晰度。",
           "confidence": 0.88
         },
         {
           "type": "merge",
-          "node_id": "L3_Ne42076c0",
-          "merge_into": "L3_Ne42076c0_BR",
-          "reason": "垂直冗余：L3(推进智慧货运高效管理)与L2(智慧货运管理)语义重复率达75%，未提供有效子类划分，应合并。",
+          "node_id": "L2_N6da1b013",
+          "merge_into": "L1_N762e6689_BR_c43b41",
+          "reason": "语义覆盖合并：L2(注重规划支撑引领)实质内容已被更精准的L2(规划顶层设计)所涵盖，且后者已包含具体行动项，前者作为独立L2节点无增量信息，应予以合并。",
+          "confidence": 0.9
+        }
+      ],
+      "applied": [
+        {
+          "type": "merge",
+          "node_id": "L3_N578f3b8a",
+          "merge_into": "L2_N578f3b8a",
+          "reason": "垂直冗余：L3(提升跨境电子商务国际货运服务能力)与父节点L2(提升国际货运服务能力)语义高度重叠（重复率76%），且未形成有效子分类，应合并以避免层级膨胀。",
+          "confidence": 0.92,
+          "status": "applied",
+          "message": ""
+        },
+        {
+          "type": "merge",
+          "node_id": "L3_N55fb6992",
+          "merge_into": "L1_N762e6689_BR_c43b41",
+          "reason": "垂直冗余：L3(加强规划顶层设计)与父节点L2(规划顶层设计)语义重复度高达85%，属于典型‘单脉传代+语义重复’场景，应坍缩为一层以符合奥卡姆剃刀原则。",
+          "confidence": 0.95,
+          "status": "applied",
+          "message": ""
+        },
+        {
+          "type": "merge",
+          "node_id": "L2_Nd5d2d592",
+          "merge_into": "L2_N242a428d",
+          "reason": "语义近似归并：L2(强化战略统筹引领)与L2(加强政策协同创新)均聚焦跨部门、跨层级的制度协调，前者偏方向、后者偏机制，但在本骨架中缺乏差异化子节点支撑，合并可减少顶层冗余，增强L2分类清晰度。",
+          "confidence": 0.88,
+          "status": "applied",
+          "message": ""
+        },
+        {
+          "type": "merge",
+          "node_id": "L2_N6da1b013",
+          "merge_into": "L1_N762e6689_BR_c43b41",
+          "reason": "语义覆盖合并：L2(注重规划支撑引领)实质内容已被更精准的L2(规划顶层设计)所涵盖，且后者已包含具体行动项，前者作为独立L2节点无增量信息，应予以合并。",
+          "confidence": 0.9,
+          "status": "applied",
+          "message": ""
+        }
+      ]
+    },
+    {
+      "l1_id": "L1_N6e836104",
+      "label": "基础设施与枢纽",
+      "raw_ops": [
+        {
+          "type": "merge",
+          "node_id": "L2_Nd8a500a1",
+          "merge_into": "L1_N6e836104_BR_7637d7",
+          "reason": "垂直冗余：L2(加快完善枢纽规划布局)是L2(枢纽规划与建设)的直接语义重复，未提供新分类维度，应合并以消除噪音层级。",
+          "confidence": 0.92
+        },
+        {
+          "type": "merge",
+          "node_id": "L2_N0a6e8ca5",
+          "merge_into": "L1_N6e836104_BR_7637d7",
+          "reason": "垂直冗余：L2(加快推进基础设施建设)与父节点L2(枢纽规划与建设)语义高度重叠，且‘基础设施’已在L1定义中明确为范畴，无需单独作为平行子项。",
           "confidence": 0.9
         },
         {
           "type": "merge",
-          "node_id": "L3_N9c47a867",
-          "merge_into": "L3_N9c47a867_BR",
-          "reason": "垂直冗余：L3(推进智慧物流建设)与L2(智慧物流推进)语义几乎一致，属无效中间层，应合并。",
+          "node_id": "L2_N7d5270bf",
+          "merge_into": "L1_N6e836104_BR_7637d7",
+          "reason": "中间商消融：L2(集中力量建设中国国际航空物流中心)作为L2节点，其下已有具体L3任务，但该L2本身仅是对目标的重申，未提供有效分类逻辑，应合并入上级L2以扁平化结构。",
+          "confidence": 0.88
+        },
+        {
+          "type": "merge",
+          "node_id": "L3_Nd003c070",
+          "merge_into": "L2_N7d5270bf",
+          "reason": "垂直冗余：L3(加快中国国际航空物流中心载体建设)与父节点L2(集中力量建设中国国际航空物流中心)语义重复度高（标注62%），且无新增分类信息，应向上合并。",
+          "confidence": 0.95
+        },
+        {
+          "type": "merge",
+          "node_id": "L1_N6e836104_BR_99d8b8",
+          "merge_into": "L1_N6e836104_BR_7637d7",
+          "reason": "中间商消融：L2(基础设施建设)是L2(枢纽规划与建设)下的冗余子节点，标签完全被父节点覆盖，且其唯一子节点L3(加强基础设施建设)语义重复率达85%，整体构成无效嵌套。",
+          "confidence": 0.96
+        },
+        {
+          "type": "merge",
+          "node_id": "L3_N08db7b5b",
+          "merge_into": "L1_N6e836104_BR_99d8b8",
+          "reason": "垂直冗余：L3(加强基础设施建设)与父节点L2(基础设施建设)语义几乎完全一致（重复率85%），属典型层级浪费，应合并。",
+          "confidence": 0.97
+        },
+        {
+          "type": "merge",
+          "node_id": "L2_Nadf8c478",
+          "merge_into": "L1_N6e836104_BR_c83016",
+          "reason": "语义重复：L2(完善机场货运基础设施)与上级L2(货运基础设施)高度重合（重复率75%），且其下L3内容已可直接挂载于‘货运基础设施’下，无需此中间层。",
+          "confidence": 0.91
+        },
+        {
+          "type": "merge",
+          "node_id": "L3_N60c3ab56",
+          "merge_into": "L2_N60c3ab56",
+          "reason": "垂直冗余：L3(构建大物流多式联运体系)与父节点L2(构建多式联运物流体系)标签几乎相同（重复率76%），未提供细化价值，应合并。",
+          "confidence": 0.94
+        }
+      ],
+      "applied": [
+        {
+          "type": "merge",
+          "node_id": "L2_Nd8a500a1",
+          "merge_into": "L1_N6e836104_BR_7637d7",
+          "reason": "垂直冗余：L2(加快完善枢纽规划布局)是L2(枢纽规划与建设)的直接语义重复，未提供新分类维度，应合并以消除噪音层级。",
+          "confidence": 0.92,
+          "status": "applied",
+          "message": ""
+        },
+        {
+          "type": "merge",
+          "node_id": "L2_N0a6e8ca5",
+          "merge_into": "L1_N6e836104_BR_7637d7",
+          "reason": "垂直冗余：L2(加快推进基础设施建设)与父节点L2(枢纽规划与建设)语义高度重叠，且‘基础设施’已在L1定义中明确为范畴，无需单独作为平行子项。",
+          "confidence": 0.9,
+          "status": "applied",
+          "message": ""
+        },
+        {
+          "type": "merge",
+          "node_id": "L2_N7d5270bf",
+          "merge_into": "L1_N6e836104_BR_7637d7",
+          "reason": "中间商消融：L2(集中力量建设中国国际航空物流中心)作为L2节点，其下已有具体L3任务，但该L2本身仅是对目标的重申，未提供有效分类逻辑，应合并入上级L2以扁平化结构。",
+          "confidence": 0.88,
+          "status": "applied",
+          "message": ""
+        },
+        {
+          "type": "merge",
+          "node_id": "L3_Nd003c070",
+          "merge_into": "L2_N7d5270bf",
+          "reason": "垂直冗余：L3(加快中国国际航空物流中心载体建设)与父节点L2(集中力量建设中国国际航空物流中心)语义重复度高（标注62%），且无新增分类信息，应向上合并。",
+          "confidence": 0.95,
+          "status": "skipped",
+          "message": "target not found"
+        },
+        {
+          "type": "merge",
+          "node_id": "L1_N6e836104_BR_99d8b8",
+          "merge_into": "L1_N6e836104_BR_7637d7",
+          "reason": "中间商消融：L2(基础设施建设)是L2(枢纽规划与建设)下的冗余子节点，标签完全被父节点覆盖，且其唯一子节点L3(加强基础设施建设)语义重复率达85%，整体构成无效嵌套。",
+          "confidence": 0.96,
+          "status": "applied",
+          "message": ""
+        },
+        {
+          "type": "merge",
+          "node_id": "L3_N08db7b5b",
+          "merge_into": "L1_N6e836104_BR_99d8b8",
+          "reason": "垂直冗余：L3(加强基础设施建设)与父节点L2(基础设施建设)语义几乎完全一致（重复率85%），属典型层级浪费，应合并。",
+          "confidence": 0.97,
+          "status": "skipped",
+          "message": "target not found"
+        },
+        {
+          "type": "merge",
+          "node_id": "L2_Nadf8c478",
+          "merge_into": "L1_N6e836104_BR_c83016",
+          "reason": "语义重复：L2(完善机场货运基础设施)与上级L2(货运基础设施)高度重合（重复率75%），且其下L3内容已可直接挂载于‘货运基础设施’下，无需此中间层。",
+          "confidence": 0.91,
+          "status": "applied",
+          "message": ""
+        },
+        {
+          "type": "merge",
+          "node_id": "L3_N60c3ab56",
+          "merge_into": "L2_N60c3ab56",
+          "reason": "垂直冗余：L3(构建大物流多式联运体系)与父节点L2(构建多式联运物流体系)标签几乎相同（重复率76%），未提供细化价值，应合并。",
+          "confidence": 0.94,
+          "status": "applied",
+          "message": ""
+        }
+      ]
+    },
+    {
+      "l1_id": "L1_N6be998d8",
+      "label": "通关与口岸效能",
+      "raw_ops": [
+        {
+          "type": "merge",
+          "node_id": "L3_Ne455f9ae",
+          "merge_into": "L2_Ne455f9ae",
+          "reason": "垂直冗余：L3(发挥自贸试验区优势赋能临空产业发展)与L2(自贸赋能临空产业)语义高度重复（相似度64%），未提供新分类维度，予以合并以扁平化层级。",
+          "confidence": 0.92
+        },
+        {
+          "type": "merge",
+          "node_id": "L3_Nfb48b97b",
+          "merge_into": "L2_Ne455f9ae",
+          "reason": "中间商消融：L3(大通关与自贸区联动)作为L2(自贸赋能临空产业)的子节点，其标签未体现明确子领域划分，且与L2主题重叠，应直接挂载其下L4或归入L2。",
+          "confidence": 0.88
+        },
+        {
+          "type": "merge",
+          "node_id": "L2_Ne455f9ae_BR_b74a14",
+          "merge_into": "L2_Ne455f9ae",
+          "reason": "垂直坍缩：L3(片区联动发展)为单子节点，且其L4(强化大通关基地与自贸试验区机场片区联动发展)已具体表达内容，L3未提供额外语义增量，可直接由L2承载该L4。",
+          "confidence": 0.9
+        },
+        {
+          "type": "merge",
+          "node_id": "L4_Nfa586cf7",
+          "merge_into": "L3_N7e9ff5f6",
+          "reason": "兄弟归并预备：L4(提升空港口岸通关作业电子化水平)与父节点L3(提升航空口岸便利化水平)语义高度重合（61%），且属于具体手段而非独立事项，应视为L3内涵的一部分，不单独保留为L4。",
+          "confidence": 0.85
+        },
+        {
+          "type": "merge",
+          "node_id": "L1_N6be998d8_BR_8df89b_BR_ff1d64",
+          "merge_into": "L1_N6be998d8_BR_8df89b",
+          "reason": "垂直冗余：L3(通关效率提升)与其L4(提升空港口岸通关效率)语义几乎完全一致，且L3未对L2(空港口岸优化)形成有效子类划分，属无效中间层，应坍缩至L2下直接表达。",
+          "confidence": 0.94
+        },
+        {
+          "type": "merge",
+          "node_id": "L2_N9e86e873",
+          "merge_into": "L1_N6be998d8_BR_8df89b",
+          "reason": "层级错位：L2(提升空港口岸作业效率)与同级L2(空港口岸优化)语义重叠，实为后者的具体方面，不应与L2平级。但因禁止跨L1调整且L2不可降级，此处识别为冗余L2，应合并入主L2节点以消除平行重复。",
+          "confidence": 0.89
+        },
+        {
+          "type": "merge",
+          "node_id": "L2_Nbde783bd",
+          "merge_into": "L2_N0109e16a",
+          "reason": "兄弟归并：L2(优化航空口岸服务环境)与L2(优化航空口岸服务功能与环境)实质描述同一领域，后者更完整，前者为冗余简化表述，应合并保留后者。",
+          "confidence": 0.91
+        },
+        {
+          "type": "merge",
+          "node_id": "L2_N227589e0",
+          "merge_into": "L1_N6be998d8_BR_8df89b",
+          "reason": "语义泛化冗余：L2(提升口岸服务效能)过于宽泛，与L2(空港口岸优化)高度重合，且未体现独特子领域，属无效平行分支，应合并入主L2节点。",
+          "confidence": 0.87
+        },
+        {
+          "type": "merge",
+          "node_id": "L1_N6be998d8_BR_8df89b_f5a4",
+          "merge_into": "L1_N6be998d8_BR_8df89b",
+          "reason": "重复L2节点：存在两个ID不同但标签均为'空港口岸优化'的L2节点，显系结构冗余，应合并为单一L2节点。",
+          "confidence": 0.99
+        },
+        {
+          "type": "merge",
+          "node_id": "L1_N6be998d8_BR_b1e228",
+          "merge_into": "L1_N6be998d8_BR_995bce",
+          "reason": "垂直冗余+语义重复：L2(通关便利化)作为L2(费用与通关便利)的子节点，标签与父节点核心词重复（相似度66%），且其下L3进一步重复（71%），整个分支无有效分层价值，应整体坍缩至L2(费用与通关便利)。",
           "confidence": 0.93
         },
         {
           "type": "merge",
-          "node_id": "L3_Nfc162f8c",
-          "merge_into": "L3_N9c47a867_BR",
-          "reason": "层级优化：原L3(加强新兴技术应用)为单子节点且语义可直接归属至已合并后的L2(智慧物流推进)，无需保留中间层。",
+          "node_id": "L3_Nce212504",
+          "merge_into": "L1_N6be998d8_BR_995bce",
+          "reason": "链式冗余：L3(提升口岸通关便利化)在已冗余的L2(通关便利化)之下，语义再次重复（71%），无独立存在必要，其内涵可由L2(费用与通关便利)直接涵盖。",
+          "confidence": 0.9
+        }
+      ],
+      "applied": [
+        {
+          "type": "merge",
+          "node_id": "L3_Ne455f9ae",
+          "merge_into": "L2_Ne455f9ae",
+          "reason": "垂直冗余：L3(发挥自贸试验区优势赋能临空产业发展)与L2(自贸赋能临空产业)语义高度重复（相似度64%），未提供新分类维度，予以合并以扁平化层级。",
+          "confidence": 0.92,
+          "status": "applied",
+          "message": ""
+        },
+        {
+          "type": "merge",
+          "node_id": "L3_Nfb48b97b",
+          "merge_into": "L2_Ne455f9ae",
+          "reason": "中间商消融：L3(大通关与自贸区联动)作为L2(自贸赋能临空产业)的子节点，其标签未体现明确子领域划分，且与L2主题重叠，应直接挂载其下L4或归入L2。",
+          "confidence": 0.88,
+          "status": "applied",
+          "message": ""
+        },
+        {
+          "type": "merge",
+          "node_id": "L2_Ne455f9ae_BR_b74a14",
+          "merge_into": "L2_Ne455f9ae",
+          "reason": "垂直坍缩：L3(片区联动发展)为单子节点，且其L4(强化大通关基地与自贸试验区机场片区联动发展)已具体表达内容，L3未提供额外语义增量，可直接由L2承载该L4。",
+          "confidence": 0.9,
+          "status": "applied",
+          "message": ""
+        },
+        {
+          "type": "merge",
+          "node_id": "L4_Nfa586cf7",
+          "merge_into": "L3_N7e9ff5f6",
+          "reason": "兄弟归并预备：L4(提升空港口岸通关作业电子化水平)与父节点L3(提升航空口岸便利化水平)语义高度重合（61%），且属于具体手段而非独立事项，应视为L3内涵的一部分，不单独保留为L4。",
+          "confidence": 0.85,
+          "status": "applied",
+          "message": ""
+        },
+        {
+          "type": "merge",
+          "node_id": "L1_N6be998d8_BR_8df89b_BR_ff1d64",
+          "merge_into": "L1_N6be998d8_BR_8df89b",
+          "reason": "垂直冗余：L3(通关效率提升)与其L4(提升空港口岸通关效率)语义几乎完全一致，且L3未对L2(空港口岸优化)形成有效子类划分，属无效中间层，应坍缩至L2下直接表达。",
+          "confidence": 0.94,
+          "status": "applied",
+          "message": ""
+        },
+        {
+          "type": "merge",
+          "node_id": "L2_N9e86e873",
+          "merge_into": "L1_N6be998d8_BR_8df89b",
+          "reason": "层级错位：L2(提升空港口岸作业效率)与同级L2(空港口岸优化)语义重叠，实为后者的具体方面，不应与L2平级。但因禁止跨L1调整且L2不可降级，此处识别为冗余L2，应合并入主L2节点以消除平行重复。",
+          "confidence": 0.89,
+          "status": "applied",
+          "message": ""
+        },
+        {
+          "type": "merge",
+          "node_id": "L2_Nbde783bd",
+          "merge_into": "L2_N0109e16a",
+          "reason": "兄弟归并：L2(优化航空口岸服务环境)与L2(优化航空口岸服务功能与环境)实质描述同一领域，后者更完整，前者为冗余简化表述，应合并保留后者。",
+          "confidence": 0.91,
+          "status": "applied",
+          "message": ""
+        },
+        {
+          "type": "merge",
+          "node_id": "L2_N227589e0",
+          "merge_into": "L1_N6be998d8_BR_8df89b",
+          "reason": "语义泛化冗余：L2(提升口岸服务效能)过于宽泛，与L2(空港口岸优化)高度重合，且未体现独特子领域，属无效平行分支，应合并入主L2节点。",
+          "confidence": 0.87,
+          "status": "applied",
+          "message": ""
+        },
+        {
+          "type": "merge",
+          "node_id": "L1_N6be998d8_BR_8df89b_f5a4",
+          "merge_into": "L1_N6be998d8_BR_8df89b",
+          "reason": "重复L2节点：存在两个ID不同但标签均为'空港口岸优化'的L2节点，显系结构冗余，应合并为单一L2节点。",
+          "confidence": 0.99,
+          "status": "applied",
+          "message": ""
+        },
+        {
+          "type": "merge",
+          "node_id": "L1_N6be998d8_BR_b1e228",
+          "merge_into": "L1_N6be998d8_BR_995bce",
+          "reason": "垂直冗余+语义重复：L2(通关便利化)作为L2(费用与通关便利)的子节点，标签与父节点核心词重复（相似度66%），且其下L3进一步重复（71%），整个分支无有效分层价值，应整体坍缩至L2(费用与通关便利)。",
+          "confidence": 0.93,
+          "status": "applied",
+          "message": ""
+        },
+        {
+          "type": "merge",
+          "node_id": "L3_Nce212504",
+          "merge_into": "L1_N6be998d8_BR_995bce",
+          "reason": "链式冗余：L3(提升口岸通关便利化)在已冗余的L2(通关便利化)之下，语义再次重复（71%），无独立存在必要，其内涵可由L2(费用与通关便利)直接涵盖。",
+          "confidence": 0.9,
+          "status": "applied",
+          "message": ""
+        }
+      ]
+    },
+    {
+      "l1_id": "L1_N6bbea948",
+      "label": "智慧绿色转型",
+      "raw_ops": [
+        {
+          "type": "merge",
+          "node_id": "L3_N1b187997",
+          "merge_into": "L2_Ne1879105",
+          "reason": "垂直冗余：L3(提升航空货运智慧化水平)与L2(提升枢纽智慧水平)语义高度重叠（重复率63%），且未提供新的分类维度，应合并以消除冗余层级。",
+          "confidence": 0.92
+        },
+        {
+          "type": "merge",
+          "node_id": "L4_Ne55e384d",
+          "merge_into": "L4_N1244f6cb",
+          "reason": "兄弟归并：L4(统筹单据电子化与标准化建设)与L4(统筹单据标准化建设)实质内容高度重合（重复率70% vs 62%），保留表达更完整的前者或后者。此处后者更简洁聚焦，建议保留L4_N1244f6cb。",
+          "confidence": 0.88
+        },
+        {
+          "type": "merge",
+          "node_id": "L3_N70eeee1d",
+          "merge_into": "L2_Nfdcfd3c4",
+          "reason": "中间商消融：L3(提升运营管理能力)仅为L2(智慧货运高效管理)的泛化表述，其下仅有一个语义模糊的L4(增强经营实力)，未形成有效子类，应合并至L2以简化结构。",
           "confidence": 0.85
+        },
+        {
+          "type": "merge",
+          "node_id": "L3_Ne55e384d",
+          "merge_into": "L2_Nfdcfd3c4",
+          "reason": "中间商消融：L3(单据电子化建设)标签与下属L4高度重复（重复率70%），且该主题可直接作为L2下的具体事项，无需独立L3层级。",
+          "confidence": 0.9
+        },
+        {
+          "type": "merge",
+          "node_id": "L3_Nfc162f8c",
+          "merge_into": "L2_Nfdcfd3c4",
+          "reason": "中间商消融：L3(加强新兴技术应用)过于宽泛，与L2(智慧货运高效管理)语义边界不清，且其功能可由其他更具体的L3（如推进智慧货运技术应用）覆盖，建议合并。",
+          "confidence": 0.82
+        },
+        {
+          "type": "merge",
+          "node_id": "L2_Nc8ab6162",
+          "merge_into": "L2_Na75f0b05",
+          "reason": "兄弟归并：L2(提高智慧韧性水平)与L2(提升枢纽绿色水平)同属L1下可持续发展维度，但‘智慧韧性’概念模糊且与‘绿色’‘智慧’主线交叉；鉴于L1聚焦‘智慧绿色转型’，韧性应融入绿色或智慧节点，此处建议并入绿色水平以强化可持续主题。",
+          "confidence": 0.78
         }
       ],
       "applied": [
         {
           "type": "merge",
           "node_id": "L3_N1b187997",
-          "reason": "垂直冗余：L3(提升航空货运智慧化水平)与L2(智慧物流升级)语义高度重合，且未提供新的分类维度，应合并以扁平化结构。",
+          "merge_into": "L2_Ne1879105",
+          "reason": "垂直冗余：L3(提升航空货运智慧化水平)与L2(提升枢纽智慧水平)语义高度重叠（重复率63%），且未提供新的分类维度，应合并以消除冗余层级。",
           "confidence": 0.92,
           "status": "applied",
-          "message": "",
-          "l1_id": "L1_N6bbea948"
+          "message": ""
         },
         {
           "type": "merge",
-          "node_id": "L3_N5b8fd671",
-          "reason": "垂直冗余：L3(推动航空货运绿色低碳发展)是L2(绿色低碳转型)的直接复述，无新增语义，应合并。",
-          "confidence": 0.94,
-          "status": "applied",
-          "message": "",
-          "l1_id": "L1_N6bbea948"
-        },
-        {
-          "type": "merge",
-          "node_id": "L3_Nbf5cb6ef",
-          "reason": "垂直冗余：L3(提升航空货运安全韧性水平)与L2(航空货运韧性)语义重复率达67%，属于无效中间层，应消除。",
+          "node_id": "L4_Ne55e384d",
+          "merge_into": "L4_N1244f6cb",
+          "reason": "兄弟归并：L4(统筹单据电子化与标准化建设)与L4(统筹单据标准化建设)实质内容高度重合（重复率70% vs 62%），保留表达更完整的前者或后者。此处后者更简洁聚焦，建议保留L4_N1244f6cb。",
           "confidence": 0.88,
           "status": "applied",
-          "message": "",
-          "l1_id": "L1_N6bbea948"
+          "message": ""
         },
         {
           "type": "merge",
-          "node_id": "L3_Ne42076c0",
-          "reason": "垂直冗余：L3(推进智慧货运高效管理)与L2(智慧货运管理)语义重复率达75%，未提供有效子类划分，应合并。",
+          "node_id": "L3_N70eeee1d",
+          "merge_into": "L2_Nfdcfd3c4",
+          "reason": "中间商消融：L3(提升运营管理能力)仅为L2(智慧货运高效管理)的泛化表述，其下仅有一个语义模糊的L4(增强经营实力)，未形成有效子类，应合并至L2以简化结构。",
+          "confidence": 0.85,
+          "status": "applied",
+          "message": ""
+        },
+        {
+          "type": "merge",
+          "node_id": "L3_Ne55e384d",
+          "merge_into": "L2_Nfdcfd3c4",
+          "reason": "中间商消融：L3(单据电子化建设)标签与下属L4高度重复（重复率70%），且该主题可直接作为L2下的具体事项，无需独立L3层级。",
           "confidence": 0.9,
           "status": "applied",
-          "message": "",
-          "l1_id": "L1_N6bbea948"
-        },
-        {
-          "type": "merge",
-          "node_id": "L3_N9c47a867",
-          "reason": "垂直冗余：L3(推进智慧物流建设)与L2(智慧物流推进)语义几乎一致，属无效中间层，应合并。",
-          "confidence": 0.93,
-          "status": "applied",
-          "message": "",
-          "l1_id": "L1_N6bbea948"
+          "message": ""
         },
         {
           "type": "merge",
           "node_id": "L3_Nfc162f8c",
-          "reason": "层级优化：原L3(加强新兴技术应用)为单子节点且语义可直接归属至已合并后的L2(智慧物流推进)，无需保留中间层。",
-          "confidence": 0.85,
+          "merge_into": "L2_Nfdcfd3c4",
+          "reason": "中间商消融：L3(加强新兴技术应用)过于宽泛，与L2(智慧货运高效管理)语义边界不清，且其功能可由其他更具体的L3（如推进智慧货运技术应用）覆盖，建议合并。",
+          "confidence": 0.82,
           "status": "applied",
-          "message": "",
-          "l1_id": "L1_N6bbea948"
+          "message": ""
+        },
+        {
+          "type": "merge",
+          "node_id": "L2_Nc8ab6162",
+          "merge_into": "L2_Na75f0b05",
+          "reason": "兄弟归并：L2(提高智慧韧性水平)与L2(提升枢纽绿色水平)同属L1下可持续发展维度，但‘智慧韧性’概念模糊且与‘绿色’‘智慧’主线交叉；鉴于L1聚焦‘智慧绿色转型’，韧性应融入绿色或智慧节点，此处建议并入绿色水平以强化可持续主题。",
+          "confidence": 0.78,
+          "status": "applied",
+          "message": ""
         }
       ]
     },
     {
       "l1_id": "L1_N52f6895e",
-      "l1_label": "区域协同与产业联动",
-      "raw_operations": [
+      "label": "区域协同与产业联动",
+      "raw_ops": [
         {
           "type": "merge",
-          "node_id": "L3_Nc5166684_BR",
-          "merge_into": "L3_Nc5166684",
-          "reason": "垂直冗余：L2(物流协同能力)与其唯一子节点L3(加快提升揽货集货能力)语义不重叠，但L2未提供独立分类价值，应坍缩为L3层级并提升为L2。",
+          "node_id": "L3_Nc5166684",
+          "merge_into": "L2_Nc81ee0b8",
+          "reason": "垂直冗余：L3(加快提升揽货集货能力)与L2(大力拓展货源腹地)语义高度重合，未提供独立分类维度，予以合并以简化层级。",
           "confidence": 0.92
         },
         {
           "type": "merge",
-          "node_id": "L4_N0188902d_BR",
-          "merge_into": "L2_Na5b73aaf",
-          "reason": "中间商消融：L3(跨境园区建设)仅是L2(推动区港联动发展)下的具体事项，且其下仅一个L4，语义未形成有效中间分类，应将L4直接挂至L2。",
-          "confidence": 0.9
+          "node_id": "L3_N3494c85c",
+          "merge_into": "L3_N2_Nc81ee0b8_BR_a92ee4",
+          "reason": "兄弟节点语义重复：L3(东盟电商服务拓展)与另一L3(东盟电商服务)实质相同，且后者命名更简洁规范，前者为单子节点，应归并。",
+          "confidence": 0.94
         },
         {
           "type": "merge",
-          "node_id": "L4_Naf94a663_BR",
+          "node_id": "L4_N3494c85c",
+          "merge_into": "L4_N3494c85c_target_placeholder",
+          "reason": "该操作由上层L3合并触发，L4将自动挂载至保留的L3(东盟电商服务)下，无需单独处理；此处不生成独立merge操作。"
+        },
+        {
+          "type": "merge",
+          "node_id": "L3_Nc3d125b3",
           "merge_into": "L2_Na5b73aaf",
-          "reason": "中间商消融 + 语义重复：L3(区港联动推进)与L2(推动区港联动发展)高度重复，且其下L4(推动区港联动)几乎同义，应消除冗余层级，将L4内容合并入L2或删除。",
-          "confidence": 0.95
+          "reason": "中间商消融：L3(强化区港高效联动)与L2(推动区港联动发展)语义几乎完全重复，未增加分类信息，应直接合并至L2。",
+          "confidence": 0.96
+        },
+        {
+          "type": "merge",
+          "node_id": "L4_Naf94a663",
+          "merge_into": "L2_Na5b73aaf",
+          "reason": "垂直冗余+内容重复：L4(推动区港联动)与L2标题语义重复率达66%，且挂载于无实质语义增量的L3(区港联动项目)下，应坍缩至L2层级或删除；鉴于其为具体行动表述，保留但直接挂L2更合理。",
+          "confidence": 0.89
         },
         {
           "type": "merge",
           "node_id": "L3_Nd93e3e25",
-          "merge_into": "L2_N4f9516d8",
-          "reason": "语义重复：L3(发展临空经济)与L2(大力发展航空经济)在政策语境下高度重合（重复率71%），且其下L4均为具体产业举措，可直接归入L2以扁平化结构。",
+          "merge_into": "L3_Nf50b9a9d",
+          "reason": "兄弟归并：L3(发展临空经济)与L3(推进临空经济发展)语义重复率71%，后者表述更完整，前者冗余，应合并。",
+          "confidence": 0.93
+        },
+        {
+          "type": "merge",
+          "node_id": "L3_N32b417e2",
+          "merge_into": "L3_N2_Nd825449f_BR_4fe323",
+          "reason": "兄弟归并：L3(生鲜交易市场建设)与L3(交易中心建设)下均指向'打造生鲜交易中心'，实质为同一事项，后者为单子节点但命名更通用，建议保留后者并将前者L4内容迁移；但因L4_N32b417e2与L3_N32b417e2同名，实为命名混乱，应统一归入'交易中心建设'。",
           "confidence": 0.88
         }
       ],
       "applied": [
         {
           "type": "merge",
-          "node_id": "L3_Nc5166684_BR",
-          "reason": "垂直冗余：L2(物流协同能力)与其唯一子节点L3(加快提升揽货集货能力)语义不重叠，但L2未提供独立分类价值，应坍缩为L3层级并提升为L2。",
+          "node_id": "L3_Nc5166684",
+          "merge_into": "L2_Nc81ee0b8",
+          "reason": "垂直冗余：L3(加快提升揽货集货能力)与L2(大力拓展货源腹地)语义高度重合，未提供独立分类维度，予以合并以简化层级。",
           "confidence": 0.92,
+          "status": "applied",
+          "message": ""
+        },
+        {
+          "type": "merge",
+          "node_id": "L3_N3494c85c",
+          "merge_into": "L3_N2_Nc81ee0b8_BR_a92ee4",
+          "reason": "兄弟节点语义重复：L3(东盟电商服务拓展)与另一L3(东盟电商服务)实质相同，且后者命名更简洁规范，前者为单子节点，应归并。",
+          "confidence": 0.94,
           "status": "skipped",
-          "message": "禁止祖先节点合并到其子孙节点，会导致子树丢失",
-          "l1_id": "L1_N52f6895e"
+          "message": "target not found"
         },
         {
           "type": "merge",
-          "node_id": "L4_N0188902d_BR",
-          "reason": "中间商消融：L3(跨境园区建设)仅是L2(推动区港联动发展)下的具体事项，且其下仅一个L4，语义未形成有效中间分类，应将L4直接挂至L2。",
-          "confidence": 0.9,
-          "status": "applied",
-          "message": "",
-          "l1_id": "L1_N52f6895e"
+          "node_id": "L4_N3494c85c",
+          "merge_into": "L4_N3494c85c_target_placeholder",
+          "reason": "该操作由上层L3合并触发，L4将自动挂载至保留的L3(东盟电商服务)下，无需单独处理；此处不生成独立merge操作。",
+          "status": "skipped",
+          "message": "target not found"
         },
         {
           "type": "merge",
-          "node_id": "L4_Naf94a663_BR",
-          "reason": "中间商消融 + 语义重复：L3(区港联动推进)与L2(推动区港联动发展)高度重复，且其下L4(推动区港联动)几乎同义，应消除冗余层级，将L4内容合并入L2或删除。",
-          "confidence": 0.95,
+          "node_id": "L3_Nc3d125b3",
+          "merge_into": "L2_Na5b73aaf",
+          "reason": "中间商消融：L3(强化区港高效联动)与L2(推动区港联动发展)语义几乎完全重复，未增加分类信息，应直接合并至L2。",
+          "confidence": 0.96,
           "status": "applied",
-          "message": "",
-          "l1_id": "L1_N52f6895e"
+          "message": ""
+        },
+        {
+          "type": "merge",
+          "node_id": "L4_Naf94a663",
+          "merge_into": "L2_Na5b73aaf",
+          "reason": "垂直冗余+内容重复：L4(推动区港联动)与L2标题语义重复率达66%，且挂载于无实质语义增量的L3(区港联动项目)下，应坍缩至L2层级或删除；鉴于其为具体行动表述，保留但直接挂L2更合理。",
+          "confidence": 0.89,
+          "status": "applied",
+          "message": ""
         },
         {
           "type": "merge",
           "node_id": "L3_Nd93e3e25",
-          "reason": "语义重复：L3(发展临空经济)与L2(大力发展航空经济)在政策语境下高度重合（重复率71%），且其下L4均为具体产业举措，可直接归入L2以扁平化结构。",
-          "confidence": 0.88,
+          "merge_into": "L3_Nf50b9a9d",
+          "reason": "兄弟归并：L3(发展临空经济)与L3(推进临空经济发展)语义重复率71%，后者表述更完整，前者冗余，应合并。",
+          "confidence": 0.93,
           "status": "applied",
-          "message": "",
-          "l1_id": "L1_N52f6895e"
+          "message": ""
+        },
+        {
+          "type": "merge",
+          "node_id": "L3_N32b417e2",
+          "merge_into": "L3_N2_Nd825449f_BR_4fe323",
+          "reason": "兄弟归并：L3(生鲜交易市场建设)与L3(交易中心建设)下均指向'打造生鲜交易中心'，实质为同一事项，后者为单子节点但命名更通用，建议保留后者并将前者L4内容迁移；但因L4_N32b417e2与L3_N32b417e2同名，实为命名混乱，应统一归入'交易中心建设'。",
+          "confidence": 0.88,
+          "status": "skipped",
+          "message": "target not found"
         }
       ]
     },
     {
-      "l1_id": "L3_N578f3b8a",
-      "l1_label": "提升跨境电子商务国际货运服务能力",
-      "raw_operations": [],
-      "applied": []
-    },
-    {
-      "l1_id": "ROOT_B01",
-      "l1_label": "综合支撑体系",
-      "raw_operations": [],
-      "applied": []
+      "l1_id": "L1_N604d4c42",
+      "label": "资源与要素保障",
+      "raw_ops": [
+        {
+          "type": "merge",
+          "node_id": "L3_N133b0ed2",
+          "merge_into": "L3_N77a3b68b",
+          "reason": "兄弟归并：两个L3节点标签完全重复（'推进集疏运体系建设'），属于录入冗余，保留其一即可。",
+          "confidence": 0.99
+        },
+        {
+          "type": "merge",
+          "node_id": "L3_N07990008",
+          "merge_into": "L3_N3ab0a1a9",
+          "reason": "兄弟归并：两个L3节点标签完全重复（'加快基础设施建设'），属于重复条目，应合并。",
+          "confidence": 0.99
+        },
+        {
+          "type": "merge",
+          "node_id": "L4_Nada24d28",
+          "merge_into": "L4_N59784fee",
+          "reason": "兄弟归并：L4节点'强化促进两个枢纽发展政策支持'与'强化双网双枢纽政策支持'语义高度重合，后者表述更精准规范，予以合并。",
+          "confidence": 0.92
+        }
+      ],
+      "applied": [
+        {
+          "type": "merge",
+          "node_id": "L3_N133b0ed2",
+          "merge_into": "L3_N77a3b68b",
+          "reason": "兄弟归并：两个L3节点标签完全重复（'推进集疏运体系建设'），属于录入冗余，保留其一即可。",
+          "confidence": 0.99,
+          "status": "applied",
+          "message": ""
+        },
+        {
+          "type": "merge",
+          "node_id": "L3_N07990008",
+          "merge_into": "L3_N3ab0a1a9",
+          "reason": "兄弟归并：两个L3节点标签完全重复（'加快基础设施建设'），属于重复条目，应合并。",
+          "confidence": 0.99,
+          "status": "applied",
+          "message": ""
+        },
+        {
+          "type": "merge",
+          "node_id": "L4_Nada24d28",
+          "merge_into": "L4_N59784fee",
+          "reason": "兄弟归并：L4节点'强化促进两个枢纽发展政策支持'与'强化双网双枢纽政策支持'语义高度重合，后者表述更精准规范，予以合并。",
+          "confidence": 0.92,
+          "status": "applied",
+          "message": ""
+        }
+      ]
     }
-  ]
+  ],
+  "stats": {
+    "llm_calls": 7,
+    "llm_failures": 1,
+    "ops_applied": 34,
+    "ops_skipped": 5
+  }
 }
