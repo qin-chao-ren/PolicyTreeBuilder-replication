@@ -23,7 +23,6 @@ LLM：按 doc_id 汇总结构后调用 1 次，让模型判断 granularity=macro
 
 import argparse
 import json
-import os
 import sys
 from pathlib import Path
 from typing import Dict, List, Tuple
@@ -39,7 +38,7 @@ PROMPT_DEFAULT = ROOT / "prompts" / "calibrate_policy_granularity.md"
 if str(HERE) not in sys.path:
     sys.path.insert(0, str(HERE))
 
-from utils.llm_client import chat_json, load_env_file  # noqa: E402
+from llm_runtime import call_llm_json, load_env_file, profiles_from_config  # noqa: E402
 
 
 def log_write(path: Path, msg: str) -> None:
@@ -121,7 +120,8 @@ def map_level(granularity: str, final_level: str) -> str:
 
 def call_llm_granularity(
     *,
-    model: str,
+    profile: str,
+    model_override: str | None,
     system_text: str,
     user_text: str,
     timeout_s: int,
@@ -130,17 +130,18 @@ def call_llm_granularity(
     """
     返回 (majority_granularity, confidence, raw_text, exceptions)；失败时回退为 ('meso', 0.4, err, [])。
     """
-    result, obj = chat_json(
+    result = call_llm_json(
+        profile=profile,
+        model_override=model_override,
         system=system_text,
         user=user_text,
-        model=model,
-        temperature=0.15,
-        max_tokens=400,
+        task="calibrate_policy_granularity",
         timeout_s=timeout_s,
         retries=retries,
     )
-    if isinstance(obj, dict) and result.ok:
-        gran_raw = str(obj.get("majority_granularity") or "").strip().lower()
+    obj = result.get("json") or {}
+    if isinstance(obj, dict) and result.get("ok"):
+        gran_raw = str(obj.get("majority_granularity") or obj.get("granularity") or "").strip().lower()
         gran = gran_raw if gran_raw in ("macro", "meso", "micro") else "meso"
         try:
             conf = float(obj.get("confidence") or 0.5)
@@ -164,8 +165,8 @@ def call_llm_granularity(
                             "reasoning": reason,
                         }
                     )
-        return gran, conf, result.raw, exceptions
-    err = result.error or result.raw or "llm_call_failed"
+        return gran, conf, str(result.get("raw") or ""), exceptions
+    err = str(result.get("error") or result.get("raw") or "llm_call_failed")
     return "meso", 0.4, err, []
 
 
@@ -249,7 +250,7 @@ def main() -> None:
     ap.add_argument("--outdir", type=str, default=str(OUT_DIR_DEFAULT))
     ap.add_argument("--env", type=str, default=str(ROOT / "configs" / ".env"))
     ap.add_argument("--mode", type=str, choices=("llm", "rule"), default="llm")
-    ap.add_argument("--model", type=str, default=None, help="LLM 模型（默认读取 PRIMARY_LLM_MODEL）")
+    ap.add_argument("--model", type=str, default=None, help="LLM model override for the configured primary profile")
     ap.add_argument("--prompt", type=str, default=str(PROMPT_DEFAULT))
     ap.add_argument("--threshold", type=float, default=0.7, help="低置信度复核阈值")
     ap.add_argument("--timeout", type=int, default=60)
@@ -280,16 +281,7 @@ def main() -> None:
     df = pd.read_csv(corpus_path, dtype=str)
     ensure_columns(df, ["sample_id", "doc_id", "final_level", "cleaned_title", "path_text"], "corpus")
 
-    model_name = args.model or os.getenv("PRIMARY_LLM_MODEL") or os.getenv("PRIMARY_LLM")
-    if args.mode == "llm" and not model_name:
-        raise ValueError("LLM 模式需要 --model 或 PRIMARY_LLM_MODEL 环境变量")
-
-    base = os.getenv("PRIMARY_LLM_BASE_URL") or os.getenv("PRIMARY_LLM_BASE")
-    key = os.getenv("PRIMARY_LLM_API_KEY") or os.getenv("PRIMARY_LLM_KEY")
-    if base:
-        os.environ["OPENAI_BASE_URL"] = base
-    if key:
-        os.environ["OPENAI_API_KEY"] = key
+    llm_profile, _ = profiles_from_config({})
 
     system_text = read_system_prompt(args.prompt)
     h1_map, h2_map = aggregate_doc_context(df, args.max_h1, args.max_h2_per_h1, args.max_h1_with_samples)
@@ -317,7 +309,8 @@ def main() -> None:
                 args.max_h1_with_samples,
             )
             g, conf, raw, exceptions = call_llm_granularity(
-                model=model_name,
+                profile=llm_profile,
+                model_override=args.model,
                 system_text=system_text,
                 user_text=prompt,
                 timeout_s=args.timeout,

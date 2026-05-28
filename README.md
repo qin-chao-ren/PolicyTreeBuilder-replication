@@ -74,6 +74,8 @@ To rerun LLM-dependent steps, copy the template and fill in local credentials:
 Copy-Item configs\.env.example configs\.env
 ```
 
+Model profile wiring is centralized in `configs/llm_profiles.yaml.example`; copy it to `configs/llm_profiles.yaml` only if you need to change profile names, providers, or env-var bindings.
+
 Do not commit `configs/.env`.
 
 For optional reruns of the evaluation judges, copy the evaluation-specific template:

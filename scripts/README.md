@@ -21,6 +21,6 @@ The full command template is `run_policy_tree_pipeline.ps1` in the repository ro
 
 ## LLM Runtime Boundary
 
-Main pipeline scripts use `common_llm.py` and helpers under `scripts/utils/`. Some older step scripts still perform small local environment-loading shims so they can be rerun independently. The public evaluation module intentionally uses a separate judge client in `evaluation/scripts/llm_clients.py` to preserve archived judge keys and output names.
+All external model calls now go through `scripts/llm_runtime.py`. Chat LLM, evaluation judge, embedding, and reranking services use named profiles from `configs/llm_profiles.yaml.example`; local credentials stay in `configs/.env` or `evaluation/.env`.
 
-This package does not consolidate those clients because the priority is preserving the verified replication behavior. A future maintenance branch can unify the runtime after a full regression rerun.
+The evaluation scripts keep the archived judge keys in their output filenames, but they no longer maintain a separate LLM client.

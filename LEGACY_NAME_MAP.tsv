@@ -100,7 +100,7 @@ data/intermediate_outputs/logs/llm_step3_classify_decisions.jsonl	data/intermedi
 policy_tree_eval/data/v4_tree_final.json	data/final_tree/policy_tree_final.json	renamed	public evaluation input mapped to final public tree
 policy_tree_eval/README.md	evaluation/README.md	rewritten	public evaluation documentation cleanup
 policy_tree_eval/roundC_v5.env.example	evaluation/.env.example	sanitized	removed real credentials and private paths
-policy_tree_eval/models_registry.yaml.example	evaluation/models_registry.yaml.example	sanitized	removed private versioning and credential assumptions
+policy_tree_eval/models_registry.yaml.example	configs/llm_profiles.yaml.example	superseded	unified public model profile template
 policy_tree_eval/scripts/01_extract_tables.py	evaluation/scripts/01_extract_tables.py	renamed	public evaluation path and CLI cleanup
 policy_tree_eval/scripts/02_structure_check.py	evaluation/scripts/02_structure_check.py	renamed	public evaluation path and CLI cleanup
 policy_tree_eval/scripts/03_sampling.py	evaluation/scripts/03_sampling.py	renamed	public evaluation path and CLI cleanup
@@ -109,6 +109,8 @@ policy_tree_eval/scripts/05_run_path_judge.py	evaluation/scripts/05_run_path_jud
 policy_tree_eval/scripts/06_aggregate.py	evaluation/scripts/06_aggregate.py	renamed	public evaluation path and CLI cleanup
 policy_tree_eval/scripts/07_status.py	evaluation/scripts/07_status.py	renamed	public evaluation path and CLI cleanup
 policy_tree_eval/scripts/08_retry_failures.py	evaluation/scripts/08_retry_failures.py	renamed	public evaluation path and CLI cleanup
-policy_tree_eval/scripts/llm_clients.py	evaluation/scripts/llm_clients.py	renamed	public evaluation credential and endpoint cleanup
+policy_tree_eval/scripts/llm_clients.py	scripts/llm_runtime.py	superseded	unified public LLM runtime
 policy_tree_eval/scripts/prompts.py	evaluation/scripts/prompts.py	renamed	public evaluation prompt module
 policy_tree_eval/outputs/	evaluation/outputs/	renamed	public archived evaluation outputs
+scripts/common_llm.py	scripts/llm_runtime.py	superseded	unified public LLM runtime
+scripts/utils/llm_client.py	scripts/llm_runtime.py	superseded	unified public LLM runtime

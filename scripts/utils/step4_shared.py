@@ -1,21 +1,21 @@
-import os
 import json
-import yaml
 import time
+from pathlib import Path
+from typing import Dict, Iterable, List, Optional
+
 import numpy as np
 import pandas as pd
-from pathlib import Path
-from typing import Dict, List, Optional, Iterable
+import yaml
 
-# 假设这些已存在，如果路径不同请调整
 from common_utils import read_embeddings
-from common_llm import LLMConfig
+from llm_runtime import load_env_file, profiles_from_config
 
 
 class Step4Env:
-    """环境与配置加载器"""
+    """Environment/config loader for tree-refinement steps."""
+
     def __init__(self, config_path: str, env_path: str):
-        self.root_dir = Path(config_path).resolve().parents[2]  # 假设在 replication package/
+        self.root_dir = Path(config_path).resolve().parents[2]
         self._enforce_env(Path(env_path))
         self.config = yaml.safe_load(Path(config_path).read_text(encoding="utf-8"))
         self.outdir = Path(self.config.get("outdir", "data/intermediate_outputs"))
@@ -23,44 +23,26 @@ class Step4Env:
         self.log_dir = self.outdir / "logs"
         self.log_dir.mkdir(parents=True, exist_ok=True)
 
-    def _enforce_env(self, env_path: Path):
-        if not env_path.exists():
-            return
-        for line in env_path.read_text(encoding="utf-8").splitlines():
-            s = line.strip()
-            if not s or s.startswith("#") or "=" not in s:
-                continue
-            k, v = s.split("=", 1)
-            os.environ.setdefault(k.strip(), v.strip().strip('"'))
-        # 自动注入 OpenAI 兼容变量
-        base = os.getenv("PRIMARY_LLM_BASE_URL")
-        key = os.getenv("PRIMARY_LLM_API_KEY")
-        if base:
-            os.environ.setdefault("OPENAI_BASE_URL", base)
-        if key:
-            os.environ.setdefault("OPENAI_API_KEY", key)
+    def _enforce_env(self, env_path: Path) -> None:
+        load_env_file(env_path, required=False)
 
-    def build_llm_config(self) -> LLMConfig:
-        c = self.config.get("llm", {})
-        return LLMConfig(
-            primary=str(c.get("primary", os.getenv("PRIMARY_LLM_MODEL", "qwen3-max"))),
-            secondary=str(c.get("secondary", os.getenv("SECONDARY_LLM_MODEL", "deepseek-v3"))),
-            temperature=float(c.get("temperature", 0.2)),
-            max_tokens=int(c.get("max_tokens", 1500)),
-            response_format=str(c.get("response_format", "json_object")),
-            workers=int(c.get("workers", 1)),
-            tie_breaker=str(c.get("tie_breaker", "score_margin_or_conservative")),
-        )
+    def llm_profiles(self) -> tuple[str, str]:
+        return profiles_from_config(self.config.get("llm", {}))
+
+    def primary_llm_profile(self) -> str:
+        return self.llm_profiles()[0]
 
 
 class EmbeddingHelper:
-    """向量计算辅助类"""
+    """Vector lookup and centroid helper."""
+
     def __init__(self, parquet_path: Path):
         if parquet_path.exists():
             df = read_embeddings(parquet_path)
-            # 建立缓存: sample_id -> numpy array
-            self.cache = {str(row["sample_id"]): np.asarray(row["_vec"], dtype=np.float32)
-                          for _, row in df.iterrows()}
+            self.cache = {
+                str(row["sample_id"]): np.asarray(row["_vec"], dtype=np.float32)
+                for _, row in df.iterrows()
+            }
         else:
             self.cache = {}
             print(f"[WARN] Embedding file not found: {parquet_path}")
@@ -86,12 +68,12 @@ def load_tree(path: Path) -> Dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def dump_tree(path: Path, root: Dict):
+def dump_tree(path: Path, root: Dict) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(root, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
-def append_jsonl(path: Path, data: Dict):
+def append_jsonl(path: Path, data: Dict) -> None:
     with path.open("a", encoding="utf-8") as f:
         f.write(json.dumps(data, ensure_ascii=False) + "\n")
 
@@ -101,7 +83,10 @@ def read_membership_map(outdir: Path, level: str) -> Dict[str, List[str]]:
     if not p.exists():
         return {}
     df = pd.read_csv(p, dtype=str)
-    return {str(nid): grp["member_id"].astype(str).tolist() for nid, grp in df.groupby("node_id")}
+    return {
+        str(nid): grp["member_id"].astype(str).tolist()
+        for nid, grp in df.groupby("node_id")
+    }
 
 
 def read_title_map(corpus_path: Path) -> Dict[str, str]:

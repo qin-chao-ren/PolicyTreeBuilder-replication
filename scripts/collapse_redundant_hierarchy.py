@@ -15,7 +15,7 @@ import json
 from pathlib import Path
 from typing import Dict, List, Tuple
 
-from common_llm import call_json
+from llm_runtime import call_llm_json
 from common_utils import jaccard_overlap
 from utils.step4_shared import (
     Step4Env, EmbeddingHelper, load_tree, dump_tree,
@@ -105,7 +105,7 @@ def can_promote_safely(tm: TreeManager, child_id: str, parent_id: str) -> Tuple[
 class SkeletonRefiner:
     def __init__(self, env: Step4Env, tm: TreeManager, args):
         self.env = env
-        self.llm = env.build_llm_config()
+        self.llm_profile = env.primary_llm_profile()
         self.tm = tm
         self.args = args
         self.emb_helper = EmbeddingHelper(Path(env.config["paths"]["embeddings"]))
@@ -154,7 +154,13 @@ class SkeletonRefiner:
             if not is_single_child:
                 evidence += "\n\n⚠️ 注意：父节点有多个子节点，请勿选择 promote_child，只能选择 keep/rename/absorb。"
 
-            resp = call_json(self.llm.primary, PROMPT_COLLAPSE.read_text(encoding="utf-8"), evidence, temperature=0.0)
+            resp = call_llm_json(
+                profile=self.llm_profile,
+                system=PROMPT_COLLAPSE.read_text(encoding="utf-8"),
+                user=evidence,
+                task="collapse_redundant_hierarchy",
+                temperature=0.0,
+            )
 
             append_jsonl(self.llm_log, {
                 "ts": int(time.time()), "parent": parent_id, "child": child_id,

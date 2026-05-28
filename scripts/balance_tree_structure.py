@@ -12,7 +12,7 @@ import hashlib
 from pathlib import Path
 from typing import Dict, List
 
-from common_llm import call_json
+from llm_runtime import call_llm_json
 from utils.step4_shared import (
     Step4Env, load_tree, dump_tree, append_jsonl
 )
@@ -62,7 +62,7 @@ def calc_depth(tm, nid):
 class ShapingProcess:
     def __init__(self, env: Step4Env, tm: TreeManager):
         self.env = env
-        self.llm = env.build_llm_config()
+        self.llm_profile = env.primary_llm_profile()
         self.tm = tm
         self.ops_log = env.outdir / "tree_edit_operations.jsonl"
         self.llm_log = env.log_dir / "llm_balance_tree_structure.jsonl"
@@ -103,7 +103,12 @@ class ShapingProcess:
         if not jumps: return False
 
         ctx = self._fmt_ctx(pid, jumps, "层级跳跃(Level Gap > 1)")
-        resp = call_json(self.llm.primary, PROMPT_BALANCE.read_text(encoding="utf-8"), ctx)
+        resp = call_llm_json(
+            profile=self.llm_profile,
+            system=PROMPT_BALANCE.read_text(encoding="utf-8"),
+            user=ctx,
+            task="balance_tree_jump_fix",
+        )
         append_jsonl(self.llm_log, {"ts":int(time.time()), "case":"jump", "parent":pid, "resp":resp})
         return self._apply(pid, resp.get("json", {}), "jump")
 
@@ -113,7 +118,12 @@ class ShapingProcess:
         if len(children) <= MAX_FANOUT: return False
 
         ctx = self._fmt_ctx(pid, children[:30], f"扇出过大({len(children)}>{MAX_FANOUT})")
-        resp = call_json(self.llm.primary, PROMPT_BALANCE.read_text(encoding="utf-8"), ctx)
+        resp = call_llm_json(
+            profile=self.llm_profile,
+            system=PROMPT_BALANCE.read_text(encoding="utf-8"),
+            user=ctx,
+            task="balance_tree_fanout",
+        )
         append_jsonl(self.llm_log, {"ts":int(time.time()), "case":"fanout", "parent":pid, "resp":resp})
         return self._apply(pid, resp.get("json", {}), "fanout")
 

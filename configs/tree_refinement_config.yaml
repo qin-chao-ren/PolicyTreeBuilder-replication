@@ -3,16 +3,8 @@
 outdir: "data/intermediate_outputs"
 
 llm:
-  models: ["qwen3-max", "deepseek-r1-0528"]
-  primary: "qwen3-max"
-  secondary: "deepseek-r1-0528"
-  temperature: 0.2
-  max_tokens: 3000
-  timeout: 120
-  retries: 2
-  backoff: 1.5
-  response_format: "json_object"
-  workers: 1
+  primary_profile: "pipeline_primary"
+  secondary_profile: "pipeline_secondary"
   tie_breaker: "score_margin_or_conservative"
   voting:
     strategy: "majority"

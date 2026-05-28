@@ -12,7 +12,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import sys
 import time
 from collections import defaultdict
@@ -31,8 +30,8 @@ from common_utils import (
     read_pairs,
     safe_write_csv,
 )
-from common_llm import LLMConfig, adjudicate
 from contract_similarity_edges import contract_edges
+from llm_runtime import adjudicate_llm_json, call_llm_json, load_env_file, profiles_from_config
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
@@ -78,38 +77,7 @@ def connected_components(graph: Dict[str, set]) -> List[List[str]]:
 
 
 def _load_env():
-    if not ENV_FILE.exists():
-        return
-    for line in ENV_FILE.read_text(encoding="utf-8").splitlines():
-        s = line.strip()
-        if not s or s.startswith("#") or "=" not in s:
-            continue
-        k, v = s.split("=", 1)
-        os.environ.setdefault(k.strip(), v.strip().strip('"'))
-
-
-def _mk_llm_config(lcfg: dict) -> LLMConfig:
-    # [修改 1] 强制单模型逻辑
-    # 优先读取 config 中的 primary，其次读取环境变量，最后兜底
-    primary = str(lcfg.get("primary") or os.getenv("PRIMARY_LLM_MODEL") or "qwen3-max")
-
-    # 将 secondary 强制设置为与 primary 相同
-    # 这样 common_llm 中的 adjudicate 即使执行双重检查，也是同一模型，避免思路打架
-    secondary = primary
-
-    os.environ.setdefault("OPENAI_BASE_URL", os.getenv("PRIMARY_LLM_BASE_URL", "https://api.openai.com/v1"))
-    if os.getenv("PRIMARY_LLM_API_KEY") and not os.getenv("OPENAI_API_KEY"):
-        os.environ["OPENAI_API_KEY"] = os.getenv("PRIMARY_LLM_API_KEY", "")
-
-    return LLMConfig(
-        primary=primary,
-        secondary=secondary, # 此时 secondary == primary
-        temperature=float(lcfg.get("temperature", 0.2)),
-        max_tokens=int(lcfg.get("max_tokens", 1500)),
-        response_format=str(lcfg.get("response_format", "json_object")),
-        workers=int(lcfg.get("workers", 1)),
-        tie_breaker=str(lcfg.get("tie_breaker", "score_margin_or_conservative")),
-    )
+    load_env_file(ENV_FILE)
 
 
 def _load_assignments(outdir: Path) -> Dict[str, str]:
@@ -158,13 +126,19 @@ def _level_to_T(level: str) -> str:
     return level
 
 
-def choose_label_llm(level_str: str, titles: List[str], cfg: LLMConfig, out_log: Path) -> Tuple[str, float]:
+def choose_label_llm(level_str: str, titles: List[str], profile: str, out_log: Path) -> Tuple[str, float]:
     prompt_sys = PROMPT_MERGE.read_text(encoding="utf-8")
     sample = titles[:10]
     stats_line = f"样本数={len(titles)}"
     user = f"层级：{level_str}\n候选成员：\n" + "\n".join([f"- {t}" for t in sample]) + f"\n{stats_line}\n"
-    res = adjudicate(cfg, prompt_sys, user, input_meta={"step": "layer_merge", "level": level_str, "count": len(titles)}, log_path=str(out_log))
-    obj = res.get("final") or {}
+    res = call_llm_json(
+        profile=profile,
+        system=prompt_sys,
+        user=user,
+        task="layer_merge",
+        log_path=str(out_log),
+    )
+    obj = res.get("json") or {}
     lbl = str(obj.get("canonical_label") or obj.get("label") or (sample[0] if sample else ""))
     conf = float(obj.get("confidence") or 0.8)
     return lbl, conf
@@ -225,7 +199,7 @@ def run_layer_merge_for_partition(config_path: Path, level_L: str, l1_category: 
 
     clusters: List[Dict] = []
     id2title = {str(r["sample_id"]): str(r["cleaned_title"]) for _, r in sub.iterrows()}
-    llm_cfg = _mk_llm_config(cfg.get("llm", {}))
+    primary_profile, secondary_profile = profiles_from_config(cfg.get("llm", {}))
     log_merge = LOG_DIR / "llm_cluster_merge_decisions.jsonl"
 
     for comp in comps:
@@ -242,7 +216,7 @@ def run_layer_merge_for_partition(config_path: Path, level_L: str, l1_category: 
             conf = 1.0
             provenance = "seed-existing"
         else:
-            label, conf = choose_label_llm(level_L, titles, llm_cfg, log_merge)
+            label, conf = choose_label_llm(level_L, titles, primary_profile, log_merge)
             conf = max(0.9, min(1.0, conf))
             provenance = "merge-high"
 
@@ -283,12 +257,12 @@ def run_layer_merge_for_partition(config_path: Path, level_L: str, l1_category: 
         stats_line = f"样本数={len(mems)}; 边p75={row['score_p75']:.2f}, mean={row['score_mean']:.2f}, max={row['score_max']:.2f}"
         user = f"层级：{level_L}\n候选成员：\n" + "\n".join([f"- {t}" for t in titles]) + f"\n{stats_line}\n"
 
-        # 这里 adjudicate 会使用 llm_cfg，其中 secondary 已被强制设为 primary
-        adj = adjudicate(
-            llm_cfg,
-            PROMPT_MERGE.read_text(encoding="utf-8"),
-            user,
-            input_meta={"step": "layer_merge_mid", "level": level_L, "p75": float(row["score_p75"])},
+        adj = adjudicate_llm_json(
+            primary_profile=primary_profile,
+            secondary_profile=secondary_profile,
+            system=PROMPT_MERGE.read_text(encoding="utf-8"),
+            user=user,
+            task="layer_merge_mid",
             log_path=str(log_merge),
             evidence_score_primary=float(row["score_p75"]),
             evidence_score_secondary=float(row["score_mean"]),
@@ -322,7 +296,7 @@ def run_layer_merge_for_partition(config_path: Path, level_L: str, l1_category: 
             lconf = 1.0
             provenance_final = "seed-existing" # 或继承之前的
         else:
-            label, lconf = choose_label_llm(level_L, [id2title.get(x, "") for x in unique_members[:15]], llm_cfg, log_merge)
+            label, lconf = choose_label_llm(level_L, [id2title.get(x, "") for x in unique_members[:15]], primary_profile, log_merge)
             provenance_final = "merge-llm" if any(p == "merge-llm" for p in provs) else ("merge-high" if any(p == "merge-high" for p in provs) else "seed-existing")
 
         confidence = float(np.clip(np.nanmean(confs) if confs else lconf, 0.6, 1.0))

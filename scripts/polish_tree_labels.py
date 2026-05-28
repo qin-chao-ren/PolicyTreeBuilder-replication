@@ -17,7 +17,7 @@ from pathlib import Path
 from typing import Dict, List, Tuple, Set
 
 from common_utils import jaccard_overlap
-from common_llm import call_json
+from llm_runtime import call_llm_json
 from utils.step4_shared import (
     Step4Env,
     EmbeddingHelper,
@@ -44,7 +44,7 @@ PROMPT_POLISH = PROJECT_ROOT / "prompts" / "polish_tree_labels.md"
 class PolishingProcess:
     def __init__(self, env: Step4Env, tm: TreeManager, args):
         self.env = env
-        self.llm = env.build_llm_config()
+        self.llm_profile = env.primary_llm_profile()
         self.tm = tm
         self.args = args
 
@@ -192,7 +192,12 @@ class PolishingProcess:
         )
 
         # 2. Call LLM
-        resp = call_json(self.llm.primary, PROMPT_POLISH.read_text(encoding="utf-8"), evidence)
+        resp = call_llm_json(
+            profile=self.llm_profile,
+            system=PROMPT_POLISH.read_text(encoding="utf-8"),
+            user=evidence,
+            task="polish_tree_labels",
+        )
 
         append_jsonl(self.llm_log, {
             "ts": int(time.time()), "case": case,

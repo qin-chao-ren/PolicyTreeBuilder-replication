@@ -27,7 +27,7 @@ This repository is organized for review of the ATRS 2026 353-node PolicyTreeBuil
 | `audit/` | Optional human-audit preparation scripts for action-unit extraction checks. |
 | `evaluation/` | Public tree-quality evaluation scripts, model-judge samples, archived judge scores/raw outputs, agreement tables, and final summaries. |
 | `prompts/` | LLM prompt templates used by the pipeline. |
-| `configs/` | YAML configs and safe environment template. |
+| `configs/` | Pipeline YAML configs, unified model profile template, and safe environment template. |
 | `SCRIPT_PROVENANCE.tsv` | Hash mapping from extracted source scripts to public path-normalized scripts. |
 
 ## Output Categories

@@ -19,7 +19,7 @@ from typing import Dict, List, Optional, Generator, Tuple
 from difflib import SequenceMatcher
 
 # 保持与你提供的一致
-from common_llm import call_json
+from llm_runtime import call_llm_json
 from utils.step4_shared import (
     Step4Env,
     load_tree,
@@ -128,7 +128,7 @@ def generate_l1_batches(tm: TreeManager, l1_id: str, definition: str) -> Generat
 class OverallStructureAudit:
     def __init__(self, env: Step4Env, tm: TreeManager, args):
         self.env = env
-        self.llm = env.build_llm_config()
+        self.llm_profile = env.primary_llm_profile()
         self.tm = tm
         self.args = args
 
@@ -274,7 +274,12 @@ class OverallStructureAudit:
 
         # 调用 LLM
         try:
-            resp = call_json(self.llm.primary, instruction, context)
+            resp = call_llm_json(
+                profile=self.llm_profile,
+                system=instruction,
+                user=context,
+                task="finalize_policy_tree",
+            )
         except Exception as e:
             print(f"[ERROR] LLM call raised exception: {e}")
             self.stats["llm_failures"] += 1

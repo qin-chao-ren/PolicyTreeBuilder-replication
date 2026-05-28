@@ -9,7 +9,7 @@ The included `outputs/` files are the archived evaluation artifacts generated fr
 - Default input tree: `data/final_tree/policy_tree_final.json`
 - Default output directory: `evaluation/outputs/`
 - Safe local environment template: `evaluation/.env.example`
-- Optional model registry template: `evaluation/models_registry.yaml.example`
+- Judge profiles: `configs/llm_profiles.yaml.example`
 - Path helper: `evaluation/scripts/eval_paths.py` centralizes repository-relative defaults for the public package.
 
 The legacy evaluation input name was `policy_tree_eval/data/v4_tree_final.json`. It is not copied into this repository because it corresponds to the current public final tree.
@@ -41,6 +41,8 @@ Model judging calls external APIs. Copy the safe template and fill in local valu
 ```powershell
 Copy-Item evaluation/.env.example evaluation/.env
 ```
+
+The judge profile wiring is centralized in `configs/llm_profiles.yaml.example`. Copy it to `configs/llm_profiles.yaml` only if the default profile names or env-var bindings need to change.
 
 Then run one judge or all configured judges:
 

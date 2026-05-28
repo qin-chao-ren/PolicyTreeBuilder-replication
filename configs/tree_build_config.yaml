@@ -18,12 +18,8 @@ global_link:
   auto_accept_conf: 0.85
 
 llm:
-  primary: "qwen3-max"
-  secondary: "deepseek-r1-0528"
-  temperature: 0.2
-  max_tokens: 3000
-  response_format: "json_object"
-  workers: 1
+  primary_profile: "pipeline_primary"
+  secondary_profile: "pipeline_secondary"
   tie_breaker: "score_margin_or_conservative"
 
 paths:

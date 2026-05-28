@@ -13,7 +13,6 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-import os
 import sys
 import time
 from pathlib import Path
@@ -28,7 +27,7 @@ from common_utils import (  # type: ignore
     jaccard_overlap,
     safe_write_csv,
 )
-from common_llm import LLMConfig, call_json  # type: ignore
+from llm_runtime import call_llm_json, load_env_file, profiles_from_config  # type: ignore
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
@@ -42,30 +41,7 @@ DEFAULT_HARD_THRESHOLD = 0.50
 DEFAULT_AUTO_ACCEPT_CONF = 0.85
 
 def _load_env():
-    if not ENV_FILE.exists():
-        return
-    for line in ENV_FILE.read_text(encoding="utf-8").splitlines():
-        s = line.strip()
-        if not s or s.startswith("#") or "=" not in s:
-            continue
-        k, v = s.split("=", 1)
-        os.environ.setdefault(k.strip(), v.strip().strip('"'))
-
-def _mk_llm_config(lcfg: dict) -> LLMConfig:
-    primary = str(lcfg.get("primary") or os.getenv("PRIMARY_LLM_MODEL") or "qwen3-max")
-    secondary = primary
-    os.environ.setdefault("OPENAI_BASE_URL", os.getenv("PRIMARY_LLM_BASE_URL", "https://api.openai.com/v1"))
-    if os.getenv("PRIMARY_LLM_API_KEY") and not os.getenv("OPENAI_API_KEY"):
-        os.environ["OPENAI_API_KEY"] = os.getenv("PRIMARY_LLM_API_KEY", "")
-    return LLMConfig(
-        primary=primary,
-        secondary=secondary,
-        temperature=float(lcfg.get("temperature", 0.1)),
-        max_tokens=int(lcfg.get("max_tokens", 1000)),
-        response_format=str(lcfg.get("response_format", "json_object")),
-        workers=int(lcfg.get("workers", 1)),
-        tie_breaker=str(lcfg.get("tie_breaker", "score_margin_or_conservative")),
-    )
+    load_env_file(ENV_FILE)
 
 def _write_jsonl(path: Path, obj: dict):
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -201,7 +177,7 @@ def run_link_t2_l1(config_path: Path, cli_hard_threshold: Optional[float]):
         }
 
     l3_context_map = _load_l3_context(outdir)
-    llm_cfg = _mk_llm_config(cfg.get("llm", {}))
+    llm_profile, _ = profiles_from_config(cfg.get("llm", {}))
     log_link = LOG_DIR / "llm_step3_link_t2_l1.jsonl"
     links_rows = []
     new_l1_nodes = []
@@ -262,7 +238,12 @@ def run_link_t2_l1(config_path: Path, cli_hard_threshold: Optional[float]):
             "JSON: {best_l1_id, confidence, create_new_l1, not_match_reason}"
         )
 
-        resp_r2 = call_json(llm_cfg.primary, PROMPT_LINK.read_text(encoding="utf-8"), user_prompt_r2)
+        resp_r2 = call_llm_json(
+            profile=llm_profile,
+            system=PROMPT_LINK.read_text(encoding="utf-8"),
+            user=user_prompt_r2,
+            task="link_second_level_to_top_level_r2",
+        )
         obj_r2 = resp_r2.get("json") or {}
 
         r2_pass = False
@@ -296,7 +277,12 @@ def run_link_t2_l1(config_path: Path, cli_hard_threshold: Optional[float]):
             "指令: 除非属于现有体系完全无法覆盖的全新领域，否则禁止新建。请优先归入现有类别。"
         )
 
-        resp_r3 = call_json(llm_cfg.primary, PROMPT_LINK.read_text(encoding="utf-8"), user_prompt_r3)
+        resp_r3 = call_llm_json(
+            profile=llm_profile,
+            system=PROMPT_LINK.read_text(encoding="utf-8"),
+            user=user_prompt_r3,
+            task="link_second_level_to_top_level_r3",
+        )
         _write_jsonl(log_link, {"node": node_id, "round": 3, "resp": resp_r3})
 
         obj_r3 = resp_r3.get("json") or {}

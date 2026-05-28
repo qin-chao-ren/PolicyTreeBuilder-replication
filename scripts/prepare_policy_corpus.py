@@ -7,7 +7,7 @@ Step 1 · 标题清洗（public 迁移实现，贴近 v2 行为）
 
 改动点：
 - 默认开启 LLM 清洗（--llm-clean yes），prompt 改为 prompts/clean_policy_titles.md；
-- ENV 对应：若设置 PRIMARY_LLM_MODEL/BASE_URL/API_KEY，则在调用前写入 OPENAI_BASE_URL/OPENAI_API_KEY 以兼容 v2 的 OpenAI 调用；
+- LLM 清洗统一通过 scripts/llm_runtime.py 的 profile 配置调用；
 - 输出对应：主输出写入 data/intermediate_outputs/policy_corpus_cleaned.csv；同时保留 v2 风格的 policy_corpus_cleaned.csv 作为兼容（可选）。
 
 python scripts/prepare_policy_corpus.py `
@@ -26,7 +26,7 @@ from typing import List, Dict, Optional, Tuple
 
 import pandas as pd
 
-from utils.llm_client import chat_json, load_env_file
+from llm_runtime import call_llm_json, load_env_file, profiles_from_config
 
 
 HERE = Path(__file__).resolve().parent
@@ -59,22 +59,24 @@ def simple_clean(title: str) -> str:
     return s or (title or '')
 
 
-def llm_clean_titles(model: str, title: str, path_text: str, prompt_tmpl: str,
+def llm_clean_titles(profile: str, title: str, path_text: str, prompt_tmpl: str,
+                     model_override: str | None = None,
                      timeout_s: int = 60, max_retries: int = 3, max_new: int = 3) -> Tuple[List[str], str, int, str]:
     """调用 LLM 返回精简标题列表。"""
     system_prompt = "You are an expert Chinese policy editor who outputs JSON."
     user_prompt = (prompt_tmpl or '').replace('{TITLE}', title).replace('{PATH_TEXT}', path_text or '').replace('{MAX_NEW}', str(max_new))
-    res, obj = chat_json(
+    res = call_llm_json(
+        profile=profile,
+        model_override=model_override,
         system=system_prompt,
         user=user_prompt,
-        model=model,
-        temperature=0.1,
-        max_tokens=256,
+        task='prepare_policy_corpus_clean_titles',
         timeout_s=timeout_s,
         retries=max_retries,
     )
-    raw = res.raw or ''
-    if res.ok and isinstance(obj, dict):
+    raw = str(res.get('raw') or '')
+    obj = res.get('json') or {}
+    if res.get('ok') and isinstance(obj, dict):
         arr = obj.get('clean_titles') or obj.get('titles') or []
         uniq, seen = [], set()
         for s in arr:
@@ -83,10 +85,10 @@ def llm_clean_titles(model: str, title: str, path_text: str, prompt_tmpl: str,
                 if s and s not in seen:
                     seen.add(s)
                     uniq.append(s)
-        return uniq[:max_new], 'ok', res.attempts, raw
-    err = (res.error or '').lower()
+        return uniq[:max_new], 'ok', int(res.get('attempts') or 0), raw
+    err = str(res.get('error') or '').lower()
     status = 'timeout' if 'timeout' in err else 'error'
-    return [], status, res.attempts, raw
+    return [], status, int(res.get('attempts') or 0), raw
 
 import re
 
@@ -371,19 +373,10 @@ def main():
     # LLM 清洗（默认开启）
     cleaned_rows = []
     llm_on = (args.llm_clean == 'yes')
-    llm_model = args.llm_clean_model or os.environ.get('PRIMARY_LLM_MODEL') or os.environ.get('CHAT_MODEL_NAME')
-    # 映射 base/key
-    base = os.environ.get('PRIMARY_LLM_BASE_URL')
-    key = os.environ.get('PRIMARY_LLM_API_KEY')
-    if base:
-        os.environ['OPENAI_BASE_URL'] = base
-    if key:
-        os.environ['OPENAI_API_KEY'] = key
-    llm_timeout = int(args.llm_timeout or os.environ.get('TIMEOUT', 60))
-    try:
-        llm_retries = int(args.llm_retries or os.environ.get('RETRY_MAX', 3))
-    except Exception:
-        llm_retries = 3
+    llm_profile, _ = profiles_from_config({})
+    llm_model_override = args.llm_clean_model
+    llm_timeout = int(args.llm_timeout or 60)
+    llm_retries = int(args.llm_retries or 3)
     prompt_tmpl = Path(args.llm_clean_prompt).read_text(encoding='utf-8') if Path(args.llm_clean_prompt).exists() else ''
 
     total = len(base_df)
@@ -414,10 +407,11 @@ def main():
         llm_attempts = 0
         llm_raw_text = ''
         clean_source = 'rule'
-        if llm_on and llm_model:
+        if llm_on:
             try:
                 titles, llm_status, llm_attempts, llm_raw_text = llm_clean_titles(
-                    llm_model, r.raw_title, r.path_text, prompt_tmpl,
+                    llm_profile, r.raw_title, r.path_text, prompt_tmpl,
+                    model_override=llm_model_override,
                     timeout_s=llm_timeout, max_retries=max(1, llm_retries), max_new=int(args.llm_clean_max_new_titles)
                 )
                 if llm_status == 'ok' and titles:
@@ -484,7 +478,8 @@ def main():
         'encoding': 'utf-8',
         'title_max_len': int(args.title_max_len),
         'llm_clean': args.llm_clean,
-        'llm_clean_model': llm_model or '',
+        'llm_clean_profile': llm_profile,
+        'llm_clean_model_override': llm_model_override or '',
         'llm_clean_max_new_titles': int(args.llm_clean_max_new_titles),
         'llm_clean_prompt_path': args.llm_clean_prompt,
         'llm_timeout': int(llm_timeout),

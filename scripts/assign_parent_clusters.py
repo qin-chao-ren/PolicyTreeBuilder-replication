@@ -13,7 +13,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import time
 from collections import Counter
 from pathlib import Path
@@ -35,8 +34,8 @@ from common_utils import (  # type: ignore
     jaccard_overlap,
     safe_write_csv,
 )
-from common_llm import LLMConfig, adjudicate  # type: ignore
 from contract_similarity_edges import contract_edges  # type: ignore
+from llm_runtime import adjudicate_llm_json, load_env_file, profiles_from_config  # type: ignore
 from pandas.errors import EmptyDataError
 
 HERE = Path(__file__).resolve().parent
@@ -50,31 +49,7 @@ ALLOWED = {("L4", "L3"), ("L3", "L2")}
 HARD_ASSIGN_THRESHOLD = 0.92
 
 def _load_env():
-    if not ENV_FILE.exists():
-        return
-    for line in ENV_FILE.read_text(encoding="utf-8").splitlines():
-        s = line.strip()
-        if not s or s.startswith("#") or "=" not in s:
-            continue
-        k, v = s.split("=", 1)
-        os.environ.setdefault(k.strip(), v.strip().strip('"'))
-
-
-def _mk_llm_config(lcfg: dict) -> LLMConfig:
-    primary = str(lcfg.get("primary") or os.getenv("PRIMARY_LLM_MODEL") or "qwen3-max")
-    secondary = primary
-    os.environ.setdefault("OPENAI_BASE_URL", os.getenv("PRIMARY_LLM_BASE_URL", "https://api.openai.com/v1"))
-    if os.getenv("PRIMARY_LLM_API_KEY") and not os.getenv("OPENAI_API_KEY"):
-        os.environ["OPENAI_API_KEY"] = os.getenv("PRIMARY_LLM_API_KEY", "")
-    return LLMConfig(
-        primary=primary,
-        secondary=secondary,
-        temperature=float(lcfg.get("temperature", 0.2)),
-        max_tokens=int(lcfg.get("max_tokens", 1500)),
-        response_format=str(lcfg.get("response_format", "json_object")),
-        workers=int(lcfg.get("workers", 1)),
-        tie_breaker=str(lcfg.get("tie_breaker", "score_margin_or_conservative")),
-    )
+    load_env_file(ENV_FILE)
 
 
 def _load_assignments(outdir: Path) -> Dict[str, str]:
@@ -175,7 +150,7 @@ def run_vertical_link(config_path: Path, from_level: str, to_level: str, l1_cate
     w_cos = float(vcfg.get("weights", {}).get("cosine", 0.7))
     w_jac = float(vcfg.get("weights", {}).get("jaccard", 0.3))
 
-    llm_cfg = _mk_llm_config(cfg.get("llm", {}))
+    primary_profile, secondary_profile = profiles_from_config(cfg.get("llm", {}))
 
     corpus = read_corpus(corpus_path)
     sample_title = {str(r["sample_id"]): str(r["cleaned_title"]) for _, r in corpus.iterrows()}
@@ -291,11 +266,12 @@ def run_vertical_link(config_path: Path, from_level: str, to_level: str, l1_cate
             )
             margin = cands[0][1] - cands[1][1] if len(cands) >= 2 else (cands[0][1] if cands else 0.0)
 
-            adj = adjudicate(
-                llm_cfg,
-                PROMPT_CLASSIFY.read_text(encoding="utf-8"),
-                user,
-                input_meta={"step": "vertical_link", "child": child_id, "from": from_level, "to": to_level},
+            adj = adjudicate_llm_json(
+                primary_profile=primary_profile,
+                secondary_profile=secondary_profile,
+                system=PROMPT_CLASSIFY.read_text(encoding="utf-8"),
+                user=user,
+                task="vertical_link",
                 log_path=str(log_classify),
                 evidence_score_primary=margin,
                 evidence_score_secondary=0.0,

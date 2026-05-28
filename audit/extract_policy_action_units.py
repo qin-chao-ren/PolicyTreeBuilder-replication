@@ -13,7 +13,6 @@ python audit/extract_policy_action_units.py `
 """
 import argparse
 import json
-import os
 import logging
 import sys
 import pandas as pd
@@ -25,8 +24,7 @@ SCRIPTS_DIR = Path(__file__).resolve().parents[1] / "scripts"
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
-# Reuse the shared LLM client from the main pipeline scripts.
-from utils.llm_client import chat_json, load_env_file
+from llm_runtime import call_llm_json, load_env_file
 
 # === 1. System Prompt (保持不变) ===
 SYSTEM_PROMPT = action_unit_prompt = {
@@ -205,7 +203,7 @@ def main():
 
     # 初始化
     load_env_file(args.env)
-    llm_model = os.getenv("PRIMARY_LLM_MODEL", "gpt-4o")
+    llm_profile = "pipeline_primary"
 
     # 设置日志
     output_path = Path(args.output)
@@ -213,7 +211,7 @@ def main():
 
     logger.info("=== Action-unit extraction Start ===")
     logger.info(f"Source: {args.source}")
-    logger.info(f"Model: {llm_model}")
+    logger.info(f"LLM profile: {llm_profile}")
 
     print(f"[INFO] Loading source: {args.source}")
     # keep_default_na=False 告诉 pandas：不要把 "NA" 当作空值，它就是个字符串 "NA"
@@ -243,15 +241,17 @@ def main():
 
         try:
             # 调用 LLM
-            resp, data = chat_json(
+            resp = call_llm_json(
+                profile=llm_profile,
                 system=action_unit_prompt["content"], # 直接传入 Prompt 字典
                 user=user_content,
-                model=llm_model,
+                task="action_unit_extraction",
                 temperature=0.1,
                 max_tokens=1000
             )
+            data = resp.get("json")
 
-            if resp.ok and isinstance(data, dict):
+            if resp.get("ok") and isinstance(data, dict):
                 units = data.get("policy_units", [])
                 # === LOG: 成功收到 ===
                 logger.info(f"[{i+1}/{len(tasks)}] RES <- OK. Extracted {len(units)} units.")
@@ -269,7 +269,7 @@ def main():
                     })
             else:
                 # === LOG: LLM 返回错误或格式不对 ===
-                logger.warning(f"[{i+1}/{len(tasks)}] RES <- FAIL or Invalid JSON. Error: {resp.error} | Raw: {resp.raw[:100]}...")
+                logger.warning(f"[{i+1}/{len(tasks)}] RES <- FAIL or Invalid JSON. Error: {resp.get('error')} | Raw: {(resp.get('raw') or '')[:100]}...")
 
         except Exception as e:
             # === LOG: 异常 ===

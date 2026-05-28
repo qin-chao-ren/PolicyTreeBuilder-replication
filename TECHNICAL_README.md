@@ -73,12 +73,13 @@ Some steps call external LLM or embedding services. Reviewers without access to 
 
 ## LLM Runtime Boundary
 
-The main tree-building pipeline and the evaluation judges intentionally keep separate LLM wrappers:
+All external model calls use `scripts/llm_runtime.py` and named profiles from `configs/llm_profiles.yaml.example`.
 
-- Main pipeline scripts use `scripts/common_llm.py` and helper code in `scripts/utils/`.
-- Evaluation judge scripts use `evaluation/scripts/llm_clients.py` because they preserve the archived judge-key convention used by `evaluation/outputs/`.
+- Main pipeline chat calls use `pipeline_primary` and, where needed, `pipeline_secondary`.
+- Evaluation judges use `judge_A_kimi`, `judge_B_claude`, and `judge_C_gemini` profiles while preserving the archived `judge_*` output filenames.
+- Embedding and reranking use `embedding_default` and `rerank_default`.
 
-This package does not merge those clients, so the public code stays close to the verified replication workflow. A future maintenance branch could consolidate them into one runtime after a full rerun validation.
+Copy `configs/llm_profiles.yaml.example` to `configs/llm_profiles.yaml` only if you need to change provider/profile wiring. Credentials and endpoints should stay in local `.env` files.
 
 ## Evaluation Workflow
 

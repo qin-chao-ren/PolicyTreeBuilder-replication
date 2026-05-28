@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 
@@ -20,31 +20,16 @@ from typing import Dict, List, Optional
 
 import numpy as np
 import pandas as pd
-import requests
 from sklearn.neighbors import NearestNeighbors
 from sklearn.preprocessing import normalize
+
+from llm_runtime import call_embedding, call_rerank, load_env_file
 
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
 OUT_DIR_DEFAULT = ROOT / "data" / "intermediate_outputs"
 LOG_DIR_DEFAULT = OUT_DIR_DEFAULT / "logs"
-
-
-def load_env_file(path: str | Path) -> None:
-    p = Path(path)
-    if not p.exists():
-        return
-    for line in p.read_text(encoding="utf-8").splitlines():
-        line = line.strip()
-        if not line or line.startswith("#"):
-            continue
-        if "=" in line:
-            k, v = line.split("=", 1)
-            k = k.strip()
-            v = v.strip().strip('"')
-            if k and os.getenv(k) is None:
-                os.environ[k] = v
 
 
 def log_write(log_path: Path, msg: str) -> None:
@@ -61,91 +46,29 @@ def embed_call_openai(
     max_retries: int = 3,
     batch_size: int = 10,
 ) -> np.ndarray:
-    try:
-        from openai import OpenAI
-
-        client = OpenAI(
-            base_url=os.environ.get("OPENAI_BASE_URL"),
-            api_key=os.environ.get("OPENAI_API_KEY"),
-        )
-        client = client.with_options(timeout=timeout_s)
-        mode = "v1"
-    except Exception:
-        mode = "http"
-        client = None
-
     out: List[List[float]] = []
     n = len(texts)
-    i = 0
     bs = max(1, batch_size)
-    min_cap = 10
-    while i < n:
-        end = min(i + bs, n)
-        batch = texts[i:end]
-
-        # --- [新] 日志点 1：记录尝试 ---
-        log_write(log_path, f"[EMB API] Attempting batch {i+1}-{end} (size {len(batch)})")
-
-        for attempt in range(1, max_retries + 1):
-            try:
-                if mode == "v1" and client is not None:
-                    resp = client.embeddings.create(model=model, input=batch)
-                    vecs = [d.embedding for d in resp.data]
-                else:
-                    # HTTP fallback via requests to /v1/embeddings
-                    base_url = os.environ.get("OPENAI_BASE_URL") or "https://api.openai.com/v1"
-                    api_key = os.environ.get("OPENAI_API_KEY")
-                    if not api_key:
-                        raise RuntimeError("Embedding OPENAI_API_KEY not configured")
-                    base = base_url.rstrip("/")
-                    if base.endswith("/v1"):
-                        url = f"{base}/embeddings"
-                    else:
-                        url = f"{base}/v1/embeddings"
-                    headers = {
-                        "Authorization": f"Bearer {api_key}",
-                        "Content-Type": "application/json",
-                    }
-                    payload = {"model": model, "input": batch}
-                    resp = requests.post(url, headers=headers, json=payload, timeout=timeout_s)
-                    resp.raise_for_status()
-                    data = resp.json()
-                    items = data.get("data", [])
-                    if not items and isinstance(data.get("output"), dict):
-                        items = data["output"].get("embeddings", data["output"].get("data", [])) or []
-                    vecs = []
-                    for d in items:
-                        if isinstance(d, dict) and "embedding" in d:
-                            vecs.append(d["embedding"])
-                        else:
-                            vecs.append(d)
-                out.extend(vecs)
-                i = end
-
-                # --- [新] 日志点 2：记录成功 ---
-                log_write(log_path, f"[EMB API] Batch {i}-{end} SUCCESS (Attempt {attempt})")
-                break
-
-            except Exception as exc:  # pragma: no cover - network failure
-                msg = str(exc)
-
-                # --- [新] 日志点 3：记录失败 ---
-                log_write(log_path, f"[EMB API] Batch {i+1}-{end} FAILED (Attempt {attempt}/{max_retries}). Error: {msg}")
-                if ("batch size" in msg or "larger than" in msg) and bs > min_cap:
-                    bs = min_cap
-                    # --- [新] 日志点 4：记录降级 ---
-                    log_write(log_path, f"[EMB API] Batch size error. Reducing batch size to {bs}")
-                    break
-                if attempt == max_retries:
-                    # --- [新] 日志点 5：记录最终失败 ---
-                    log_write(log_path, f"[EMB API] Batch {i+1}-{end} FAILED ALL RETRIES. Filling with zeros.")
-                    dim = len(out[0]) if out else 1536
-                    out.extend([[0.0] * dim for _ in batch])
-                    i = end
-                else:
-                    import time
-
-                    time.sleep(1.2)
+    for start in range(0, n, bs):
+        end = min(start + bs, n)
+        batch = texts[start:end]
+        log_write(log_path, f"[EMB API] Attempting batch {start+1}-{end} (size {len(batch)})")
+        resp = call_embedding(
+            profile="embedding_default",
+            texts=batch,
+            model_override=model,
+            timeout_s=timeout_s,
+            retries=max_retries,
+        )
+        vectors = resp.get("vectors") or []
+        if resp.get("ok") and len(vectors) == len(batch):
+            out.extend(vectors)
+            log_write(log_path, f"[EMB API] Batch {start+1}-{end} SUCCESS")
+            continue
+        err = resp.get("error") or "embedding request failed"
+        log_write(log_path, f"[EMB API] Batch {start+1}-{end} FAILED. Error: {err}. Filling with zeros.")
+        dim = len(out[0]) if out else 1536
+        out.extend([[0.0] * dim for _ in batch])
     return np.asarray(out, dtype=np.float32)
 
 
@@ -245,118 +168,23 @@ def rerank_api_call(
     timeout_s: int = 60,
     max_retries: int = 3,
 ) -> Optional[List[float]]:
-    headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
-    # 判断是否为阿里 DashScope 接口
-    is_dashscope = "dashscope.aliyuncs.com" in (endpoint or "")
-
-    for attempt in range(1, max_retries + 1):
-        try:
-            # ==========================================
-            # 分支 A: 阿里 DashScope 专用逻辑
-            # ==========================================
-            if is_dashscope:
-                def _call(payload):
-                    resp = requests.post(endpoint, headers=headers, json=payload, timeout=timeout_s)
-                    resp.raise_for_status()
-                    return resp.json()
-
-                # 阿里对文本长度敏感，需要简单截断
-                def _clip(text: str, max_len: int = 1000) -> str:
-                    try:
-                        return (text or "")[:max_len]
-                    except Exception:
-                        return str(text)[:max_len]
-
-                docs_str = [_clip(d if isinstance(d, str) else str(d)) for d in documents]
-                q_str = _clip(query or "")
-
-                # 阿里要求 top_n 参数
-                topn = max(1, min(len(docs_str), 20))
-
-                # 构造阿里专用 Payload 结构
-                body = {
-                    "model": model,
-                    "input": {
-                        "query": q_str,
-                        "documents": docs_str
-                    },
-                    "parameters": {
-                        "top_n": topn,
-                        "return_documents": False
-                    },
-                }
-
-                data = _call(body)
-
-                # [关键修复] 解析阿里返回的嵌套结构: output -> results
-                items = data.get("output", {}).get("results", [])
-                scores: List[float] = [0.0] * len(docs_str)
-
-                # 阿里返回的数据通常带有 index，需要按 index 填回
-                for it in items:
-                    idx = it.get("index")
-                    sc = it.get("relevance_score", it.get("score", 0.0))
-                    if isinstance(idx, int) and 0 <= idx < len(scores):
-                        scores[idx] = float(sc)
-
-                return scores
-
-            # ==========================================
-            # 分支 B: 通用 OpenAI / SiliconFlow / vLLM 逻辑
-            # ==========================================
-            else:
-                body = {"model": model, "query": query, "documents": documents}
-                # 某些接口(如 BGE)可能需要 explicit top_n
-                body["top_n"] = len(documents)
-
-                resp = requests.post(endpoint, headers=headers, json=body, timeout=timeout_s)
-                resp.raise_for_status()
-                data = resp.json()
-
-                # 通用解析: results 或 data
-                items = data.get("results", []) or data.get("data", [])
-                scores = [0.0] * len(documents)
-
-                has_index = any(isinstance(it, dict) and ("index" in it) for it in items)
-
-                if has_index:
-                    for it in items:
-                        if not isinstance(it, dict): continue
-                        idx = it.get("index")
-                        sc = it.get("relevance_score", it.get("score", 0.0))
-                        if isinstance(idx, int) and 0 <= idx < len(scores):
-                            scores[idx] = float(sc)
-                else:
-                    # 如果没有 index，假设按顺序返回
-                    for pos, it in enumerate(items[: len(scores)]):
-                        if isinstance(it, dict):
-                            sc = it.get("relevance_score", it.get("score", 0.0))
-                        elif isinstance(it, (list, tuple)) and len(it) >= 2:
-                            # 兼容 [idx, score] 格式
-                            sc = it[1]
-                        else:
-                            sc = float(it) if isinstance(it, (int, float)) else 0.0
-                        scores[pos] = float(sc)
-                return scores
-
-        except Exception as e:
-            # 错误打印
-            print(f"\n[ERROR] Rerank API Error (Attempt {attempt}): {e}")
-            if isinstance(e, requests.exceptions.HTTPError):
-                print(f"   >>> Status Code: {e.response.status_code}")
-                try:
-                    print(f"   >>> Body: {e.response.text}")
-                except:
-                    pass
-
-            if attempt == max_retries:
-                print(f"   [FAIL] All retries failed. Returning None.")
-                return None
-
-            import time
-            time.sleep(1.0)
-
-    return None
+    if endpoint:
+        os.environ["RERANK_API_ENDPOINT"] = endpoint
+    if api_key:
+        os.environ["RERANK_API_KEY"] = api_key
+    resp = call_rerank(
+        profile="rerank_default",
+        query=query,
+        documents=documents,
+        model_override=model,
+        endpoint_override=endpoint,
+        timeout_s=timeout_s,
+        retries=max_retries,
+    )
+    if not resp.get("ok"):
+        print(f"\n[ERROR] Rerank API Error: {resp.get('error')}")
+        return None
+    return [float(x) for x in (resp.get("scores") or [])]
 
 
 def main() -> None:
@@ -434,14 +262,6 @@ def main() -> None:
         return
 
     embed_model = args.embed_model or os.getenv("EMBED_MODEL_NAME") or "text-embedding-v4"
-    embed_base = os.getenv("EMBED_MODEL_BASE_URL") or os.getenv("OPENAI_BASE_URL")
-    embed_key = os.getenv("EMBED_MODEL_API_KEY") or os.getenv("OPENAI_API_KEY")
-    if embed_base:
-        os.environ["OPENAI_BASE_URL"] = embed_base
-    if embed_key:
-        os.environ["OPENAI_API_KEY"] = embed_key
-    if not os.environ.get("OPENAI_API_KEY"):
-        raise RuntimeError("Embedding OPENAI_API_KEY not configured")
     log_write(log_path, f"[EMB] model={embed_model} n={n}")
 
     emb_cache_path = out_dir / "policy_corpus_embeddings.parquet"
@@ -579,8 +399,6 @@ def main() -> None:
                 api_ep = base.rstrip("/") + "/api/v1/services/rerank/text-rerank/text-rerank"
         if not api_ep or not api_key or not model:
             log_write(log_path, "[RERANK] skipped: endpoint/api_key/model missing")
-        elif requests is None:
-            log_write(log_path, "[RERANK] skipped: requests not available")
         elif edge_df.empty:
             log_write(log_path, "[RERANK] skipped: no edges to rerank")
         else:

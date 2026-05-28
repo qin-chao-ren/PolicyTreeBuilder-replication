@@ -31,14 +31,12 @@ import argparse
 import csv
 import hashlib
 import json
-import os
 from pathlib import Path
 from typing import Dict, List, Tuple
 
 import pandas as pd
 
-from common_llm import call_json
-from utils.llm_client import load_env_file
+from llm_runtime import call_llm_json, load_env_file, profiles_from_config
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
@@ -115,15 +113,7 @@ def main():
     out_dir = Path(args.outdir)
     out_dir.mkdir(parents=True, exist_ok=True)
     log_path = LOG_DIR_DEFAULT / 'define_top_level_categories.log'
-
-    # 注入 OPENAI_* 以兼容 v3 封装
-    model = args.model or os.getenv('PRIMARY_LLM_MODEL') or os.getenv('PRIMARY_LLM')
-    base = os.getenv('PRIMARY_LLM_BASE_URL')
-    key = os.getenv('PRIMARY_LLM_API_KEY')
-    if base:
-        os.environ['OPENAI_BASE_URL'] = base
-    if key:
-        os.environ['OPENAI_API_KEY'] = key
+    llm_profile, _ = profiles_from_config({})
 
     # 读取 calibrated 语料，收集 T1 标题
     cal_path = Path(args.calibrated)
@@ -152,17 +142,13 @@ def main():
     user_lines.append('- 目标类别数：6–12；互斥、可执行；名称≤10字；keywords 3–8 个；definition 1–2 句。')
     user_text = '\n'.join(user_lines)
 
-    log_write(log_path, f'[INFO] calling LLM model={model} t1={len(candidates)} seed_groups={len(assets)}')
-    res = call_json(
-        model=model,
-        system_text=sys_p,
-        user_text=user_text,
-        temperature=float(os.getenv('LLM_TEMPERATURE', '0.2')),
-        max_tokens=int(os.getenv('LLM_MAX_TOKENS', '2000')),
-        response_format='json_object',
-        timeout=float(os.getenv('TIMEOUT', '120')),
-        retries=int(os.getenv('RETRIES', '2')),
-        backoff=float(os.getenv('BACKOFF', '1.5')),
+    log_write(log_path, f'[INFO] calling LLM profile={llm_profile} model_override={args.model or ""} t1={len(candidates)} seed_groups={len(assets)}')
+    res = call_llm_json(
+        profile=llm_profile,
+        model_override=args.model,
+        system=sys_p,
+        user=user_text,
+        task='define_top_level_categories',
     )
     obj = res.get('json') or {}
     cats_in = obj.get('categories') or []
