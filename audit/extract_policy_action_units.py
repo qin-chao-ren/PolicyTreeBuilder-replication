@@ -6,7 +6,7 @@ Action-unit extraction · Extract T5 Action Units (With Traceability & De-duplic
 - Extracts Action Units using LLM (Action + Object).
 - Generates unique IDs linked to source block range.
 
-python scripts/extract_policy_action_units.py `
+python audit/extract_policy_action_units.py `
   --source "data/source/policy_action_segments.csv" `
   --output "data/intermediate_outputs/policy_action_units_raw.csv" `
   --env "configs/.env"
@@ -15,12 +15,17 @@ import argparse
 import json
 import os
 import logging
+import sys
 import pandas as pd
 from pathlib import Path
 from tqdm import tqdm
 from datetime import datetime
 
-# 假设你的 llm_client 位于 utils 目录
+SCRIPTS_DIR = Path(__file__).resolve().parents[1] / "scripts"
+if str(SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS_DIR))
+
+# Reuse the shared LLM client from the main pipeline scripts.
 from utils.llm_client import chat_json, load_env_file
 
 # === 1. System Prompt (保持不变) ===

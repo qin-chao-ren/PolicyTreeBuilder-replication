@@ -1,0 +1,4 @@
+﻿dimension,weighted_kappa_A_kimi_VS_B_claude,n_A_kimi_VS_B_claude,weighted_kappa_A_kimi_VS_C_gemini,n_A_kimi_VS_C_gemini,weighted_kappa_B_claude_VS_C_gemini,n_B_claude_VS_C_gemini,mean_pairwise_weighted_kappa,krippendorff_alpha_ordinal
+vertical_coherence,0.692,278,0.558,278,0.675,278,0.642,0.637
+horizontal_coherence,0.67,278,0.651,278,0.721,278,0.681,0.683
+label_quality,0.655,278,0.333,278,0.348,278,0.445,0.322

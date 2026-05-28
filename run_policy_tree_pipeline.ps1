@@ -1,4 +1,8 @@
 # PolicyTreeBuilder public replication pipeline template.
+# This is a full rerun template, not a required reviewer quick check.
+# It requires local credentials for external LLM, embedding, and reranking services.
+# Reviewers without those services can inspect included outputs and run deterministic
+# evaluation checks documented in README.md and TECHNICAL_README.md.
 # Run from the repository root after configuring configs/.env.
 
 Write-Host "[1/14] Prepare policy corpus"

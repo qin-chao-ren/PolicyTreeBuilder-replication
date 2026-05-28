@@ -17,9 +17,37 @@ Expected structure:
 
 The older 317-node package is superseded and is not part of this public replication package.
 
+## Reviewer Quick Check
+
+Reviewers who do not need to rerun the full LLM pipeline can inspect the fixed outputs directly:
+
+| Purpose | File or command |
+| --- | --- |
+| Final policy tree | `data/final_tree/policy_tree_final.json` |
+| Final radial figure | `data/final_tree/policy_tree_final_en_radial.jpg` |
+| Final tree tables and audit files | `data/final_tree/` |
+| Evaluation summary | `evaluation/outputs/final_summary.json` |
+| Package file manifest | `FILE_INDEX.tsv` |
+| Legacy-to-public name map | `LEGACY_NAME_MAP.tsv` |
+
+No-API validation commands:
+
+```powershell
+python evaluation/scripts/01_extract_tables.py --output-dir evaluation/outputs_scratch
+python evaluation/scripts/02_structure_check.py --output-dir evaluation/outputs_scratch
+python evaluation/scripts/03_sampling.py --output-dir evaluation/outputs_scratch --seed 20260430
+python evaluation/scripts/06_aggregate.py --output-dir evaluation/outputs
+python evaluation/scripts/07_status.py --output-dir evaluation/outputs
+```
+
+The full pipeline rerun is optional and requires local credentials for external LLM, embedding, and reranking services. Use the included outputs for review when those services are unavailable.
+
 ## Repository Layout
 
-- `scripts/`: pipeline, tree refinement, administrative splitting, and figure rendering scripts.
+- `scripts/`: main pipeline and tree refinement scripts.
+- `visualization/`: administrative tree splitting, visualization repair, and figure rendering scripts.
+- `audit/`: optional human-audit preparation scripts for action-unit extraction checks.
+- `evaluation/`: public tree-quality evaluation scripts and archived evaluation outputs.
 - `prompts/`: LLM prompt templates used by the pipeline.
 - `configs/`: YAML pipeline configs and a safe `.env.example` template.
 - `data/source/`: source input segments and administrative-unit metadata.
@@ -48,9 +76,17 @@ Copy-Item configs\.env.example configs\.env
 
 Do not commit `configs/.env`.
 
+For optional reruns of the evaluation judges, copy the evaluation-specific template:
+
+```powershell
+Copy-Item evaluation\.env.example evaluation\.env
+```
+
+Do not commit `evaluation/.env`.
+
 ## Main Reproduction Path
 
-The final outputs are already included. To rerun the pipeline from the source input, use `run_policy_tree_pipeline.ps1` and the workflow in `TECHNICAL_README.md`.
+The final outputs are already included. To rerun the pipeline from the source input, use `run_policy_tree_pipeline.ps1` and the workflow in `TECHNICAL_README.md`. This script is a full rerun template and is not required for basic review.
 
 Primary input:
 
@@ -72,6 +108,8 @@ data/final_tree/policy_tree_final.json
 
 ## Notes For Reviewers
 
-`policy_tree_eval` is not included in this public package. It was kept locally only as a consistency check: its input tree matches the 353-node final tree by extracted-file SHA256, but its scores were not used in the paper's main results.
+The public evaluation module is in `evaluation/`. Its archived outputs evaluate the same 353-node final tree and include deterministic structure checks, sampled node/path judge inputs, model judge outputs, agreement tables, divergent-sample reports, and final summaries.
+
+The legacy local directory name `policy_tree_eval` is intentionally not restored. The legacy input `v4_tree_final.json` maps to `data/final_tree/policy_tree_final.json`.
 
 See `PUBLICATION_SNAPSHOT.md` for the fixed publication snapshot and `replication_package.md` for the package index.

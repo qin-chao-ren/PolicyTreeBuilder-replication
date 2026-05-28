@@ -1,0 +1,3 @@
+﻿dimension,weighted_kappa_A_kimi_VS_B_claude,n_A_kimi_VS_B_claude,weighted_kappa_A_kimi_VS_C_gemini,n_A_kimi_VS_C_gemini,weighted_kappa_B_claude_VS_C_gemini,n_B_claude_VS_C_gemini,mean_pairwise_weighted_kappa,krippendorff_alpha_ordinal
+path_coherence,0.451,51,0.413,51,0.506,51,0.457,0.406
+granularity_progression,0.18,51,0.251,51,0.517,51,0.316,0.26

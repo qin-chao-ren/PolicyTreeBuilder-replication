@@ -1,0 +1,5982 @@
+[
+  {
+    "sample_id": "N0000_L1_N762e6689",
+    "node_id": "L1_N762e6689",
+    "node_label": "战略规划与治理",
+    "level": "L1",
+    "max_score_diff": 1,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 4,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 4,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 5,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0002_L1_N70e79b29",
+    "node_id": "L1_N70e79b29",
+    "node_label": "市场主体与网络",
+    "level": "L1",
+    "max_score_diff": 2,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 3,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 4,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 5,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0003_L1_N6be998d8",
+    "node_id": "L1_N6be998d8",
+    "node_label": "通关与口岸效能",
+    "level": "L1",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 4,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 5,
+        "label_quality": 5
+      },
+      "C_gemini": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 5,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0004_L1_N6bbea948",
+    "node_id": "L1_N6bbea948",
+    "node_label": "智慧绿色转型",
+    "level": "L1",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 4,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 4,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 5,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0005_L1_N52f6895e",
+    "node_id": "L1_N52f6895e",
+    "node_label": "区域协同与产业联动",
+    "level": "L1",
+    "max_score_diff": 2,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 4,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 4,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 5,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0006_L1_N604d4c42",
+    "node_id": "L1_N604d4c42",
+    "node_label": "资源与要素保障",
+    "level": "L1",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 4,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 4,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 4,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0007_L2_N8ed52793",
+    "node_id": "L2_N8ed52793",
+    "node_label": "强化政策引导支持",
+    "level": "L2",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 3,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0008_L2_N6db20b9a",
+    "node_id": "L2_N6db20b9a",
+    "node_label": "提升服务管理水平",
+    "level": "L2",
+    "max_score_diff": 2,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0009_L2_Nd5d2d592",
+    "node_id": "L2_Nd5d2d592",
+    "node_label": "强化战略统筹引领",
+    "level": "L2",
+    "max_score_diff": 2,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": false,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0010_L2_N242a428d",
+    "node_id": "L2_N242a428d",
+    "node_label": "加强政策协同创新",
+    "level": "L2",
+    "max_score_diff": 1,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0012_L2_N578f3b8a",
+    "node_id": "L2_N578f3b8a",
+    "node_label": "提升国际货运服务能力",
+    "level": "L2",
+    "max_score_diff": 1,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0013_L1_N762e6689_BR_c43b41",
+    "node_id": "L1_N762e6689_BR_c43b41",
+    "node_label": "规划顶层设计",
+    "level": "L2",
+    "max_score_diff": 1,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 3,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0014_L1_N6e836104_BR_7637d7",
+    "node_id": "L1_N6e836104_BR_7637d7",
+    "node_label": "枢纽规划与建设",
+    "level": "L2",
+    "max_score_diff": 1,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 4,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0015_L2_Nd8a500a1",
+    "node_id": "L2_Nd8a500a1",
+    "node_label": "加快完善枢纽规划布局",
+    "level": "L2",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0016_L2_N0a6e8ca5",
+    "node_id": "L2_N0a6e8ca5",
+    "node_label": "加快推进基础设施建设",
+    "level": "L2",
+    "max_score_diff": 2,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 1,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 1,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0017_L2_N7d5270bf",
+    "node_id": "L2_N7d5270bf",
+    "node_label": "集中力量建设中国国际航空物流中心",
+    "level": "L2",
+    "max_score_diff": 2,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0018_L1_N6e836104_BR_99d8b8",
+    "node_id": "L1_N6e836104_BR_99d8b8",
+    "node_label": "基础设施建设",
+    "level": "L2",
+    "max_score_diff": 2,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 1,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0019_L1_N6e836104_BR_c83016",
+    "node_id": "L1_N6e836104_BR_c83016",
+    "node_label": "货运基础设施",
+    "level": "L2",
+    "max_score_diff": 1,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 4,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0020_L2_Nadf8c478",
+    "node_id": "L2_Nadf8c478",
+    "node_label": "完善机场货运基础设施",
+    "level": "L2",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 1,
+        "horizontal_coherence": 1,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0021_L1_N6e836104_BR_7c2433",
+    "node_id": "L1_N6e836104_BR_7c2433",
+    "node_label": "物流体系与通达性",
+    "level": "L2",
+    "max_score_diff": 1,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 4,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 4,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0022_L1_N6e836104_BR_e7aeb0",
+    "node_id": "L1_N6e836104_BR_e7aeb0",
+    "node_label": "资源与运营保障",
+    "level": "L2",
+    "max_score_diff": 2,
+    "worst_dim": "label_quality",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 3,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 4,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 4,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0023_L1_N70e79b29_BR_6c0dca",
+    "node_id": "L1_N70e79b29_BR_6c0dca",
+    "node_label": "市场主体引育",
+    "level": "L2",
+    "max_score_diff": 2,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": false,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 1,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0024_L1_N70e79b29_BR_02c746",
+    "node_id": "L1_N70e79b29_BR_02c746",
+    "node_label": "市场拓展与推介",
+    "level": "L2",
+    "max_score_diff": 2,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 4,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0025_L1_N70e79b29_BR_6c0dca_7ecc",
+    "node_id": "L1_N70e79b29_BR_6c0dca_7ecc",
+    "node_label": "市场主体引育",
+    "level": "L2",
+    "max_score_diff": 3,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 4,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 1,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0026_L1_N70e79b29_BR_ec0720",
+    "node_id": "L1_N70e79b29_BR_ec0720",
+    "node_label": "航空货运网络",
+    "level": "L2",
+    "max_score_diff": 2,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 4,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0027_L1_N70e79b29_BR_2ba3df",
+    "node_id": "L1_N70e79b29_BR_2ba3df",
+    "node_label": "载体与物流创新",
+    "level": "L2",
+    "max_score_diff": 2,
+    "worst_dim": "label_quality",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 3,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0028_L2_Ne455f9ae",
+    "node_id": "L2_Ne455f9ae",
+    "node_label": "自贸赋能临空产业",
+    "level": "L2",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0029_L1_N6be998d8_BR_8df89b",
+    "node_id": "L1_N6be998d8_BR_8df89b",
+    "node_label": "空港口岸优化",
+    "level": "L2",
+    "max_score_diff": 2,
+    "worst_dim": "label_quality",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 1,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 1,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0031_L2_Nbde783bd",
+    "node_id": "L2_Nbde783bd",
+    "node_label": "优化航空口岸服务环境",
+    "level": "L2",
+    "max_score_diff": 2,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": false,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0032_L2_N227589e0",
+    "node_id": "L2_N227589e0",
+    "node_label": "提升口岸服务效能",
+    "level": "L2",
+    "max_score_diff": 2,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 1,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0034_L1_N6be998d8_BR_995bce",
+    "node_id": "L1_N6be998d8_BR_995bce",
+    "node_label": "费用与通关便利",
+    "level": "L2",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 3,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0035_L1_N6be998d8_BR_b1e228",
+    "node_id": "L1_N6be998d8_BR_b1e228",
+    "node_label": "通关便利化",
+    "level": "L2",
+    "max_score_diff": 2,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 1,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0036_L2_Ne1879105",
+    "node_id": "L2_Ne1879105",
+    "node_label": "提升枢纽智慧水平",
+    "level": "L2",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0037_L2_Na75f0b05",
+    "node_id": "L2_Na75f0b05",
+    "node_label": "提升枢纽绿色水平",
+    "level": "L2",
+    "max_score_diff": 1,
+    "worst_dim": "label_quality",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 3,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0038_L2_Nc8ab6162",
+    "node_id": "L2_Nc8ab6162",
+    "node_label": "提高智慧韧性水平",
+    "level": "L2",
+    "max_score_diff": 2,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 3,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0039_L2_Nfdcfd3c4",
+    "node_id": "L2_Nfdcfd3c4",
+    "node_label": "智慧货运高效管理",
+    "level": "L2",
+    "max_score_diff": 1,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0040_L1_N6bbea948_BR_3d6bc6",
+    "node_id": "L1_N6bbea948_BR_3d6bc6",
+    "node_label": "航空货运转型",
+    "level": "L2",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      }
+    }
+  },
+  {
+    "sample_id": "N0041_L2_Nc81ee0b8",
+    "node_id": "L2_Nc81ee0b8",
+    "node_label": "大力拓展货源腹地",
+    "level": "L2",
+    "max_score_diff": 1,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 4,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 4,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0042_L2_N6d9c5da7",
+    "node_id": "L2_N6d9c5da7",
+    "node_label": "营造宜商宜业环境",
+    "level": "L2",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 3,
+        "label_quality": 3
+      }
+    }
+  },
+  {
+    "sample_id": "N0043_L2_Na5b73aaf",
+    "node_id": "L2_Na5b73aaf",
+    "node_label": "推动区港联动发展",
+    "level": "L2",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 4,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 4,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0044_L2_N4f9516d8",
+    "node_id": "L2_N4f9516d8",
+    "node_label": "大力发展航空经济",
+    "level": "L2",
+    "max_score_diff": 2,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 4,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 4,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 4,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0045_L2_Nd825449f",
+    "node_id": "L2_Nd825449f",
+    "node_label": "延伸产业丰富业态",
+    "level": "L2",
+    "max_score_diff": 2,
+    "worst_dim": "label_quality",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 3,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 4,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0046_L2_N649ec6c7",
+    "node_id": "L2_N649ec6c7",
+    "node_label": "扎实做好货物运输保障",
+    "level": "L2",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 4,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0047_L2_N9f46f3fd",
+    "node_id": "L2_N9f46f3fd",
+    "node_label": "继续做好航空资源保障",
+    "level": "L2",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 3,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 3
+      }
+    }
+  },
+  {
+    "sample_id": "N0048_L2_Nbd50000d",
+    "node_id": "L2_Nbd50000d",
+    "node_label": "持续提升服务保障能力",
+    "level": "L2",
+    "max_score_diff": 1,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 3,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0049_L2_N306e9a75",
+    "node_id": "L2_N306e9a75",
+    "node_label": "强化基础能力保障",
+    "level": "L2",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 3,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 3,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0050_L2_Nff3b5230",
+    "node_id": "L2_Nff3b5230",
+    "node_label": "聚集航空物流资源要素",
+    "level": "L2",
+    "max_score_diff": 2,
+    "worst_dim": "label_quality",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0051_L2_N24b2144b",
+    "node_id": "L2_N24b2144b",
+    "node_label": "加大政策扶持力度",
+    "level": "L2",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 4,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0053_L2_Nfdcfd3c4_BR_a78b7b",
+    "node_id": "L2_Nfdcfd3c4_BR_a78b7b",
+    "node_label": "资金引入",
+    "level": "L3",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 1,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 1,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0055_L2_Nd825449f_BR_4fe323",
+    "node_id": "L2_Nd825449f_BR_4fe323",
+    "node_label": "交易中心建设",
+    "level": "L3",
+    "max_score_diff": 2,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 3,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 3,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0056_L2_N4f9516d8_BR_ebb95b",
+    "node_id": "L2_N4f9516d8_BR_ebb95b",
+    "node_label": "航空维修支持",
+    "level": "L3",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0057_L3_N09522c48",
+    "node_id": "L3_N09522c48",
+    "node_label": "推进智慧平台建设",
+    "level": "L3",
+    "max_score_diff": 2,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0058_L2_Nb80d9c6e",
+    "node_id": "L2_Nb80d9c6e",
+    "node_label": "提升航空货运枢纽集疏运能力",
+    "level": "L3",
+    "max_score_diff": 2,
+    "worst_dim": "label_quality",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 1,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0059_L1_N70e79b29_BR_c48137",
+    "node_id": "L1_N70e79b29_BR_c48137",
+    "node_label": "货运航线网络",
+    "level": "L3",
+    "max_score_diff": 1,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 4,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 4,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 3,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0061_L3_N7e9ff5f6",
+    "node_id": "L3_N7e9ff5f6",
+    "node_label": "提升航空口岸便利化水平",
+    "level": "L3",
+    "max_score_diff": 2,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 1,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0062_L3_Ne455f9ae",
+    "node_id": "L3_Ne455f9ae",
+    "node_label": "发挥自贸试验区优势赋能临空产业发展",
+    "level": "L3",
+    "max_score_diff": 2,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 3,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 2
+      },
+      "C_gemini": {
+        "vertical_coherence": 1,
+        "horizontal_coherence": 1,
+        "label_quality": 3
+      }
+    }
+  },
+  {
+    "sample_id": "N0063_L1_N70e79b29_BR_a56c84",
+    "node_id": "L1_N70e79b29_BR_a56c84",
+    "node_label": "产业载体建设",
+    "level": "L3",
+    "max_score_diff": 2,
+    "worst_dim": "label_quality",
+    "flag_disagree": false,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 5,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 4,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 5,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0065_L3_N1b187997",
+    "node_id": "L3_N1b187997",
+    "node_label": "提升航空货运智慧化水平",
+    "level": "L3",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0068_L3_N48dcd88a",
+    "node_id": "L3_N48dcd88a",
+    "node_label": "助力基地航空公司发展",
+    "level": "L3",
+    "max_score_diff": 2,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 4,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 3,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 5,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0070_L3_N9c47a867",
+    "node_id": "L3_N9c47a867",
+    "node_label": "推进智慧物流建设",
+    "level": "L3",
+    "max_score_diff": 2,
+    "worst_dim": "label_quality",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 3,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0071_L4_N08407b0e",
+    "node_id": "L4_N08407b0e",
+    "node_label": "增强经营实力",
+    "level": "L3",
+    "max_score_diff": 1,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 1,
+        "label_quality": 2
+      },
+      "C_gemini": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      }
+    }
+  },
+  {
+    "sample_id": "N0072_L3_Nf50b9a9d",
+    "node_id": "L3_Nf50b9a9d",
+    "node_label": "推进临空经济发展",
+    "level": "L3",
+    "max_score_diff": 2,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 1,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0073_L3_N578f3b8a",
+    "node_id": "L3_N578f3b8a",
+    "node_label": "提升跨境电子商务国际货运服务能力",
+    "level": "L3",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 3
+      }
+    }
+  },
+  {
+    "sample_id": "N0074_L1_N70e79b29_BR_6c0dca_BR_f11806",
+    "node_id": "L1_N70e79b29_BR_6c0dca_BR_f11806",
+    "node_label": "主体培育",
+    "level": "L3",
+    "max_score_diff": 1,
+    "worst_dim": "label_quality",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0075_L4_Nfb48b97b",
+    "node_id": "L4_Nfb48b97b",
+    "node_label": "强化大通关基地与自贸试验区机场片区联动发展",
+    "level": "L3",
+    "max_score_diff": 2,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 1,
+        "label_quality": 2
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0076_L2_N4f9516d8_BR_a9e426",
+    "node_id": "L2_N4f9516d8_BR_a9e426",
+    "node_label": "临空产业推进",
+    "level": "L3",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0078_L2_Nb22f5139",
+    "node_id": "L2_Nb22f5139",
+    "node_label": "全面改善枢纽运营环境",
+    "level": "L3",
+    "max_score_diff": 2,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 3,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0079_L3_N792037db",
+    "node_id": "L3_N792037db",
+    "node_label": "优化简化货物安检流程",
+    "level": "L3",
+    "max_score_diff": 2,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0080_L3_N9815851a",
+    "node_id": "L3_N9815851a",
+    "node_label": "大力培育适航产业",
+    "level": "L3",
+    "max_score_diff": 2,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 4,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0081_L3_N5383b7aa",
+    "node_id": "L3_N5383b7aa",
+    "node_label": "创新发展管理模式",
+    "level": "L3",
+    "max_score_diff": 2,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 4,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 4,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0082_L2_N60c3ab56",
+    "node_id": "L2_N60c3ab56",
+    "node_label": "构建多式联运物流体系",
+    "level": "L3",
+    "max_score_diff": 1,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 4,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 4,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 3,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0083_L3_N42402ab1",
+    "node_id": "L3_N42402ab1",
+    "node_label": "提升口岸通关便利化水平",
+    "level": "L3",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 4,
+        "label_quality": 5
+      },
+      "B_claude": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 4,
+        "label_quality": 5
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0084_L3_Nef0fcc52",
+    "node_id": "L3_Nef0fcc52",
+    "node_label": "出台新一轮专项扶持政策",
+    "level": "L3",
+    "max_score_diff": 2,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 4,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0086_L2_N578f3b8a_BR_5b483d",
+    "node_id": "L2_N578f3b8a_BR_5b483d",
+    "node_label": "口岸通关优化",
+    "level": "L3",
+    "max_score_diff": 2,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 5,
+        "label_quality": 5
+      },
+      "C_gemini": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 3,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0087_L3_N3494c85c",
+    "node_id": "L3_N3494c85c",
+    "node_label": "东盟电商服务拓展",
+    "level": "L3",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 1,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0088_L3_Na5cf0ba6",
+    "node_id": "L3_Na5cf0ba6",
+    "node_label": "完善航空物流配套设施",
+    "level": "L3",
+    "max_score_diff": 2,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 5,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0090_L1_N70e79b29_BR_6c0dca_BR_8b6dc1",
+    "node_id": "L1_N70e79b29_BR_6c0dca_BR_8b6dc1",
+    "node_label": "主体引育专项",
+    "level": "L3",
+    "max_score_diff": 1,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 3,
+        "label_quality": 2
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      }
+    }
+  },
+  {
+    "sample_id": "N0091_L3_Nd003c070",
+    "node_id": "L3_Nd003c070",
+    "node_label": "加快中国国际航空物流中心载体建设",
+    "level": "L3",
+    "max_score_diff": 2,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 1,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 1,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0092_L3_N84a28744",
+    "node_id": "L3_N84a28744",
+    "node_label": "打造高效便利的营商环境",
+    "level": "L3",
+    "max_score_diff": 3,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 5,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0094_L3_N51765af4",
+    "node_id": "L3_N51765af4",
+    "node_label": "优化航空物流产业生态系统",
+    "level": "L3",
+    "max_score_diff": 2,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 3,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 1,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 1,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0095_L3_Na04441bf",
+    "node_id": "L3_Na04441bf",
+    "node_label": "争取民航国家政策支持",
+    "level": "L3",
+    "max_score_diff": 2,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 5,
+        "label_quality": 5
+      },
+      "C_gemini": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 4,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0096_L3_N724f0a0b",
+    "node_id": "L3_N724f0a0b",
+    "node_label": "加强与重点产业园区对接",
+    "level": "L3",
+    "max_score_diff": 1,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0097_L2_Na5b73aaf_BR_6c5234",
+    "node_id": "L2_Na5b73aaf_BR_6c5234",
+    "node_label": "区港联动项目",
+    "level": "L3",
+    "max_score_diff": 1,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 3,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 3,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0099_L3_N4b540045",
+    "node_id": "L3_N4b540045",
+    "node_label": "加快大通关基地建设运营",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0101_L2_N8228268e_BR_50c2c9",
+    "node_id": "L2_N8228268e_BR_50c2c9",
+    "node_label": "货运设施智能化",
+    "level": "L4",
+    "max_score_diff": 2,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0102_L4_Na35a474b",
+    "node_id": "L4_Na35a474b",
+    "node_label": "引入战略投资者",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0103_L2_N27ba78e2",
+    "node_id": "L2_N27ba78e2",
+    "node_label": "发展临空经济",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0104_L3_Ne96a4ba3",
+    "node_id": "L3_Ne96a4ba3",
+    "node_label": "增强航空货运基础保障能力",
+    "level": "L4",
+    "max_score_diff": 2,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0105_L4_Nea0a385e",
+    "node_id": "L4_Nea0a385e",
+    "node_label": "实现货物状态可视化",
+    "level": "L4",
+    "max_score_diff": 2,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 5,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 5,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 5,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0106_L3_N55664f5d",
+    "node_id": "L3_N55664f5d",
+    "node_label": "开展航空货运发展专项研究",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0107_L2_N60c3ab56_BR_cc3c6f",
+    "node_id": "L2_N60c3ab56_BR_cc3c6f",
+    "node_label": "电商物流协同",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0109_L3_N9ae5e272",
+    "node_id": "L3_N9ae5e272",
+    "node_label": "统筹一级货站功能",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 4,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 4,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0110_L4_N2d19c279",
+    "node_id": "L4_N2d19c279",
+    "node_label": "引育优质货运代理",
+    "level": "L4",
+    "max_score_diff": 2,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 1,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0111_L3_N29e43ee4",
+    "node_id": "L3_N29e43ee4",
+    "node_label": "全货运包机基地建设",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0112_L2_N640a2992",
+    "node_id": "L2_N640a2992",
+    "node_label": "优化供应链管理",
+    "level": "L4",
+    "max_score_diff": 2,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0113_L4_N31c774ef",
+    "node_id": "L4_N31c774ef",
+    "node_label": "加强与货运航空公司合作",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0114_L4_N0188902d",
+    "node_id": "L4_N0188902d",
+    "node_label": "建设跨境产业园",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0115_L2_N709fdde1",
+    "node_id": "L2_N709fdde1",
+    "node_label": "市场主体培育",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 1,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 1,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0116_L2_Nbfebbffa",
+    "node_id": "L2_Nbfebbffa",
+    "node_label": "构建优质航线网络",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0118_L3_N303eccc1",
+    "node_id": "L3_N303eccc1",
+    "node_label": "打造精品中转航线网络",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0119_L4_Nf3f8f8c3",
+    "node_id": "L4_Nf3f8f8c3",
+    "node_label": "提供门到门物流服务",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 4,
+        "label_quality": 5
+      },
+      "C_gemini": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 4,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0120_L4_N162d5723",
+    "node_id": "L4_N162d5723",
+    "node_label": "加强国内外航空货运市场推介",
+    "level": "L4",
+    "max_score_diff": 2,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      }
+    }
+  },
+  {
+    "sample_id": "N0121_L3_N3ba23cb1",
+    "node_id": "L3_N3ba23cb1",
+    "node_label": "拓展货运中转服务",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0122_L2_N8e687f9d",
+    "node_id": "L2_N8e687f9d",
+    "node_label": "构建全球航空货运网络",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 1,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0123_L4_N6c7fdcaf",
+    "node_id": "L4_N6c7fdcaf",
+    "node_label": "强化电子商务发展政策支持",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 3,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0124_L3_N3810ecfd",
+    "node_id": "L3_N3810ecfd",
+    "node_label": "推动区域机场合作",
+    "level": "L4",
+    "max_score_diff": 3,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 3,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0125_L4_N8d005590",
+    "node_id": "L4_N8d005590",
+    "node_label": "健全应急物流包机服务体系",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0128_L3_N94978a33",
+    "node_id": "L3_N94978a33",
+    "node_label": "提升客机腹舱运力",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0129_L4_Nb4e3c0ce",
+    "node_id": "L4_Nb4e3c0ce",
+    "node_label": "开展多形式中转业务",
+    "level": "L4",
+    "max_score_diff": 2,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0130_L3_N86ef6403",
+    "node_id": "L3_N86ef6403",
+    "node_label": "强化国际货运航班时刻供给",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 1,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0131_L4_Ne55e384d",
+    "node_id": "L4_Ne55e384d",
+    "node_label": "统筹单据电子化与标准化建设",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "label_quality",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 5,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 5,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 5,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0132_L3_N0362ceea",
+    "node_id": "L3_N0362ceea",
+    "node_label": "加快完善口岸功能",
+    "level": "L4",
+    "max_score_diff": 2,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 4,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 5,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0133_L3_Nd571b089",
+    "node_id": "L3_Nd571b089",
+    "node_label": "提升装备专业化水平",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0134_L2_Ne4cef915_BR_f9b7ac",
+    "node_id": "L2_Ne4cef915_BR_f9b7ac",
+    "node_label": "运力提升措施",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 1,
+        "label_quality": 2
+      },
+      "C_gemini": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      }
+    }
+  },
+  {
+    "sample_id": "N0135_L3_Na1b5b8e4",
+    "node_id": "L3_Na1b5b8e4",
+    "node_label": "加快国际航空物流中心载体建设",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 4,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 4,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0136_L3_N198ad664",
+    "node_id": "L3_N198ad664",
+    "node_label": "积极打造中转航线",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "label_quality",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0138_L3_N640a2992",
+    "node_id": "L3_N640a2992",
+    "node_label": "进一步优化供应链管理",
+    "level": "L5",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 3,
+        "label_quality": 2
+      },
+      "B_claude": {
+        "vertical_coherence": 1,
+        "horizontal_coherence": 2,
+        "label_quality": 2
+      },
+      "C_gemini": {
+        "vertical_coherence": 1,
+        "horizontal_coherence": 2,
+        "label_quality": 2
+      }
+    }
+  },
+  {
+    "sample_id": "N0139_L3_Nc56580b0",
+    "node_id": "L3_Nc56580b0",
+    "node_label": "提升运力供给水平",
+    "level": "L5",
+    "max_score_diff": 1,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 1,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0140_L2_N640a2992_BR_b1b518",
+    "node_id": "L2_N640a2992_BR_b1b518",
+    "node_label": "供应链金融支持",
+    "level": "L5",
+    "max_score_diff": 2,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 1,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0141_L3_Ne5a02d74",
+    "node_id": "L3_Ne5a02d74",
+    "node_label": "提升中转联运功能",
+    "level": "L5",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0142_L3_Nc97533ee",
+    "node_id": "L3_Nc97533ee",
+    "node_label": "引进航司提升运力",
+    "level": "L5",
+    "max_score_diff": 2,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": false,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 1,
+        "horizontal_coherence": 1,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 1,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0143_L3_Nd551ce89",
+    "node_id": "L3_Nd551ce89",
+    "node_label": "发展航空中转集拼业务",
+    "level": "L5",
+    "max_score_diff": 1,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0145_L3_Nb394347b",
+    "node_id": "L3_Nb394347b",
+    "node_label": "优化简化安检流程",
+    "level": "L5",
+    "max_score_diff": 3,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0146_L3_N9a9d4b5c",
+    "node_id": "L3_N9a9d4b5c",
+    "node_label": "支持多元市场主体发展",
+    "level": "L5",
+    "max_score_diff": 2,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 1,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0147_L3_N90c2cae1",
+    "node_id": "L3_N90c2cae1",
+    "node_label": "企业运营环境优化",
+    "level": "L5",
+    "max_score_diff": 2,
+    "worst_dim": "label_quality",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 1,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0148_L2_Nf64b0b03_BR_2e222e",
+    "node_id": "L2_Nf64b0b03_BR_2e222e",
+    "node_label": "物流园区建设",
+    "level": "L5",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0149_L4_Nea99104a",
+    "node_id": "L4_Nea99104a",
+    "node_label": "做大跨境电商和国际航空货运规模",
+    "level": "L5",
+    "max_score_diff": 1,
+    "worst_dim": "label_quality",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 2
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 2
+      },
+      "C_gemini": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      }
+    }
+  },
+  {
+    "sample_id": "N0150_L3_Nf8bb4ea7",
+    "node_id": "L3_Nf8bb4ea7",
+    "node_label": "加强集疏运体系建设",
+    "level": "L5",
+    "max_score_diff": 1,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0152_L4_N7d2d45d8",
+    "node_id": "L4_N7d2d45d8",
+    "node_label": "推进冷链物流基础设施建设",
+    "level": "L5",
+    "max_score_diff": 2,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 5,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0154_L3_Nf3b017a0",
+    "node_id": "L3_Nf3b017a0",
+    "node_label": "完善国际货运航线",
+    "level": "L5",
+    "max_score_diff": 2,
+    "worst_dim": "label_quality",
+    "flag_disagree": false,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 1,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0155_L4_N5e94e625",
+    "node_id": "L4_N5e94e625",
+    "node_label": "推动跨境电商企业数字化转型",
+    "level": "L5",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0156_L4_N5fc249ab",
+    "node_id": "L4_N5fc249ab",
+    "node_label": "规划配置陆侧道路",
+    "level": "L6",
+    "max_score_diff": 2,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 4,
+        "label_quality": 5
+      },
+      "B_claude": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 4,
+        "label_quality": 5
+      },
+      "C_gemini": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0157_L4_Ndfac356a",
+    "node_id": "L4_Ndfac356a",
+    "node_label": "规划配置货机位",
+    "level": "L6",
+    "max_score_diff": 2,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 4,
+        "label_quality": 5
+      },
+      "B_claude": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 4,
+        "label_quality": 5
+      },
+      "C_gemini": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0158_L4_Nb11795db",
+    "node_id": "L4_Nb11795db",
+    "node_label": "开通贸易密切城市航线",
+    "level": "L6",
+    "max_score_diff": 2,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 5,
+        "label_quality": 5
+      },
+      "C_gemini": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 4,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0159_L4_Na37f8214",
+    "node_id": "L4_Na37f8214",
+    "node_label": "引导国际货运航线布局与制造业需求对接",
+    "level": "L6",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 3,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 4,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 4,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0160_L4_Na8ba2f4a",
+    "node_id": "L4_Na8ba2f4a",
+    "node_label": "探索开展多式联运",
+    "level": "L6",
+    "max_score_diff": 1,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 3,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 2
+      },
+      "C_gemini": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      }
+    }
+  },
+  {
+    "sample_id": "N0161_L4_Nb967aed3",
+    "node_id": "L4_Nb967aed3",
+    "node_label": "加强与国际机场合作",
+    "level": "L6",
+    "max_score_diff": 2,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 3,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 4,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0162_L3_N65606e29",
+    "node_id": "L3_N65606e29",
+    "node_label": "强化陆运集货网络",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 1,
+        "horizontal_coherence": 1,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0163_L2_N578f3b8a_BR_6092b1",
+    "node_id": "L2_N578f3b8a_BR_6092b1",
+    "node_label": "航空货运枢纽建设",
+    "level": "L3",
+    "max_score_diff": 2,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 5
+      },
+      "B_claude": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 5,
+        "label_quality": 5
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 4,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0164_L4_Nfdd2124b",
+    "node_id": "L4_Nfdd2124b",
+    "node_label": "加快引进货运航司",
+    "level": "L6",
+    "max_score_diff": 1,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 1,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0165_L3_Naeed249a",
+    "node_id": "L3_Naeed249a",
+    "node_label": "加强招商",
+    "level": "L5",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 2
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 1,
+        "label_quality": 3
+      }
+    }
+  },
+  {
+    "sample_id": "N0166_L3_Nccfe417c",
+    "node_id": "L3_Nccfe417c",
+    "node_label": "强化国际航空货运航线供给",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 1,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0167_L4_Na1c24377",
+    "node_id": "L4_Na1c24377",
+    "node_label": "推进跨境电商产业园区建设",
+    "level": "L5",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 1,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0168_L3_Ned79e54c",
+    "node_id": "L3_Ned79e54c",
+    "node_label": "强化服务保障能力",
+    "level": "L5",
+    "max_score_diff": 2,
+    "worst_dim": "label_quality",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 2
+      },
+      "C_gemini": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0170_L4_N6bcc2030",
+    "node_id": "L4_N6bcc2030",
+    "node_label": "构建高效的航空物流地面集散体系",
+    "level": "L6",
+    "max_score_diff": 2,
+    "worst_dim": "label_quality",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0171_L2_Nbfebbffa_BR_cc65d1",
+    "node_id": "L2_Nbfebbffa_BR_cc65d1",
+    "node_label": "航线网络布局",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 1,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 1,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0172_L4_Nbc7f4787",
+    "node_id": "L4_Nbc7f4787",
+    "node_label": "推进保税物流园区建设",
+    "level": "L5",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0176_L2_Nd39445b0",
+    "node_id": "L2_Nd39445b0",
+    "node_label": "大力开拓航空物流新兴业态",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0178_L4_N27d838ea",
+    "node_id": "L4_N27d838ea",
+    "node_label": "构建双扇形航线网络布局",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "label_quality",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0180_L2_N9a2b3002",
+    "node_id": "L2_N9a2b3002",
+    "node_label": "鼓励航空货运市场主体开行全货机定期航线",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0181_L2_N926fa20a",
+    "node_id": "L2_N926fa20a",
+    "node_label": "优化拓展货运航线网络",
+    "level": "L4",
+    "max_score_diff": 2,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 1,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0182_L2_N68c2aa93",
+    "node_id": "L2_N68c2aa93",
+    "node_label": "提升货源组织能力",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0184_L2_N68c2aa93_BR_1322ba",
+    "node_id": "L2_N68c2aa93_BR_1322ba",
+    "node_label": "货源拓展",
+    "level": "L5",
+    "max_score_diff": 1,
+    "worst_dim": "label_quality",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0185_L3_Nea54495c",
+    "node_id": "L3_Nea54495c",
+    "node_label": "加快机场货运重大项目建设",
+    "level": "L3",
+    "max_score_diff": 2,
+    "worst_dim": "label_quality",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0186_L3_Nb0e7dd4f",
+    "node_id": "L3_Nb0e7dd4f",
+    "node_label": "加快数字基建建设",
+    "level": "L5",
+    "max_score_diff": 2,
+    "worst_dim": "label_quality",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 1,
+        "horizontal_coherence": 1,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0187_L4_N9596affd",
+    "node_id": "L4_N9596affd",
+    "node_label": "积极推进机场各货运区规划建设",
+    "level": "L6",
+    "max_score_diff": 2,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 2
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      }
+    }
+  },
+  {
+    "sample_id": "N0188_L2_N08a346fe",
+    "node_id": "L2_N08a346fe",
+    "node_label": "构建国际航线网络",
+    "level": "L4",
+    "max_score_diff": 2,
+    "worst_dim": "label_quality",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 1,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0190_L3_N74ff71bd",
+    "node_id": "L3_N74ff71bd",
+    "node_label": "强化行业资源供给",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 1,
+        "label_quality": 2
+      },
+      "C_gemini": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      }
+    }
+  },
+  {
+    "sample_id": "N0191_L3_Nc3e4e468",
+    "node_id": "L3_Nc3e4e468",
+    "node_label": "推进临空经济发展",
+    "level": "L5",
+    "max_score_diff": 1,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 1,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 1,
+        "horizontal_coherence": 1,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 1,
+        "horizontal_coherence": 1,
+        "label_quality": 3
+      }
+    }
+  },
+  {
+    "sample_id": "N0192_L4_Ne0f95b19",
+    "node_id": "L4_Ne0f95b19",
+    "node_label": "推进航空敏感货物运输业务",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 1,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0193_L1_N70e79b29_BR_167030",
+    "node_id": "L1_N70e79b29_BR_167030",
+    "node_label": "物流服务与业态创新",
+    "level": "L3",
+    "max_score_diff": 2,
+    "worst_dim": "label_quality",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 4,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 4,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 5,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0195_L3_N7c0dd099",
+    "node_id": "L3_N7c0dd099",
+    "node_label": "强化货运枢纽地位",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 1,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0196_L4_N2720f054",
+    "node_id": "L4_N2720f054",
+    "node_label": "补齐机场设施短板",
+    "level": "L6",
+    "max_score_diff": 2,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0197_L3_N18ada171",
+    "node_id": "L3_N18ada171",
+    "node_label": "积极推进跨境电商发展",
+    "level": "L5",
+    "max_score_diff": 1,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0198_L3_Nd290d812",
+    "node_id": "L3_Nd290d812",
+    "node_label": "探索开展多式联运",
+    "level": "L5",
+    "max_score_diff": 1,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 1,
+        "label_quality": 2
+      },
+      "C_gemini": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      }
+    }
+  },
+  {
+    "sample_id": "N0199_L4_N255c1775",
+    "node_id": "L4_N255c1775",
+    "node_label": "推进客货枢纽建设",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 1,
+        "label_quality": 3
+      }
+    }
+  },
+  {
+    "sample_id": "N0200_L4_Nf737d76d",
+    "node_id": "L4_Nf737d76d",
+    "node_label": "加强地面综合交通能力匹配",
+    "level": "L5",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 4,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 4,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 4,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0201_L4_N0e93e380",
+    "node_id": "L4_N0e93e380",
+    "node_label": "加强同制造业融合发展",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 1,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0202_L2_Nc3c2ff15_BR_81365c",
+    "node_id": "L2_Nc3c2ff15_BR_81365c",
+    "node_label": "多式联运网络建设",
+    "level": "L5",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0203_L3_Nb2d030f0",
+    "node_id": "L3_Nb2d030f0",
+    "node_label": "培育物流龙头企业",
+    "level": "L5",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0205_L2_Nf64b0b03",
+    "node_id": "L2_Nf64b0b03",
+    "node_label": "提高物流服务保障效率",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0206_L4_Nf47f4823",
+    "node_id": "L4_Nf47f4823",
+    "node_label": "推动供应链金融快速发展",
+    "level": "L5",
+    "max_score_diff": 1,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 1,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0207_L4_N3ac13c17",
+    "node_id": "L4_N3ac13c17",
+    "node_label": "探索异地货站模式",
+    "level": "L6",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0208_L3_N60c3ab56",
+    "node_id": "L3_N60c3ab56",
+    "node_label": "构建大物流多式联运体系",
+    "level": "L3",
+    "max_score_diff": 2,
+    "worst_dim": "label_quality",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 1,
+        "horizontal_coherence": 1,
+        "label_quality": 2
+      },
+      "C_gemini": {
+        "vertical_coherence": 1,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0209_L3_Nc594b785",
+    "node_id": "L3_Nc594b785",
+    "node_label": "拓展航空货运细分领域",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 3,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0211_L3_N9ecfe06c",
+    "node_id": "L3_N9ecfe06c",
+    "node_label": "提升国际货运中转功能",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0213_L3_N14530829",
+    "node_id": "L3_N14530829",
+    "node_label": "增强机场集疏运能力",
+    "level": "L4",
+    "max_score_diff": 3,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 1,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0214_L3_N8f8e91cf",
+    "node_id": "L3_N8f8e91cf",
+    "node_label": "提升货源与运力组织能力",
+    "level": "L5",
+    "max_score_diff": 1,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 1,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 1,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0215_L2_N0e93e380_BR_1a4623",
+    "node_id": "L2_N0e93e380_BR_1a4623",
+    "node_label": "融合促进措施",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 1,
+        "label_quality": 3
+      }
+    }
+  },
+  {
+    "sample_id": "N0216_L1_N70e79b29_BR_ab4348",
+    "node_id": "L1_N70e79b29_BR_ab4348",
+    "node_label": "市场主体培育",
+    "level": "L4",
+    "max_score_diff": 2,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 1,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 1,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0217_L2_N2f32c229",
+    "node_id": "L2_N2f32c229",
+    "node_label": "增强航空物流服务能力",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0218_L2_N640a2992_BR_500031",
+    "node_id": "L2_N640a2992_BR_500031",
+    "node_label": "运营环境优化",
+    "level": "L5",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 1,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0219_L4_N1b595109",
+    "node_id": "L4_N1b595109",
+    "node_label": "加快引进快递企业航司",
+    "level": "L6",
+    "max_score_diff": 2,
+    "worst_dim": "label_quality",
+    "flag_disagree": false,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0222_L4_Nc38e3e2b",
+    "node_id": "L4_Nc38e3e2b",
+    "node_label": "加快补齐核心资源短板",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 2
+      },
+      "C_gemini": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      }
+    }
+  },
+  {
+    "sample_id": "N0223_L3_N4c90cbd7",
+    "node_id": "L3_N4c90cbd7",
+    "node_label": "完善国际航空货运航线",
+    "level": "L5",
+    "max_score_diff": 3,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 1,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0225_L2_N9ef25cc0",
+    "node_id": "L2_N9ef25cc0",
+    "node_label": "促进航空货量增长",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 1,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0226_L2_Nc3c2ff15",
+    "node_id": "L2_Nc3c2ff15",
+    "node_label": "丰富多式联运体系",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0227_L2_Ne4cef915",
+    "node_id": "L2_Ne4cef915",
+    "node_label": "增加全货机运力",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0228_L2_N27ba78e2_BR_3c6003",
+    "node_id": "L2_N27ba78e2_BR_3c6003",
+    "node_label": "航空货运招商",
+    "level": "L5",
+    "max_score_diff": 2,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 1,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0229_L4_N61514be4",
+    "node_id": "L4_N61514be4",
+    "node_label": "持续发力全货运包机业务",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      }
+    }
+  },
+  {
+    "sample_id": "N0231_L2_N69b20189_BR_05fd1b",
+    "node_id": "L2_N69b20189_BR_05fd1b",
+    "node_label": "货运航空合作",
+    "level": "L4",
+    "max_score_diff": 2,
+    "worst_dim": "label_quality",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0232_L4_N945a64d3",
+    "node_id": "L4_N945a64d3",
+    "node_label": "加密货源丰富地区航线",
+    "level": "L6",
+    "max_score_diff": 2,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 5,
+        "label_quality": 5
+      },
+      "C_gemini": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 4,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0233_L4_Nef2378d9",
+    "node_id": "L4_Nef2378d9",
+    "node_label": "丰富空港口岸资质类型",
+    "level": "L5",
+    "max_score_diff": 2,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 4,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 4,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 5,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0234_L4_N94978a33",
+    "node_id": "L4_N94978a33",
+    "node_label": "提升客机腹舱货邮量",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0235_L4_N219c5452",
+    "node_id": "L4_N219c5452",
+    "node_label": "成立货运机场联盟",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0236_L4_Nc0927f0b",
+    "node_id": "L4_Nc0927f0b",
+    "node_label": "货运基础设施规划建设",
+    "level": "L6",
+    "max_score_diff": 1,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 1,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0239_L2_N8228268e",
+    "node_id": "L2_N8228268e",
+    "node_label": "提升货运设施保障能力",
+    "level": "L3",
+    "max_score_diff": 2,
+    "worst_dim": "label_quality",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0240_L4_N3220a070",
+    "node_id": "L4_N3220a070",
+    "node_label": "着力打造内畅外联航线网络",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 1,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0241_L2_N69b20189",
+    "node_id": "L2_N69b20189",
+    "node_label": "鼓励新设立基地货运航空公司",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0242_L3_N82cdf37d",
+    "node_id": "L3_N82cdf37d",
+    "node_label": "做大空空中转业务",
+    "level": "L5",
+    "max_score_diff": 1,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0243_L2_N08a346fe_BR_7db842",
+    "node_id": "L2_N08a346fe_BR_7db842",
+    "node_label": "国际货运拓展",
+    "level": "L5",
+    "max_score_diff": 2,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0244_L3_N27ba78e2",
+    "node_id": "L3_N27ba78e2",
+    "node_label": "推进临空经济发展",
+    "level": "L5",
+    "max_score_diff": 1,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 1,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 1,
+        "horizontal_coherence": 1,
+        "label_quality": 2
+      },
+      "C_gemini": {
+        "vertical_coherence": 1,
+        "horizontal_coherence": 1,
+        "label_quality": 3
+      }
+    }
+  },
+  {
+    "sample_id": "N0245_L2_N0e93e380",
+    "node_id": "L2_N0e93e380",
+    "node_label": "制造业融合促进",
+    "level": "L4",
+    "max_score_diff": 2,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 1,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 1,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0246_L3_N4da94e7a",
+    "node_id": "L3_N4da94e7a",
+    "node_label": "拓展货源组织",
+    "level": "L5",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 1,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      }
+    }
+  },
+  {
+    "sample_id": "N0248_L2_Nd0b47c6e",
+    "node_id": "L2_Nd0b47c6e",
+    "node_label": "构建全球国际航线网络",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 1,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0249_L3_Nca0d54be",
+    "node_id": "L3_Nca0d54be",
+    "node_label": "引入培育龙头企业",
+    "level": "L5",
+    "max_score_diff": 2,
+    "worst_dim": "label_quality",
+    "flag_disagree": false,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0250_L1_N70e79b29_BR_2ba091",
+    "node_id": "L1_N70e79b29_BR_2ba091",
+    "node_label": "航空货运能力提升",
+    "level": "L3",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 4,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 4,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 4,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0251_L1_N70e79b29_BR_946648_BR_1416e5",
+    "node_id": "L1_N70e79b29_BR_946648_BR_1416e5",
+    "node_label": "货运代理引育",
+    "level": "L4",
+    "max_score_diff": 3,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 1,
+        "label_quality": 5
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 1,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0252_L2_N0109e16a_BR_448437",
+    "node_id": "L2_N0109e16a_BR_448437",
+    "node_label": "通关便利化",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0253_L3_N5c977f92",
+    "node_id": "L3_N5c977f92",
+    "node_label": "引育货运基地航空公司",
+    "level": "L3",
+    "max_score_diff": 2,
+    "worst_dim": "label_quality",
+    "flag_disagree": false,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0254_L4_N6bfccf65",
+    "node_id": "L4_N6bfccf65",
+    "node_label": "规划配置空侧道路和配套办公设施",
+    "level": "L6",
+    "max_score_diff": 2,
+    "worst_dim": "label_quality",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0255_L2_N13abaa5a_BR_9f83a3",
+    "node_id": "L2_N13abaa5a_BR_9f83a3",
+    "node_label": "航空货运枢纽建设",
+    "level": "L5",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0256_L4_N30b235c2",
+    "node_id": "L4_N30b235c2",
+    "node_label": "推动机场功能定位差异化发展",
+    "level": "L4",
+    "max_score_diff": 2,
+    "worst_dim": "label_quality",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0257_L1_N70e79b29_BR_946648",
+    "node_id": "L1_N70e79b29_BR_946648",
+    "node_label": "货运代理引育",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 1,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0258_L2_N13abaa5a",
+    "node_id": "L2_N13abaa5a",
+    "node_label": "增强货运保障能力",
+    "level": "L4",
+    "max_score_diff": 2,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0259_L3_N2d02331f",
+    "node_id": "L3_N2d02331f",
+    "node_label": "鼓励市场主体加强货运能力建设",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 2
+      },
+      "C_gemini": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      }
+    }
+  },
+  {
+    "sample_id": "N0261_L3_Nc92a3618",
+    "node_id": "L3_Nc92a3618",
+    "node_label": "做实空地联运业务",
+    "level": "L5",
+    "max_score_diff": 2,
+    "worst_dim": "label_quality",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0262_L3_N8b934feb",
+    "node_id": "L3_N8b934feb",
+    "node_label": "优化客货运航线网络",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0263_L2_N926fa20a_BR_40d163",
+    "node_id": "L2_N926fa20a_BR_40d163",
+    "node_label": "敏感货物运输",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 1,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0264_L4_Ne346220c",
+    "node_id": "L4_Ne346220c",
+    "node_label": "提升国际航空货运中转与响应能力",
+    "level": "L5",
+    "max_score_diff": 2,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": false,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0267_L3_N06f95f57",
+    "node_id": "L3_N06f95f57",
+    "node_label": "推进航空客货枢纽建设",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 1,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0268_L4_N6834f90a",
+    "node_id": "L4_N6834f90a",
+    "node_label": "推进跨境电商园区建设",
+    "level": "L5",
+    "max_score_diff": 2,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 1,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0270_L2_Nd77a7607",
+    "node_id": "L2_Nd77a7607",
+    "node_label": "鼓励航空货运市场主体向机场集货",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0271_L4_Na5c9f759",
+    "node_id": "L4_Na5c9f759",
+    "node_label": "以运力发展带动航线布局",
+    "level": "L6",
+    "max_score_diff": 2,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 3,
+        "label_quality": 3
+      },
+      "B_claude": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 1,
+        "label_quality": 3
+      },
+      "C_gemini": {
+        "vertical_coherence": 2,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0272_L3_Nd93e3e25",
+    "node_id": "L3_Nd93e3e25",
+    "node_label": "发展临空经济",
+    "level": "L3",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 1,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0273_L4_Na2b3c84a",
+    "node_id": "L4_Na2b3c84a",
+    "node_label": "拓展园区货源",
+    "level": "L5",
+    "max_score_diff": 2,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 1,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0274_L4_N8bd3a8a5",
+    "node_id": "L4_N8bd3a8a5",
+    "node_label": "加快中转硬件设施配套",
+    "level": "L5",
+    "max_score_diff": 1,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 3,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0275_L2_N8c3b0cad",
+    "node_id": "L2_N8c3b0cad",
+    "node_label": "构建覆盖全球的货运航线网络",
+    "level": "L4",
+    "max_score_diff": 1,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 1,
+        "label_quality": 4
+      }
+    }
+  },
+  {
+    "sample_id": "N0276_L4_N256f563d",
+    "node_id": "L4_N256f563d",
+    "node_label": "引进货运航司",
+    "level": "L6",
+    "max_score_diff": 2,
+    "worst_dim": "vertical_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 3,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 5,
+        "horizontal_coherence": 2,
+        "label_quality": 5
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 1,
+        "label_quality": 5
+      }
+    }
+  },
+  {
+    "sample_id": "N0277_L4_N6dc065d5",
+    "node_id": "L4_N6dc065d5",
+    "node_label": "建立供应链服务平台",
+    "level": "L5",
+    "max_score_diff": 1,
+    "worst_dim": "horizontal_coherence",
+    "flag_disagree": true,
+    "scores_by_judge": {
+      "A_kimi": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "B_claude": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 2,
+        "label_quality": 4
+      },
+      "C_gemini": {
+        "vertical_coherence": 4,
+        "horizontal_coherence": 1,
+        "label_quality": 5
+      }
+    }
+  }
+]

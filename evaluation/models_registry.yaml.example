@@ -1,0 +1,30 @@
+version: "public-evaluation-template"
+
+defaults:
+  timeout_s: 120
+  retries: 3
+  temperature: 0.0
+  supports_json_mode: true
+  concurrency: 1
+
+models:
+  A_kimi:
+    provider: openai_compatible
+    model_id_env: A_KIMI_MODEL
+    api_key_env: A_KIMI_API_KEY
+    base_url_env: A_KIMI_BASE_URL
+    max_output_tokens: 1024
+
+  B_claude:
+    provider: openai_compatible
+    model_id_env: B_CLAUDE_MODEL
+    api_key_env: B_CLAUDE_API_KEY
+    base_url_env: B_CLAUDE_BASE_URL
+    max_output_tokens: 1024
+
+  C_gemini:
+    provider: openai_compatible
+    model_id_env: C_GEMINI_MODEL
+    api_key_env: C_GEMINI_API_KEY
+    base_url_env: C_GEMINI_BASE_URL
+    max_output_tokens: 16384

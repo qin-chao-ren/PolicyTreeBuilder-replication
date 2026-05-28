@@ -17,6 +17,7 @@ import copy
 import json
 import math
 import os
+import sys
 import unicodedata
 from pathlib import Path
 from typing import Any
@@ -28,6 +29,10 @@ import matplotlib.patheffects as pe
 import matplotlib.pyplot as plt
 from matplotlib.patches import Wedge
 import numpy as np
+
+SCRIPTS_DIR = Path(__file__).resolve().parents[1] / "scripts"
+if str(SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS_DIR))
 
 from artifact_paths import FINAL_TREE_DIR
 

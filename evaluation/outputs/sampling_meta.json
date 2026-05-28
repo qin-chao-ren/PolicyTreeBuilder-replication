@@ -1,0 +1,62 @@
+{
+  "random_seed": 20260430,
+  "node_sample": {
+    "total_population": 352,
+    "total_sampled": 278,
+    "by_level": {
+      "L1": 7,
+      "L2": 45,
+      "L3": 61,
+      "L4": 85,
+      "L5": 62,
+      "L6": 18
+    },
+    "high_risk_included": 176,
+    "rules": {
+      "L1": "100%",
+      "L2": "100%",
+      "L3": "50%",
+      "L4": "30%",
+      "L5": "30%",
+      "L6": "30%",
+      "force_include": [
+        "sibling_duplicate_label",
+        "label_too_long",
+        "oversized_parent_and_children",
+        "cross_branch_same_label",
+        "level_depth_mismatch",
+        "depth_>=_5"
+      ]
+    }
+  },
+  "path_sample": {
+    "total_population": 272,
+    "total_sampled": 51,
+    "by_l1": {
+      "战略规划与治理": 4,
+      "基础设施与枢纽": 8,
+      "市场主体与网络": 25,
+      "通关与口岸效能": 4,
+      "智慧绿色转型": 3,
+      "区域协同与产业联动": 4,
+      "资源与要素保障": 3
+    },
+    "l1_quota": {
+      "战略规划与治理": 3,
+      "基础设施与枢纽": 6,
+      "市场主体与网络": 19,
+      "通关与口岸效能": 3,
+      "智慧绿色转型": 3,
+      "区域协同与产业联动": 4,
+      "资源与要素保障": 3
+    },
+    "rules": {
+      "target": "~40 (cap 50)",
+      "weighting": "by L1 path count, min 3 per L1",
+      "force_include": [
+        "longest path globally",
+        "paths containing high-risk nodes"
+      ]
+    }
+  }
+}

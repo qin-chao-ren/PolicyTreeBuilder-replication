@@ -18,8 +18,8 @@ The public code and data are based on the source archive that produced the 353-n
 
 ## Evaluation Package
 
-The local `policy_tree_eval` archive is not uploaded. It is retained only as local supporting material because its input tree is the same 353-node tree. Its scoring outputs were not used in the paper's main conclusions.
+The former local `policy_tree_eval` materials have been integrated as the public `evaluation/` module after removing local environments, credentials, caches, and private path assumptions. The archived evaluation outputs evaluate the same 353-node final tree and provide supporting quality checks for reviewers.
 
 ## Non-public Material
 
-The public repository excludes local archives, real `.env` files, API keys, virtual environments, caches, and the superseded 317-node outputs.
+The public repository excludes local archives, real `.env` files, API keys, virtual environments, caches, scratch outputs, and the superseded 317-node package.

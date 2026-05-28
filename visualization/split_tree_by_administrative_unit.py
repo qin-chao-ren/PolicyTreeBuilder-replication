@@ -13,10 +13,15 @@ import argparse
 import csv
 import json
 import re
+import sys
 from collections import defaultdict
 from copy import deepcopy
 from pathlib import Path
 from typing import Any
+
+SCRIPTS_DIR = Path(__file__).resolve().parents[1] / "scripts"
+if str(SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS_DIR))
 
 from artifact_paths import ADMINISTRATIVE_METADATA, FINAL_TREE_DIR, INTERMEDIATE_DIR
 

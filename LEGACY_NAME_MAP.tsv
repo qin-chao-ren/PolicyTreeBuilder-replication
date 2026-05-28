@@ -46,6 +46,9 @@ data/intermediate_outputs/v4_tree_coarse_global.json	data/intermediate_outputs/p
 data/intermediate_outputs/v4_tree_refined.json	data/intermediate_outputs/policy_tree_refined.json	renamed	public replication package naming cleanup
 data/intermediate_outputs/v4_tree_s4_1.json	data/intermediate_outputs/policy_tree_after_vertical_collapse.json	renamed	public replication package naming cleanup
 data/intermediate_outputs/v4_tree_s4_2.json	data/intermediate_outputs/policy_tree_after_structure_balancing.json	renamed	public replication package naming cleanup
+data/intermediate_outputs/v4_units_t5_raw.csv	data/intermediate_outputs/policy_action_units_raw.csv	renamed	public replication package naming cleanup
+data/intermediate_outputs/v4_units_t5_raw_ruled.csv	data/intermediate_outputs/policy_action_units_ruled.csv	renamed	public replication package naming cleanup
+data/intermediate_outputs/v4_audit_dataset_50.json	data/intermediate_outputs/policy_audit_sample.json	renamed	public replication package naming cleanup
 data/intermediate_outputs/roundC_llm_raw.jsonl	data/intermediate_outputs/policy_title_cleaning_llm_raw.jsonl	renamed	public replication package naming cleanup
 data/intermediate_outputs/logs/llm_step4_5_overall.jsonl	data/intermediate_outputs/logs/llm_finalize_policy_tree.jsonl	renamed	public replication package naming cleanup
 scripts/step1_prepare_corpus.py	scripts/prepare_policy_corpus.py	renamed	public replication package naming cleanup
@@ -63,12 +66,12 @@ scripts/step4_1_skeleton.py	scripts/collapse_redundant_hierarchy.py	renamed	publ
 scripts/step4_2_shaping.py	scripts/balance_tree_structure.py	renamed	public replication package naming cleanup
 scripts/step4_3_polishing.py	scripts/polish_tree_labels.py	renamed	public replication package naming cleanup
 scripts/step4_5_overall_structure.py	scripts/finalize_policy_tree.py	renamed	public replication package naming cleanup
-scripts/step5_1_extract_t5.py	scripts/extract_policy_action_units.py	renamed	public replication package naming cleanup
-scripts/step5_data_preparation.py	scripts/prepare_policy_audit_dataset.py	renamed	public replication package naming cleanup
-scripts/fix_tree_levels_for_viz.py	scripts/normalize_tree_levels_for_visualization.py	renamed	public replication package naming cleanup
+scripts/step5_1_extract_t5.py	audit/extract_policy_action_units.py	renamed	public replication package naming cleanup
+scripts/step5_data_preparation.py	audit/prepare_policy_audit_dataset.py	renamed	public replication package naming cleanup
+scripts/fix_tree_levels_for_viz.py	visualization/normalize_tree_levels_for_visualization.py	renamed	public replication package naming cleanup
 scripts/trace_id_lineage.py	scripts/trace_node_lineage.py	renamed	public replication package naming cleanup
-scripts/split_final_tree_by_admin_revised_0509.py	scripts/split_tree_by_administrative_unit.py	renamed	public replication package naming cleanup
-scripts/visualize_radial_tree_v6_style_0510.py	scripts/render_radial_tree_figure.py	renamed	public replication package naming cleanup
+scripts/split_final_tree_by_admin_revised_0509.py	visualization/split_tree_by_administrative_unit.py	renamed	public replication package naming cleanup
+scripts/visualize_radial_tree_v6_style_0510.py	visualization/render_radial_tree_figure.py	renamed	public replication package naming cleanup
 prompts/step1_title_cleaned.md	prompts/clean_policy_titles.md	renamed	public replication package naming cleanup
 prompts/step2_5_calibrate.md	prompts/calibrate_policy_granularity.md	renamed	public replication package naming cleanup
 prompts/step2_8_define_l1.md	prompts/define_top_level_categories.md	renamed	public replication package naming cleanup
@@ -94,3 +97,18 @@ data/intermediate_outputs/logs/llm_step4_shaping.jsonl	data/intermediate_outputs
 data/intermediate_outputs/logs/llm_step4_vertical_collapse.jsonl	data/intermediate_outputs/logs/llm_collapse_redundant_hierarchy.jsonl	renamed	public replication package naming cleanup
 data/intermediate_outputs/logs/llm_step3_merge_decisions.jsonl	data/intermediate_outputs/logs/llm_cluster_merge_decisions.jsonl	renamed	public replication package naming cleanup
 data/intermediate_outputs/logs/llm_step3_classify_decisions.jsonl	data/intermediate_outputs/logs/llm_parent_cluster_assignments.jsonl	renamed	public replication package naming cleanup
+policy_tree_eval/data/v4_tree_final.json	data/final_tree/policy_tree_final.json	renamed	public evaluation input mapped to final public tree
+policy_tree_eval/README.md	evaluation/README.md	rewritten	public evaluation documentation cleanup
+policy_tree_eval/roundC_v5.env.example	evaluation/.env.example	sanitized	removed real credentials and private paths
+policy_tree_eval/models_registry.yaml.example	evaluation/models_registry.yaml.example	sanitized	removed private versioning and credential assumptions
+policy_tree_eval/scripts/01_extract_tables.py	evaluation/scripts/01_extract_tables.py	renamed	public evaluation path and CLI cleanup
+policy_tree_eval/scripts/02_structure_check.py	evaluation/scripts/02_structure_check.py	renamed	public evaluation path and CLI cleanup
+policy_tree_eval/scripts/03_sampling.py	evaluation/scripts/03_sampling.py	renamed	public evaluation path and CLI cleanup
+policy_tree_eval/scripts/04_run_node_judge.py	evaluation/scripts/04_run_node_judge.py	renamed	public evaluation path and CLI cleanup
+policy_tree_eval/scripts/05_run_path_judge.py	evaluation/scripts/05_run_path_judge.py	renamed	public evaluation path and CLI cleanup
+policy_tree_eval/scripts/06_aggregate.py	evaluation/scripts/06_aggregate.py	renamed	public evaluation path and CLI cleanup
+policy_tree_eval/scripts/07_status.py	evaluation/scripts/07_status.py	renamed	public evaluation path and CLI cleanup
+policy_tree_eval/scripts/08_retry_failures.py	evaluation/scripts/08_retry_failures.py	renamed	public evaluation path and CLI cleanup
+policy_tree_eval/scripts/llm_clients.py	evaluation/scripts/llm_clients.py	renamed	public evaluation credential and endpoint cleanup
+policy_tree_eval/scripts/prompts.py	evaluation/scripts/prompts.py	renamed	public evaluation prompt module
+policy_tree_eval/outputs/	evaluation/outputs/	renamed	public archived evaluation outputs

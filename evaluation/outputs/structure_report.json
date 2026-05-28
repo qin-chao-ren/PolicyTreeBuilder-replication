@@ -1,0 +1,422 @@
+{
+  "tree_basic_stats": {
+    "total_nodes": 353,
+    "total_edges": 352,
+    "total_leaf_nodes": 272,
+    "max_depth": 6,
+    "level_distribution": {
+      "ROOT": 1,
+      "L1": 7,
+      "L2": 45,
+      "L3": 94,
+      "L4": 126,
+      "L5": 62,
+      "L6": 18
+    },
+    "depth_distribution": {
+      "0": 1,
+      "1": 7,
+      "2": 36,
+      "3": 102,
+      "4": 127,
+      "5": 62,
+      "6": 18
+    },
+    "l1_node_count": {
+      "战略规划与治理": 27,
+      "基础设施与枢纽": 53,
+      "市场主体与网络": 157,
+      "通关与口岸效能": 29,
+      "智慧绿色转型": 25,
+      "区域协同与产业联动": 37,
+      "资源与要素保障": 24
+    },
+    "l1_leaf_count": {
+      "战略规划与治理": 20,
+      "基础设施与枢纽": 41,
+      "市场主体与网络": 130,
+      "通关与口岸效能": 23,
+      "智慧绿色转型": 17,
+      "区域协同与产业联动": 25,
+      "资源与要素保障": 16
+    },
+    "l1_max_depth": {
+      "战略规划与治理": 4,
+      "基础设施与枢纽": 5,
+      "市场主体与网络": 6,
+      "通关与口岸效能": 4,
+      "智慧绿色转型": 4,
+      "区域协同与产业联动": 4,
+      "资源与要素保障": 4
+    },
+    "avg_children_per_internal_node": 4.35,
+    "internal_node_count": 81,
+    "oversized_parent_count": 7
+  },
+  "rule_based_issues": {
+    "duplicate_node_id_count": 0,
+    "duplicate_node_ids": [],
+    "orphan_node_count": 0,
+    "orphan_node_ids": [],
+    "multi_parent_node_count": 0,
+    "multi_parent_nodes": {},
+    "circular_reference_count": 0,
+    "circular_reference_ids": [],
+    "empty_label_count": 0,
+    "empty_label_ids": [],
+    "bad_children_field_count": 0,
+    "bad_children_field_ids": [],
+    "level_depth_mismatch_count": 10,
+    "level_depth_mismatch_examples": [
+      {
+        "node_id": "L2_Nd8a500a1",
+        "label": "加快完善枢纽规划布局",
+        "level": "L2",
+        "depth": 3,
+        "expected_depth": 2,
+        "parent_label": "枢纽规划与建设",
+        "path_labels": "ROOT>基础设施与枢纽>枢纽规划与建设>加快完善枢纽规划布局"
+      },
+      {
+        "node_id": "L2_N0a6e8ca5",
+        "label": "加快推进基础设施建设",
+        "level": "L2",
+        "depth": 3,
+        "expected_depth": 2,
+        "parent_label": "枢纽规划与建设",
+        "path_labels": "ROOT>基础设施与枢纽>枢纽规划与建设>加快推进基础设施建设"
+      },
+      {
+        "node_id": "L2_N7d5270bf",
+        "label": "集中力量建设中国国际航空物流中心",
+        "level": "L2",
+        "depth": 3,
+        "expected_depth": 2,
+        "parent_label": "枢纽规划与建设",
+        "path_labels": "ROOT>基础设施与枢纽>枢纽规划与建设>集中力量建设中国国际航空物流中心"
+      },
+      {
+        "node_id": "L1_N6e836104_BR_99d8b8",
+        "label": "基础设施建设",
+        "level": "L2",
+        "depth": 3,
+        "expected_depth": 2,
+        "parent_label": "枢纽规划与建设",
+        "path_labels": "ROOT>基础设施与枢纽>枢纽规划与建设>基础设施建设"
+      },
+      {
+        "node_id": "L2_Nadf8c478",
+        "label": "完善机场货运基础设施",
+        "level": "L2",
+        "depth": 3,
+        "expected_depth": 2,
+        "parent_label": "货运基础设施",
+        "path_labels": "ROOT>基础设施与枢纽>货运基础设施>完善机场货运基础设施"
+      },
+      {
+        "node_id": "L3_N60c3ab56",
+        "label": "构建大物流多式联运体系",
+        "level": "L3",
+        "depth": 4,
+        "expected_depth": 3,
+        "parent_label": "构建多式联运物流体系",
+        "path_labels": "ROOT>基础设施与枢纽>物流体系与通达性>构建多式联运物流体系>构建大物流多式联运体系"
+      },
+      {
+        "node_id": "L2_N9e86e873",
+        "label": "提升空港口岸作业效率",
+        "level": "L2",
+        "depth": 3,
+        "expected_depth": 2,
+        "parent_label": "空港口岸优化",
+        "path_labels": "ROOT>通关与口岸效能>空港口岸优化>提升空港口岸作业效率"
+      },
+      {
+        "node_id": "L2_Nbde783bd",
+        "label": "优化航空口岸服务环境",
+        "level": "L2",
+        "depth": 3,
+        "expected_depth": 2,
+        "parent_label": "空港口岸优化",
+        "path_labels": "ROOT>通关与口岸效能>空港口岸优化>优化航空口岸服务环境"
+      },
+      {
+        "node_id": "L2_N227589e0",
+        "label": "提升口岸服务效能",
+        "level": "L2",
+        "depth": 3,
+        "expected_depth": 2,
+        "parent_label": "空港口岸优化",
+        "path_labels": "ROOT>通关与口岸效能>空港口岸优化>提升口岸服务效能"
+      },
+      {
+        "node_id": "L1_N6be998d8_BR_b1e228",
+        "label": "通关便利化",
+        "level": "L2",
+        "depth": 3,
+        "expected_depth": 2,
+        "parent_label": "费用与通关便利",
+        "path_labels": "ROOT>通关与口岸效能>费用与通关便利>通关便利化"
+      }
+    ]
+  },
+  "structural_warnings": {
+    "oversized_parents": [
+      {
+        "node_id": "L1_N70e79b29_BR_c48137",
+        "label": "货运航线网络",
+        "level": "L3",
+        "children_count": 18
+      },
+      {
+        "node_id": "L1_N70e79b29_BR_2ba091",
+        "label": "航空货运能力提升",
+        "level": "L3",
+        "children_count": 18
+      },
+      {
+        "node_id": "L2_N27ba78e2",
+        "label": "发展临空经济",
+        "level": "L4",
+        "children_count": 12
+      },
+      {
+        "node_id": "L2_Nb80d9c6e",
+        "label": "提升航空货运枢纽集疏运能力",
+        "level": "L3",
+        "children_count": 10
+      },
+      {
+        "node_id": "L1_N70e79b29_BR_167030",
+        "label": "物流服务与业态创新",
+        "level": "L3",
+        "children_count": 10
+      },
+      {
+        "node_id": "L1_N6e836104_BR_c83016",
+        "label": "货运基础设施",
+        "level": "L2",
+        "children_count": 9
+      },
+      {
+        "node_id": "L2_N640a2992",
+        "label": "优化供应链管理",
+        "level": "L4",
+        "children_count": 9
+      }
+    ],
+    "long_labels_count": 1,
+    "long_labels_examples": [
+      {
+        "node_id": "L3_Nb28e82d6",
+        "label": "整合盘活低效闲置土地资源强化对航空货运枢纽建设项目用地支持",
+        "label_len": 29
+      }
+    ],
+    "sibling_duplicate_label_count": 8,
+    "sibling_duplicate_label_examples": [
+      {
+        "parent_id": "L1_N70e79b29",
+        "parent_label": "市场主体与网络",
+        "duplicated_label": "市场主体引育",
+        "count": 2,
+        "node_ids": [
+          "L1_N70e79b29_BR_6c0dca",
+          "L1_N70e79b29_BR_6c0dca_7ecc"
+        ]
+      },
+      {
+        "parent_id": "L1_N70e79b29_BR_6c0dca_BR_f11806",
+        "parent_label": "主体培育",
+        "duplicated_label": "市场主体培育",
+        "count": 2,
+        "node_ids": [
+          "L2_N709fdde1",
+          "L1_N70e79b29_BR_ab4348"
+        ]
+      },
+      {
+        "parent_id": "L1_N70e79b29_BR_6c0dca_BR_8b6dc1",
+        "parent_label": "主体引育专项",
+        "duplicated_label": "货运代理引育",
+        "count": 2,
+        "node_ids": [
+          "L1_N70e79b29_BR_946648",
+          "L1_N70e79b29_BR_946648_BR_1416e5"
+        ]
+      },
+      {
+        "parent_id": "L1_N70e79b29_BR_167030",
+        "parent_label": "物流服务与业态创新",
+        "duplicated_label": "制造业融合促进",
+        "count": 2,
+        "node_ids": [
+          "L2_N0e93e380",
+          "L3_N0e93e380"
+        ]
+      },
+      {
+        "parent_id": "L2_N27ba78e2",
+        "parent_label": "发展临空经济",
+        "duplicated_label": "推进临空经济发展",
+        "count": 2,
+        "node_ids": [
+          "L3_N27ba78e2",
+          "L3_Nc3e4e468"
+        ]
+      },
+      {
+        "parent_id": "L1_N6be998d8",
+        "parent_label": "通关与口岸效能",
+        "duplicated_label": "空港口岸优化",
+        "count": 2,
+        "node_ids": [
+          "L1_N6be998d8_BR_8df89b",
+          "L1_N6be998d8_BR_8df89b_f5a4"
+        ]
+      },
+      {
+        "parent_id": "L2_N649ec6c7",
+        "parent_label": "扎实做好货物运输保障",
+        "duplicated_label": "推进集疏运体系建设",
+        "count": 2,
+        "node_ids": [
+          "L3_N133b0ed2",
+          "L3_N77a3b68b"
+        ]
+      },
+      {
+        "parent_id": "L2_N306e9a75",
+        "parent_label": "强化基础能力保障",
+        "duplicated_label": "加快基础设施建设",
+        "count": 2,
+        "node_ids": [
+          "L3_N07990008",
+          "L3_N3ab0a1a9"
+        ]
+      }
+    ],
+    "parent_child_same_label_count": 0,
+    "parent_child_same_label_examples": [],
+    "cross_branch_same_label_count": 7,
+    "cross_branch_same_label_examples": [
+      {
+        "label": "推进临空经济发展",
+        "count": 3,
+        "occurrences": [
+          {
+            "node_id": "L3_N27ba78e2",
+            "parent_label": "发展临空经济",
+            "level": "L5"
+          },
+          {
+            "node_id": "L3_Nc3e4e468",
+            "parent_label": "发展临空经济",
+            "level": "L5"
+          },
+          {
+            "node_id": "L3_Nf50b9a9d",
+            "parent_label": "大力发展航空经济",
+            "level": "L3"
+          }
+        ]
+      },
+      {
+        "label": "推进智慧物流建设",
+        "count": 2,
+        "occurrences": [
+          {
+            "node_id": "L3_N9c47a867",
+            "parent_label": "提升国际货运服务能力",
+            "level": "L3"
+          },
+          {
+            "node_id": "L3_N62ed0091",
+            "parent_label": "提高物流服务保障效率",
+            "level": "L5"
+          }
+        ]
+      },
+      {
+        "label": "航空货运枢纽建设",
+        "count": 2,
+        "occurrences": [
+          {
+            "node_id": "L2_N578f3b8a_BR_6092b1",
+            "parent_label": "提升国际货运服务能力",
+            "level": "L3"
+          },
+          {
+            "node_id": "L2_N13abaa5a_BR_9f83a3",
+            "parent_label": "增强货运保障能力",
+            "level": "L5"
+          }
+        ]
+      },
+      {
+        "label": "提升国际货运中转功能",
+        "count": 2,
+        "occurrences": [
+          {
+            "node_id": "L3_N9ecfe06c",
+            "parent_label": "货运航线网络",
+            "level": "L4"
+          },
+          {
+            "node_id": "L3_Nb67e0092",
+            "parent_label": "增强货运保障能力",
+            "level": "L5"
+          }
+        ]
+      },
+      {
+        "label": "探索开展多式联运",
+        "count": 2,
+        "occurrences": [
+          {
+            "node_id": "L3_Nd290d812",
+            "parent_label": "丰富多式联运体系",
+            "level": "L5"
+          },
+          {
+            "node_id": "L4_Na8ba2f4a",
+            "parent_label": "多式联运网络建设",
+            "level": "L6"
+          }
+        ]
+      },
+      {
+        "label": "发展临空经济",
+        "count": 2,
+        "occurrences": [
+          {
+            "node_id": "L2_N27ba78e2",
+            "parent_label": "物流服务与业态创新",
+            "level": "L4"
+          },
+          {
+            "node_id": "L3_Nd93e3e25",
+            "parent_label": "大力发展航空经济",
+            "level": "L3"
+          }
+        ]
+      },
+      {
+        "label": "通关便利化",
+        "count": 2,
+        "occurrences": [
+          {
+            "node_id": "L2_N0109e16a_BR_448437",
+            "parent_label": "优化航空口岸服务功能与环境",
+            "level": "L4"
+          },
+          {
+            "node_id": "L1_N6be998d8_BR_b1e228",
+            "parent_label": "费用与通关便利",
+            "level": "L2"
+          }
+        ]
+      }
+    ]
+  }
+}

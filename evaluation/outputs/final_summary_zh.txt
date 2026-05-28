@@ -1,0 +1,53 @@
+# 政策行动树质量评估摘要
+
+## 一、树规模
+
+全树共 353 个节点（含 ROOT），其中叶节点 272 个，最大深度 6。L1 共 7 个主题域，内部节点平均分支数 4.35，子节点数超过 8 的父节点 7 个。
+
+## 二、规则检查问题
+
+- 重复 node_id：0
+- 孤立节点：0
+- 多父引用：0
+- 循环引用：0
+- 空标签：0
+- level 与实际 depth 不一致：10
+
+## 三、结构性提示
+
+- 子节点数 > 8 的父节点：0
+- 标签长度 > 25 字：1
+- 兄弟标签字面重复：8
+- 父子标签字面相同：0
+- 跨分支同名节点：7
+
+## 四、节点级评价
+
+评价模型：A_kimi, B_claude, C_gemini
+- A_kimi: vertical=3.205, horizontal=2.576, label=3.655
+- B_claude: vertical=3.406, horizontal=2.475, label=3.54
+- C_gemini: vertical=3.604, horizontal=2.327, label=4.486
+
+模型间一致性（节点级）：
+- vertical_coherence: 均 weighted κ = 0.642, Krippendorff α = 0.637
+- horizontal_coherence: 均 weighted κ = 0.681, Krippendorff α = 0.683
+- label_quality: 均 weighted κ = 0.445, Krippendorff α = 0.322
+
+## 五、路径级评价
+
+评价模型：A_kimi, B_claude, C_gemini
+- A_kimi: coherence=3.078, granularity=2.255
+- B_claude: coherence=3.608, granularity=2.98
+- C_gemini: coherence=3.922, granularity=3.275
+
+模型间一致性（路径级）：
+- path_coherence: 均 weighted κ = 0.457, Krippendorff α = 0.406
+- granularity_progression: 均 weighted κ = 0.316, Krippendorff α = 0.26
+
+## 六、综合质量评分
+
+- C_gemini: 节点均分=2.746, 路径均分=3.012, FrameworkScore=2.839
+- A_kimi: 节点均分=2.351, 路径均分=1.544, FrameworkScore=2.069
+- B_claude: 节点均分=2.484, 路径均分=2.588, FrameworkScore=2.521
+
+**最终框架质量评分（多模型平均）：2.476**

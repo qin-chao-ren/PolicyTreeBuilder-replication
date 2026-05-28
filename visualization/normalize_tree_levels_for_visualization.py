@@ -9,7 +9,7 @@ Utility Script · Fix Tree Levels for Visualization
 - 以此类推...
 目的：解决可视化时因层级跳跃（Skip-level）导致的连线混乱问题。
 
-python scripts/normalize_tree_levels_for_visualization.py `
+python visualization/normalize_tree_levels_for_visualization.py `
 --input "data/intermediate_outputs/policy_tree_refined.json" `
 --output "data/intermediate_outputs/policy_tree_visualization_ready.json"
 """

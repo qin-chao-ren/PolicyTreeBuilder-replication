@@ -1,0 +1,434 @@
+{
+  "tree_basic_stats": {
+    "total_nodes": 353,
+    "total_edges": 352,
+    "total_leaf_nodes": 272,
+    "max_depth": 6,
+    "level_distribution": {
+      "ROOT": 1,
+      "L1": 7,
+      "L2": 45,
+      "L3": 94,
+      "L4": 126,
+      "L5": 62,
+      "L6": 18
+    },
+    "depth_distribution": {
+      "0": 1,
+      "1": 7,
+      "2": 36,
+      "3": 102,
+      "4": 127,
+      "5": 62,
+      "6": 18
+    },
+    "l1_node_count": {
+      "战略规划与治理": 27,
+      "基础设施与枢纽": 53,
+      "市场主体与网络": 157,
+      "通关与口岸效能": 29,
+      "智慧绿色转型": 25,
+      "区域协同与产业联动": 37,
+      "资源与要素保障": 24
+    },
+    "l1_leaf_count": {
+      "战略规划与治理": 20,
+      "基础设施与枢纽": 41,
+      "市场主体与网络": 130,
+      "通关与口岸效能": 23,
+      "智慧绿色转型": 17,
+      "区域协同与产业联动": 25,
+      "资源与要素保障": 16
+    },
+    "l1_max_depth": {
+      "战略规划与治理": 4,
+      "基础设施与枢纽": 5,
+      "市场主体与网络": 6,
+      "通关与口岸效能": 4,
+      "智慧绿色转型": 4,
+      "区域协同与产业联动": 4,
+      "资源与要素保障": 4
+    },
+    "avg_children_per_internal_node": 4.35,
+    "internal_node_count": 81,
+    "oversized_parent_count": 7
+  },
+  "rule_based_issues_summary": {
+    "duplicate_node_id_count": 0,
+    "orphan_node_count": 0,
+    "multi_parent_node_count": 0,
+    "circular_reference_count": 0,
+    "empty_label_count": 0,
+    "bad_children_field_count": 0,
+    "level_depth_mismatch_count": 10
+  },
+  "structural_warnings_summary": {
+    "long_labels_count": 1,
+    "sibling_duplicate_label_count": 8,
+    "parent_child_same_label_count": 0,
+    "cross_branch_same_label_count": 7
+  },
+  "node_judges": [
+    "A_kimi",
+    "B_claude",
+    "C_gemini"
+  ],
+  "path_judges": [
+    "A_kimi",
+    "B_claude",
+    "C_gemini"
+  ],
+  "agreement_node": [
+    {
+      "dimension": "vertical_coherence",
+      "judges": [
+        "A_kimi",
+        "B_claude",
+        "C_gemini"
+      ],
+      "pairwise": [
+        {
+          "judge_a": "A_kimi",
+          "judge_b": "B_claude",
+          "n": 278,
+          "weighted_kappa": 0.692
+        },
+        {
+          "judge_a": "A_kimi",
+          "judge_b": "C_gemini",
+          "n": 278,
+          "weighted_kappa": 0.558
+        },
+        {
+          "judge_a": "B_claude",
+          "judge_b": "C_gemini",
+          "n": 278,
+          "weighted_kappa": 0.675
+        }
+      ],
+      "mean_pairwise_weighted_kappa": 0.642,
+      "krippendorff_alpha_ordinal": 0.637
+    },
+    {
+      "dimension": "horizontal_coherence",
+      "judges": [
+        "A_kimi",
+        "B_claude",
+        "C_gemini"
+      ],
+      "pairwise": [
+        {
+          "judge_a": "A_kimi",
+          "judge_b": "B_claude",
+          "n": 278,
+          "weighted_kappa": 0.67
+        },
+        {
+          "judge_a": "A_kimi",
+          "judge_b": "C_gemini",
+          "n": 278,
+          "weighted_kappa": 0.651
+        },
+        {
+          "judge_a": "B_claude",
+          "judge_b": "C_gemini",
+          "n": 278,
+          "weighted_kappa": 0.721
+        }
+      ],
+      "mean_pairwise_weighted_kappa": 0.681,
+      "krippendorff_alpha_ordinal": 0.683
+    },
+    {
+      "dimension": "label_quality",
+      "judges": [
+        "A_kimi",
+        "B_claude",
+        "C_gemini"
+      ],
+      "pairwise": [
+        {
+          "judge_a": "A_kimi",
+          "judge_b": "B_claude",
+          "n": 278,
+          "weighted_kappa": 0.655
+        },
+        {
+          "judge_a": "A_kimi",
+          "judge_b": "C_gemini",
+          "n": 278,
+          "weighted_kappa": 0.333
+        },
+        {
+          "judge_a": "B_claude",
+          "judge_b": "C_gemini",
+          "n": 278,
+          "weighted_kappa": 0.348
+        }
+      ],
+      "mean_pairwise_weighted_kappa": 0.445,
+      "krippendorff_alpha_ordinal": 0.322
+    }
+  ],
+  "agreement_node_flags": [
+    {
+      "flag": "GRANULARITY_JUMP",
+      "n_evaluated": 278,
+      "full_agreement_rate": 0.874,
+      "majority_agreement_rate": 1.0,
+      "mean_pairwise_cohen_kappa": 0.064,
+      "rate_A_kimi": 0.097,
+      "rate_B_claude": 0.036,
+      "rate_C_gemini": 0.011
+    },
+    {
+      "flag": "LABEL_TOO_LONG",
+      "n_evaluated": 278,
+      "full_agreement_rate": 0.964,
+      "majority_agreement_rate": 1.0,
+      "mean_pairwise_cohen_kappa": 0.313,
+      "rate_A_kimi": 0.018,
+      "rate_B_claude": 0.032,
+      "rate_C_gemini": 0.004
+    },
+    {
+      "flag": "LABEL_TOO_VAGUE",
+      "n_evaluated": 278,
+      "full_agreement_rate": 0.996,
+      "majority_agreement_rate": 1.0,
+      "mean_pairwise_cohen_kappa": 0.0,
+      "rate_A_kimi": 0.004,
+      "rate_B_claude": 0.0,
+      "rate_C_gemini": 0.0
+    },
+    {
+      "flag": "LOW_ABSTRACTION_PARENT",
+      "n_evaluated": 278,
+      "full_agreement_rate": 0.914,
+      "majority_agreement_rate": 1.0,
+      "mean_pairwise_cohen_kappa": 0.086,
+      "rate_A_kimi": 0.068,
+      "rate_B_claude": 0.025,
+      "rate_C_gemini": 0.007
+    },
+    {
+      "flag": "MIXED_ABSTRACTION_SIBLINGS",
+      "n_evaluated": 278,
+      "full_agreement_rate": 0.594,
+      "majority_agreement_rate": 1.0,
+      "mean_pairwise_cohen_kappa": 0.405,
+      "rate_A_kimi": 0.752,
+      "rate_B_claude": 0.561,
+      "rate_C_gemini": 0.658
+    },
+    {
+      "flag": "PARENT_CHILD_IDENTICAL",
+      "n_evaluated": 278,
+      "full_agreement_rate": 0.849,
+      "majority_agreement_rate": 1.0,
+      "mean_pairwise_cohen_kappa": 0.536,
+      "rate_A_kimi": 0.079,
+      "rate_B_claude": 0.158,
+      "rate_C_gemini": 0.133
+    },
+    {
+      "flag": "SEMANTIC_DRIFT_CHILD",
+      "n_evaluated": 278,
+      "full_agreement_rate": 0.813,
+      "majority_agreement_rate": 1.0,
+      "mean_pairwise_cohen_kappa": 0.585,
+      "rate_A_kimi": 0.201,
+      "rate_B_claude": 0.173,
+      "rate_C_gemini": 0.18
+    },
+    {
+      "flag": "SIBLING_SEMANTIC_DUPLICATE",
+      "n_evaluated": 278,
+      "full_agreement_rate": 0.698,
+      "majority_agreement_rate": 1.0,
+      "mean_pairwise_cohen_kappa": 0.591,
+      "rate_A_kimi": 0.655,
+      "rate_B_claude": 0.655,
+      "rate_C_gemini": 0.475
+    },
+    {
+      "flag": "UNBALANCED_BRANCHING",
+      "n_evaluated": 278,
+      "full_agreement_rate": 0.817,
+      "majority_agreement_rate": 1.0,
+      "mean_pairwise_cohen_kappa": 0.267,
+      "rate_A_kimi": 0.101,
+      "rate_B_claude": 0.04,
+      "rate_C_gemini": 0.147
+    }
+  ],
+  "agreement_path": [
+    {
+      "dimension": "path_coherence",
+      "judges": [
+        "A_kimi",
+        "B_claude",
+        "C_gemini"
+      ],
+      "pairwise": [
+        {
+          "judge_a": "A_kimi",
+          "judge_b": "B_claude",
+          "n": 51,
+          "weighted_kappa": 0.451
+        },
+        {
+          "judge_a": "A_kimi",
+          "judge_b": "C_gemini",
+          "n": 51,
+          "weighted_kappa": 0.413
+        },
+        {
+          "judge_a": "B_claude",
+          "judge_b": "C_gemini",
+          "n": 51,
+          "weighted_kappa": 0.506
+        }
+      ],
+      "mean_pairwise_weighted_kappa": 0.457,
+      "krippendorff_alpha_ordinal": 0.406
+    },
+    {
+      "dimension": "granularity_progression",
+      "judges": [
+        "A_kimi",
+        "B_claude",
+        "C_gemini"
+      ],
+      "pairwise": [
+        {
+          "judge_a": "A_kimi",
+          "judge_b": "B_claude",
+          "n": 51,
+          "weighted_kappa": 0.18
+        },
+        {
+          "judge_a": "A_kimi",
+          "judge_b": "C_gemini",
+          "n": 51,
+          "weighted_kappa": 0.251
+        },
+        {
+          "judge_a": "B_claude",
+          "judge_b": "C_gemini",
+          "n": 51,
+          "weighted_kappa": 0.517
+        }
+      ],
+      "mean_pairwise_weighted_kappa": 0.316,
+      "krippendorff_alpha_ordinal": 0.26
+    }
+  ],
+  "agreement_path_flags": [
+    {
+      "flag": "PATH_GRANULARITY_JUMP",
+      "n_evaluated": 51,
+      "full_agreement_rate": 0.098,
+      "majority_agreement_rate": 1.0,
+      "mean_pairwise_cohen_kappa": -0.014,
+      "rate_A_kimi": 0.902,
+      "rate_B_claude": 0.098,
+      "rate_C_gemini": 0.059
+    },
+    {
+      "flag": "PATH_OVER_DEEP",
+      "n_evaluated": 51,
+      "full_agreement_rate": 0.49,
+      "majority_agreement_rate": 1.0,
+      "mean_pairwise_cohen_kappa": 0.341,
+      "rate_A_kimi": 0.588,
+      "rate_B_claude": 0.314,
+      "rate_C_gemini": 0.255
+    },
+    {
+      "flag": "PATH_REDUNDANT_CHAIN",
+      "n_evaluated": 51,
+      "full_agreement_rate": 0.647,
+      "majority_agreement_rate": 1.0,
+      "mean_pairwise_cohen_kappa": 0.529,
+      "rate_A_kimi": 0.451,
+      "rate_B_claude": 0.647,
+      "rate_C_gemini": 0.549
+    },
+    {
+      "flag": "PATH_SEMANTIC_DRIFT",
+      "n_evaluated": 51,
+      "full_agreement_rate": 0.647,
+      "majority_agreement_rate": 1.0,
+      "mean_pairwise_cohen_kappa": 0.456,
+      "rate_A_kimi": 0.373,
+      "rate_B_claude": 0.294,
+      "rate_C_gemini": 0.275
+    },
+    {
+      "flag": "PATH_UNDER_STRUCTURED",
+      "n_evaluated": 51,
+      "full_agreement_rate": 0.98,
+      "majority_agreement_rate": 1.0,
+      "mean_pairwise_cohen_kappa": 0.333,
+      "rate_A_kimi": 0.0,
+      "rate_B_claude": 0.02,
+      "rate_C_gemini": 0.02
+    }
+  ],
+  "framework_per_model": {
+    "C_gemini": {
+      "mean_node_score_adjusted": 2.746,
+      "mean_path_score_adjusted": 3.012,
+      "framework_score": 2.839,
+      "n_node_samples": 278,
+      "n_path_samples": 51
+    },
+    "A_kimi": {
+      "mean_node_score_adjusted": 2.351,
+      "mean_path_score_adjusted": 1.544,
+      "framework_score": 2.069,
+      "n_node_samples": 278,
+      "n_path_samples": 51
+    },
+    "B_claude": {
+      "mean_node_score_adjusted": 2.484,
+      "mean_path_score_adjusted": 2.588,
+      "framework_score": 2.521,
+      "n_node_samples": 278,
+      "n_path_samples": 51
+    }
+  },
+  "final_framework_score": 2.476,
+  "dim_means_node": {
+    "A_kimi": {
+      "vertical_coherence": 3.205,
+      "horizontal_coherence": 2.576,
+      "label_quality": 3.655
+    },
+    "B_claude": {
+      "vertical_coherence": 3.406,
+      "horizontal_coherence": 2.475,
+      "label_quality": 3.54
+    },
+    "C_gemini": {
+      "vertical_coherence": 3.604,
+      "horizontal_coherence": 2.327,
+      "label_quality": 4.486
+    }
+  },
+  "dim_means_path": {
+    "A_kimi": {
+      "path_coherence": 3.078,
+      "granularity_progression": 2.255
+    },
+    "B_claude": {
+      "path_coherence": 3.608,
+      "granularity_progression": 2.98
+    },
+    "C_gemini": {
+      "path_coherence": 3.922,
+      "granularity_progression": 3.275
+    }
+  }
+}

@@ -7,6 +7,7 @@ _local_archive/
 .env
 *.env
 !configs/.env.example
+!evaluation/.env.example
 *key*.txt
 
 # Python/runtime artifacts
@@ -18,3 +19,11 @@ venv/
 # Non-public source packages
 policy_tree_eval/
 outputs_1123/
+
+# Evaluation local reruns
+evaluation/.env
+evaluation/models_registry.yaml
+evaluation/outputs_scratch/
+evaluation/outputs/*.bak_*
+evaluation/outputs/logs/
+evaluation/outputs/failures/

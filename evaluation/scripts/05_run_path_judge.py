@@ -1,0 +1,131 @@
+#!/usr/bin/env python3
+"""Run one or more model judges on sampled root-to-leaf paths."""
+from __future__ import annotations
+
+import argparse
+import json
+from pathlib import Path
+
+from eval_paths import default_output_dir, resolve_repo_path
+from llm_clients import MODEL_CONFIG, call_with_retry, make_client
+from prompts import PATH_SYSTEM, PATH_USER_TEMPLATE
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--judge", required=True, help="Judge key from MODEL_CONFIG, or 'all'.")
+    parser.add_argument("--limit", type=int, default=None, help="Only evaluate the first N pending samples.")
+    parser.add_argument("--no-resume", action="store_true", help="Do not skip samples already in scores JSONL.")
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=default_output_dir(),
+        help="Directory containing sampled_paths_for_judge.jsonl and receiving judge outputs.",
+    )
+    return parser.parse_args()
+
+
+def build_user_prompt(sample: dict) -> str:
+    path_labels = [node["label"] for node in sample["path"]]
+    return PATH_USER_TEMPLATE.format(
+        path_json=json.dumps(sample["path"], ensure_ascii=False, indent=2),
+        path_id=sample["sample_id"],
+        path_labels_json=json.dumps(path_labels, ensure_ascii=False),
+    )
+
+
+def load_done_ids(path: Path) -> set[str]:
+    done_ids: set[str] = set()
+    if not path.exists():
+        return done_ids
+    with path.open("r", encoding="utf-8") as f:
+        for line in f:
+            try:
+                done_ids.add(json.loads(line)["sample_id"])
+            except Exception:
+                pass
+    return done_ids
+
+
+def run_one_judge(judge_key: str, samples: list[dict], output_dir: Path,
+                  limit: int | None = None, resume: bool = True) -> None:
+    client = make_client(judge_key)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    out_path = output_dir / f"judge_{judge_key}_path_scores.jsonl"
+    raw_path = output_dir / f"judge_{judge_key}_path_raw.jsonl"
+
+    done_ids = load_done_ids(out_path) if resume else set()
+    if done_ids:
+        print(f"  already completed: {len(done_ids)}; resuming")
+
+    todo = [sample for sample in samples if sample["sample_id"] not in done_ids]
+    if limit:
+        todo = todo[:limit]
+    print(f"  pending: {len(todo)} / {len(samples)}")
+
+    fail_count = 0
+    with out_path.open("a", encoding="utf-8") as f_score, raw_path.open("a", encoding="utf-8") as f_raw:
+        for index, sample in enumerate(todo, start=1):
+            user_prompt = build_user_prompt(sample)
+            try:
+                result, raw_text = call_with_retry(client, PATH_SYSTEM, user_prompt)
+            except Exception as exc:
+                err_text = str(exc)
+                raw_dump = ""
+                if "|||LAST_RAW|||" in err_text:
+                    err_msg, raw_dump = err_text.split("|||LAST_RAW|||", 1)
+                else:
+                    err_msg = err_text
+                print(f"  [{index}/{len(todo)}] FAIL {sample['sample_id']}: {err_msg}")
+                fail_count += 1
+                f_raw.write(json.dumps({
+                    "sample_id": sample["sample_id"],
+                    "error": err_msg,
+                    "raw": raw_dump,
+                }, ensure_ascii=False) + "\n")
+                f_raw.flush()
+                continue
+
+            record = {
+                "sample_id": sample["sample_id"],
+                "judge_key": judge_key,
+                "judge_provider": MODEL_CONFIG[judge_key]["provider"],
+                "judge_model": MODEL_CONFIG[judge_key]["model"],
+                "judge_base_url": MODEL_CONFIG[judge_key].get("base_url", ""),
+                "l1_label": sample["l1_label"],
+                "path_length": sample["path_length"],
+                "leaf_id": sample["meta"]["leaf_id"],
+                "result": result,
+            }
+            f_score.write(json.dumps(record, ensure_ascii=False) + "\n")
+            f_score.flush()
+            f_raw.write(json.dumps({"sample_id": sample["sample_id"], "raw": raw_text}, ensure_ascii=False) + "\n")
+            f_raw.flush()
+
+            if index % 5 == 0:
+                print(f"  [{index}/{len(todo)}] OK; failures so far: {fail_count}")
+
+    print(f"  completed judge={judge_key}, failures={fail_count}, output={out_path}")
+
+
+def main() -> None:
+    args = parse_args()
+    output_dir = resolve_repo_path(args.output_dir)
+
+    samples = []
+    with (output_dir / "sampled_paths_for_judge.jsonl").open("r", encoding="utf-8") as f:
+        for line in f:
+            samples.append(json.loads(line))
+    print(f"loaded {len(samples)} path samples")
+
+    judges = list(MODEL_CONFIG.keys()) if args.judge == "all" else [args.judge]
+    for judge in judges:
+        if judge not in MODEL_CONFIG:
+            print(f"unknown judge: {judge}; available: {list(MODEL_CONFIG.keys())}")
+            continue
+        print(f"\n===== running judge: {judge} ({MODEL_CONFIG[judge]['model']}) =====")
+        run_one_judge(judge, samples, output_dir, limit=args.limit, resume=not args.no_resume)
+
+
+if __name__ == "__main__":
+    main()
