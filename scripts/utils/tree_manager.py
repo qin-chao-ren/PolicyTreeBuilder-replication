@@ -58,6 +58,28 @@ class TreeManager:
     def get_all_node_ids(self) -> List[str]:
         return list(self.index.keys())
 
+    def is_descendant(self, node_id: str, ancestor_id: str) -> bool:
+        """node_id 是否为 ancestor_id 的子孙（严格子孙，自身不算）。
+
+        沿 parent_map 上溯；带 seen 保护，即使索引已被破坏成环也不会死循环。
+        finalize_policy_tree.py 早已按此 API 写了 move 守卫，但此前方法缺失、
+        `hasattr` 兜底恒为假，导致守卫静默失效。
+        """
+        if node_id not in self.index or ancestor_id not in self.index:
+            return False
+        if node_id == ancestor_id:
+            return False
+        seen: Set[str] = set()
+        cur = self.parent_map.get(node_id)
+        while cur is not None:
+            if cur == ancestor_id:
+                return True
+            if cur in seen:
+                return False
+            seen.add(cur)
+            cur = self.parent_map.get(cur)
+        return False
+
     # --- 核心原子操作 (Write Ops) ---
 
     def move_node(self, node_id: str, new_parent_id: str) -> bool:
@@ -70,6 +92,10 @@ class TreeManager:
 
         # 1. 防止自环或移动到子孙节点
         if node_id == new_parent_id:
+            return False
+        # 移到自己的子孙下会把该分支从根切断并造出环，必须拒绝。
+        # 原代码只防了上面的自环，此处缺失导致 move_node("B", B的子孙) 返回 True 并成环。
+        if self.is_descendant(new_parent_id, node_id):
             return False
 
         # 2. 从旧父节点移除

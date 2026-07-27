@@ -64,6 +64,10 @@ def contract_edges(
                 "pair_count": int(len(scores)),
             }
         )
+    if not rows:
+        # 所有样本对都落在同一节点内部（mask 全过滤）→ 无跨节点边。
+        # 与上方 sub.empty 出口保持同构：空结果也必须带列名，否则调用方按列取值会 KeyError。
+        return pd.DataFrame(columns=["node_a", "node_b", "score_mean", "score_p75", "score_max", "pair_count"])
     return pd.DataFrame(rows)
 
 

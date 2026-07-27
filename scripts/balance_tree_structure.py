@@ -33,7 +33,10 @@ PROMPT_BALANCE = PROJECT_ROOT / "prompts" / "balance_tree_structure.md"
 # ==========================================
 
 # 常量配置
-LEVEL_MAP = {"L1": 1, "L2": 2, "L3": 3, "L4": 4}
+# ROOT 必须在表内：ROOT 扇出 > MAX_FANOUT 时会给 ROOT 造桥节点，
+# 缺 ROOT 条目会让 get_next_level("ROOT") 取默认 99 → min(100,4) → "L4"，
+# 造出标成 L4 却位于 L1 之上的桥节点，顶层结构错乱。
+LEVEL_MAP = {"ROOT": 0, "L1": 1, "L2": 2, "L3": 3, "L4": 4}
 MAX_DEPTH = 4
 MAX_FANOUT = 7
 MAX_ROUNDS = 10
@@ -110,10 +113,17 @@ class ShapingProcess:
             task="balance_tree_jump_fix",
         )
         append_jsonl(self.llm_log, {"ts":int(time.time()), "case":"jump", "parent":pid, "resp":resp})
-        return self._apply(pid, resp.get("json", {}), "jump")
+        # 见 polish_tree_labels.py:209 注释：调用失败时 json=None，默认值不生效
+        return self._apply(pid, resp.get("json") or {}, "jump")
 
     # 逻辑2：扇出过大
     def _fix_fanout(self, pid):
+        # ROOT 的子节点是步 5 定义的顶层分类（top_level_categories.json），
+        # 其数量由分类法本身决定，不是「扇出过大」需要整形的对象。
+        # 若对 ROOT 造桥，LLM 临时起名的分组会取代 l1-def 里的类目、真 L1 被降级，
+        # 14d 的 L1 审计随之只覆盖 1/9。基准运行恰好 7 个 L1（7<=7）未触发，故未暴露。
+        if pid == "ROOT":
+            return False
         children = self.tm.get_children(pid)
         if len(children) <= MAX_FANOUT: return False
 
@@ -125,7 +135,7 @@ class ShapingProcess:
             task="balance_tree_fanout",
         )
         append_jsonl(self.llm_log, {"ts":int(time.time()), "case":"fanout", "parent":pid, "resp":resp})
-        return self._apply(pid, resp.get("json", {}), "fanout")
+        return self._apply(pid, resp.get("json") or {}, "fanout")
 
     # 逻辑3：深度压平 (New)
     def _fix_depth(self, pid):

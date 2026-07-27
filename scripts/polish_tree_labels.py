@@ -206,7 +206,9 @@ class PolishingProcess:
         })
 
         # 3. Execute
-        res = resp.get("json", {})
+        # 注意：不能写 resp.get("json", {})——LLM 调用失败时返回 {"json": None}，
+        # key 存在故默认值不生效，res 会是 None。仓库其余 8 处均用 `or {}`。
+        res = resp.get("json") or {}
         op = res.get("operation", "keep")
 
         record = {

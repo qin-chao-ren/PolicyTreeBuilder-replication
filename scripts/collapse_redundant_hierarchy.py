@@ -167,7 +167,8 @@ class SkeletonRefiner:
                 "is_single": is_single_child, "metrics": {"jac":jac, "cos":cos}, "resp": resp
             })
 
-            self._execute_decision(parent_id, parent_node, child_id, resp.get("json", {}), is_single_child)
+            # 见 polish_tree_labels.py:209 注释：调用失败时 json=None，默认值不生效
+            self._execute_decision(parent_id, parent_node, child_id, resp.get("json") or {}, is_single_child)
 
     def _build_evidence(self, pid, cid, jac, cos, single):
         note = "【单脉传场景】" if single else "【多子节点场景】"
