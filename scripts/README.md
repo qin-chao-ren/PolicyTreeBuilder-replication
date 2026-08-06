@@ -1,6 +1,6 @@
 # Pipeline Scripts
 
-This directory contains the public pipeline scripts used to build and refine the fixed 353-node policy action tree. The scripts are kept close to the verified replication workflow; most reviewers can inspect the included outputs instead of rerunning every API-dependent step.
+This directory contains the public pipeline scripts used to build and refine policy action trees. The committed 353-node output is the archived paper snapshot; most reviewers can inspect it without rerunning every API-dependent step.
 
 ## Step Map
 
@@ -16,8 +16,11 @@ This directory contains the public pipeline scripts used to build and refine the
 | Initial tree | `build_initial_policy_tree.py` | node and parent-link tables | `policy_tree_initial.json` | No |
 | Refinement and finalization | `collapse_redundant_hierarchy.py`, `balance_tree_structure.py`, `polish_tree_labels.py`, `finalize_policy_tree.py` | initial/refined tree states | final tree and audit outputs | Yes |
 | Lineage tracing | `trace_node_lineage.py` | corpus, membership, operation logs | lineage report | No |
+| E0 integrity gate | `validate_tree_e0.py` | candidate tree, membership, lineage, operations | machine-readable PASS/FAIL report | No |
 
 The full command template is `run_policy_tree_pipeline.ps1` in the repository root.
+
+Tree writes in the refinement stages use rollback plus raw/index/parent-map postconditions and record the current run in `tree_refinement_operations.jsonl`. Finalization validates that trace together with its own operations, then publishes `policy_tree_final.json` only after E0 passes. Run the offline regression suite with `python -m unittest discover -s tests -v`.
 
 ## LLM Runtime Boundary
 

@@ -1,6 +1,6 @@
 # Policy Tree Evaluation
 
-This directory contains the public evaluation module for the fixed 353-node policy action tree.
+This directory contains the public evaluation module for the archived 353-node policy action tree.
 
 The included `outputs/` files are the archived evaluation artifacts generated from `data/final_tree/policy_tree_final.json`. They include deterministic table extraction, structure checks, sampled judge inputs, model judge outputs, agreement tables, divergent-sample reports, and final summaries.
 

@@ -1,0 +1,41 @@
+{
+  "schema_version": "c13-duplicate-cases-v1",
+  "sources": {
+    "old_353": {
+      "tree_sha256": "9242d4961e417ffa1e30e728d82e73bf669e4facdedd12f4f03f10d19b157983",
+      "expected_nodes": 353,
+      "expected_sibling_groups": 8,
+      "expected_parent_child_pairs": 0,
+      "expected_level_mismatches": 10
+    },
+    "new_268": {
+      "tree_sha256": "5bf3c99c404f54f4c39cbd4a417792061f97b06f60a0f0fd310588dc310e1e96",
+      "expected_nodes": 268,
+      "expected_sibling_groups": 7,
+      "expected_parent_child_pairs": 3,
+      "expected_level_mismatches": 17
+    }
+  },
+  "sibling_cases": [
+    {"source": "old_353", "parent_id": "L1_N70e79b29_BR_6c0dca_BR_f11806", "label": "市场主体培育", "node_ids": ["L2_N709fdde1", "L1_N70e79b29_BR_ab4348"]},
+    {"source": "old_353", "parent_id": "L1_N70e79b29_BR_6c0dca_BR_8b6dc1", "label": "货运代理引育", "node_ids": ["L1_N70e79b29_BR_946648", "L1_N70e79b29_BR_946648_BR_1416e5"]},
+    {"source": "old_353", "parent_id": "L2_N27ba78e2", "label": "推进临空经济发展", "node_ids": ["L3_N27ba78e2", "L3_Nc3e4e468"]},
+    {"source": "old_353", "parent_id": "L1_N70e79b29_BR_167030", "label": "制造业融合促进", "node_ids": ["L2_N0e93e380", "L3_N0e93e380"]},
+    {"source": "old_353", "parent_id": "L1_N70e79b29", "label": "市场主体引育", "node_ids": ["L1_N70e79b29_BR_6c0dca", "L1_N70e79b29_BR_6c0dca_7ecc"]},
+    {"source": "old_353", "parent_id": "L1_N6be998d8", "label": "空港口岸优化", "node_ids": ["L1_N6be998d8_BR_8df89b", "L1_N6be998d8_BR_8df89b_f5a4"]},
+    {"source": "old_353", "parent_id": "L2_N649ec6c7", "label": "推进集疏运体系建设", "node_ids": ["L3_N133b0ed2", "L3_N77a3b68b"]},
+    {"source": "old_353", "parent_id": "L2_N306e9a75", "label": "加快基础设施建设", "node_ids": ["L3_N07990008", "L3_N3ab0a1a9"]},
+    {"source": "new_268", "parent_id": "L1_Na2c51463_BR_2a4177", "label": "强化基础能力保障", "node_ids": ["L2_N53c05738", "L2_Ndf0b5124"]},
+    {"source": "new_268", "parent_id": "L1_Ne04d7cfa_BR_41421b", "label": "拓展增量市场业务", "node_ids": ["L2_N1f3bd9b5", "L2_N74b249c8"]},
+    {"source": "new_268", "parent_id": "L2_Nf64b0b03", "label": "推进智慧物流建设", "node_ids": ["L3_N62ed0091", "L3_N9c47a867"]},
+    {"source": "new_268", "parent_id": "L2_N2f32c229", "label": "航空物流设施建设", "node_ids": ["L3_Na5cf0ba6", "L3_N970e9205"]},
+    {"source": "new_268", "parent_id": "L1_Ne04d7cfa_BR_808176", "label": "提升服务管理水平", "node_ids": ["L2_N0700f788", "L2_N45ccbfbf"]},
+    {"source": "new_268", "parent_id": "L2_Nbec5a9c5", "label": "优化口岸营商环境", "node_ids": ["L3_Nbec5a9c5", "L3_Ne7b47d1e"]},
+    {"source": "new_268", "parent_id": "L2_Nbec5a9c5", "label": "探索开展多式联运", "node_ids": ["L3_Nd290d812", "L4_Na8ba2f4a"]}
+  ],
+  "parent_child_cases": [
+    {"source": "new_268", "parent_id": "L2_Nc21e1f2f", "child_id": "L3_Nc21e1f2f", "label": "完善财政奖补机制"},
+    {"source": "new_268", "parent_id": "L2_N71ce64b1", "child_id": "L3_N71ce64b1", "label": "争取政策倾斜"},
+    {"source": "new_268", "parent_id": "L1_Ne04d7cfa_BR_8be846_BR_5c9b23", "child_id": "L4_N3bc888c0", "label": "引育大型电商物流企业"}
+  ]
+}

@@ -11,9 +11,8 @@ Step 4.1 · Skeleton (Fixed Version + Stable Paths)
 
 import argparse
 import time
-import json
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, Tuple
 
 from llm_runtime import call_llm_json
 from common_utils import jaccard_overlap
@@ -22,6 +21,7 @@ from utils.step4_shared import (
     append_jsonl, read_membership_map, read_title_map
 )
 from utils.tree_manager import TreeManager
+from utils.tree_integrity import atomic_write_json, atomic_write_jsonl
 
 # ==========================================
 # 1. 路径锚点 (Path Anchors) - 保留你的配置
@@ -111,12 +111,13 @@ class SkeletonRefiner:
         self.emb_helper = EmbeddingHelper(Path(env.config["paths"]["embeddings"]))
         self.title_map = read_title_map(Path(env.config["paths"]["corpus"]))
         self.membership = {lvl: read_membership_map(env.outdir, lvl) for lvl in ["L4", "L3", "L2", "L1"]}
-        self.ops_log = env.outdir / "tree_edit_operations.jsonl"
+        self.ops_log = env.outdir / "tree_refinement_operations.jsonl"
         self.llm_log = env.log_dir / "llm_collapse_redundant_hierarchy.jsonl"
         self.redirect_map = {}
 
     def run(self):
         print("[Step 4.1] Starting Skeleton Refinement (Fixed)...")
+        atomic_write_jsonl(self.ops_log, [])
         candidate_parents = [nid for nid in self.tm.get_all_node_ids() if self.tm.get_children(nid)]
 
         for parent_id in candidate_parents:
@@ -125,16 +126,18 @@ class SkeletonRefiner:
 
         dump_tree(Path(self.args.output), self.tm.root)
         trace_path = self.env.outdir / "vertical_collapse_trace.json"
-        trace_path.write_text(json.dumps(self.redirect_map, indent=2), encoding="utf-8")
+        atomic_write_json(trace_path, self.redirect_map)
         print(f"[DONE] Skeleton Refined. Tree saved to {self.args.output}")
 
     def _process_parent(self, parent_id):
-        parent_node = self.tm.get_node(parent_id)
         children = list(self.tm.get_children(parent_id)) # Snapshot
 
-        for child_node in children:
-            child_id = child_node["node_id"]
+        for child_snapshot in children:
+            child_id = child_snapshot["node_id"]
             if not self.tm.exists(child_id): continue
+            parent_node = self.tm.get_node(parent_id)
+            child_node = self.tm.get_node(child_id)
+            if not parent_node or not child_node: continue
 
             # 计算相似度
             p_mems = self.membership.get(parent_node.get("level"), {}).get(parent_id, [])
@@ -185,14 +188,28 @@ class SkeletonRefiner:
         rec = {"step":"vertical_collapse", "parent":pid, "child":cid, "op":dec}
 
         if dec == "rename_then_keep" and new_lbl:
-            pnode["label"] = new_lbl
-            append_jsonl(self.ops_log, {**rec, "detail": "rename"})
+            if self.tm.rename_node(pid, new_lbl):
+                append_jsonl(self.ops_log, {
+                    **rec, "type": "rename", "node_id": pid,
+                    "new_label": new_lbl, "status": "applied"
+                })
+            else:
+                append_jsonl(self.ops_log, {
+                    **rec, "status": "rejected", "reason": self.tm.last_error
+                })
 
         elif dec == "absorb_child":
-            if self.tm.absorb_node(pid, cid):
-                if new_lbl: pnode["label"] = new_lbl
+            if self.tm.absorb_node(pid, cid, new_label=new_lbl):
                 self.redirect_map[cid] = pid
-                append_jsonl(self.ops_log, {**rec, "detail": "absorb"})
+                append_jsonl(self.ops_log, {
+                    **rec, "type": "merge", "source_id": cid,
+                    "target_id": pid, "new_label": new_lbl,
+                    "status": "applied"
+                })
+            else:
+                append_jsonl(self.ops_log, {
+                    **rec, "status": "rejected", "reason": self.tm.last_error
+                })
 
         elif dec == "promote_child":
             # 核心修复点：安全检查
@@ -201,13 +218,17 @@ class SkeletonRefiner:
                 append_jsonl(self.ops_log, {**rec, "status": "rejected", "reason": reason})
                 return
 
-            if self.tm.promote_child_safe(cid):
-                if new_lbl: self.tm.get_node(cid)["label"] = new_lbl
+            if self.tm.promote_child_and_remove_parent(cid, new_label=new_lbl):
                 self.redirect_map[pid] = cid
-                # 关键：移除了原来那个 "move all siblings to child" 的错误逻辑
-                # 因为能进这里必定是 single child，根本没有 siblings
-                self.tm.remove_node(pid)
-                append_jsonl(self.ops_log, {**rec, "status": "success"})
+                append_jsonl(self.ops_log, {
+                    **rec, "type": "merge", "source_id": pid,
+                    "target_id": cid, "new_label": new_lbl,
+                    "status": "applied"
+                })
+            else:
+                append_jsonl(self.ops_log, {
+                    **rec, "status": "rejected", "reason": self.tm.last_error
+                })
 
 def main():
     parser = argparse.ArgumentParser(description="PolicyTreeBuilder final replication · Step4.1 Skeleton (Fixed)")

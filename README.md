@@ -1,10 +1,10 @@
 # PolicyTreeBuilder Replication Package
 
-This repository contains the public replication package for the ATRS 2026 PolicyTreeBuilder experiment. The fixed publication result is a 353-node policy action tree.
+This repository contains the public replication package for the ATRS 2026 PolicyTreeBuilder experiment. The archived publication result is a 353-node policy action tree.
 
-## Final Version
+## Archived Paper Version
 
-Final tree file: `data/final_tree/policy_tree_final.json`
+Archived tree file: `data/final_tree/policy_tree_final.json`
 
 Expected structure:
 
@@ -17,15 +17,21 @@ Expected structure:
 
 The older 317-node package is superseded and is not part of this public replication package.
 
+### Historical snapshot and E0 status
+
+The committed 353-node tree is preserved byte-for-byte as the historical paper snapshot; the hardening changes do not silently replace it. The deterministic E0 validator rejects that snapshot as a negative control: it contains 8 exact sibling-duplicate groups, 10 declared-level/physical-depth mismatches, and 34 logged `applied` merges whose sources are still present. These findings affect the engineering integrity of the archived output, not the ability to inspect the exact artifact used for the paper.
+
+New pipeline candidates are fail-closed: `finalize_policy_tree.py` publishes the formal tree only after raw/index/parent consistency, unique IDs, acyclicity, exact-label uniqueness, level/depth alignment, closed lineage, membership conservation, and applied-operation postconditions all pass. An explicitly requested membership input must exist, and a caught write failure restores the pre-publication formal outputs. The historical 353-node tree remains unchanged until a separately versioned corrected run passes that contract.
+
 ## Reviewer Quick Check
 
-Reviewers who do not need to rerun the full LLM pipeline can inspect the fixed outputs directly:
+Reviewers who do not need to rerun the full LLM pipeline can inspect the archived outputs directly:
 
 | Purpose | File or command |
 | --- | --- |
-| Final policy tree | `data/final_tree/policy_tree_final.json` |
-| Final radial figure | `data/final_tree/policy_tree_final_en_radial.jpg` |
-| Final tree tables and audit files | `data/final_tree/` |
+| Archived policy tree | `data/final_tree/policy_tree_final.json` |
+| Archived radial figure | `data/final_tree/policy_tree_final_en_radial.jpg` |
+| Archived tree tables and audit files | `data/final_tree/` |
 | Evaluation summary | `evaluation/outputs/final_summary.json` |
 | Package file manifest | `FILE_INDEX.tsv` |
 | Legacy-to-public name map | `LEGACY_NAME_MAP.tsv` |
@@ -40,6 +46,19 @@ python evaluation/scripts/06_aggregate.py --output-dir evaluation/outputs
 python evaluation/scripts/07_status.py --output-dir evaluation/outputs
 ```
 
+Run the new E0 validator independently with:
+
+```powershell
+python scripts/validate_tree_e0.py `
+  --tree data/final_tree/policy_tree_final.json `
+  --membership data/final_tree/policy_tree_final_membership.csv `
+  --operations data/final_tree/policy_tree_final_operations.jsonl `
+  --require-membership `
+  --report evaluation/outputs_scratch/policy_tree_e0_report.json
+```
+
+The command intentionally exits nonzero for the frozen 353-node negative control. A newly published candidate must exit zero.
+
 The full pipeline rerun is optional and requires local credentials for external LLM, embedding, and reranking services. Use the included outputs for review when those services are unavailable.
 
 ## Repository Layout
@@ -52,7 +71,7 @@ The full pipeline rerun is optional and requires local credentials for external 
 - `configs/`: YAML pipeline configs and a safe `.env.example` template.
 - `data/source/`: source input segments and administrative-unit metadata.
 - `data/intermediate_outputs/`: included intermediate outputs, logs, embeddings, and trace files.
-- `data/final_tree/`: final tree, final tabular outputs, academic English tree variants, and paper figure assets.
+- `data/final_tree/`: archived tree, tabular outputs, academic English tree variants, and paper figure assets.
 - `LEGACY_NAME_MAP.tsv`: mapping from legacy development names to the public package names.
 - `SCRIPT_PROVENANCE.tsv`: source and public hashes for path-normalized scripts.
 
@@ -88,7 +107,7 @@ Do not commit `evaluation/.env`.
 
 ## Main Reproduction Path
 
-The final outputs are already included. To rerun the pipeline from the source input, use `run_policy_tree_pipeline.ps1` and the workflow in `TECHNICAL_README.md`. This script is a full rerun template and is not required for basic review.
+The archived outputs are already included. To create a new candidate from the source input, use `run_policy_tree_pipeline.ps1` and the workflow in `TECHNICAL_README.md`. The wrapper stops on the first nonzero Python exit, and finalization replaces formal outputs only after E0 passes.
 
 Primary input:
 
@@ -114,4 +133,4 @@ The public evaluation module is in `evaluation/`. Its archived outputs evaluate 
 
 The legacy local directory name `policy_tree_eval` is intentionally not restored. The legacy input `v4_tree_final.json` maps to `data/final_tree/policy_tree_final.json`.
 
-See `PUBLICATION_SNAPSHOT.md` for the fixed publication snapshot and `replication_package.md` for the package index.
+See `PUBLICATION_SNAPSHOT.md` for the historical publication snapshot and `replication_package.md` for the package index.

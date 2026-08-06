@@ -13,9 +13,9 @@ Finalization · Overall Structure (Fixed Version)
 import argparse
 import time
 import json
-import pandas as pd
+from collections import Counter
 from pathlib import Path
-from typing import Dict, List, Optional, Generator, Tuple
+from typing import Dict, List, Optional, Generator
 from difflib import SequenceMatcher
 
 # 保持与你提供的一致
@@ -23,10 +23,22 @@ from llm_runtime import call_llm_json
 from utils.step4_shared import (
     Step4Env,
     load_tree,
-    dump_tree,
     append_jsonl
 )
 from utils.tree_manager import TreeManager
+from utils.tree_integrity import (
+    E0ValidationError,
+    LineageError,
+    atomic_write_bytes,
+    atomic_write_csv,
+    atomic_write_json,
+    atomic_write_jsonl,
+    merge_lineage_maps,
+    read_jsonl,
+    read_membership_csv,
+    redirect_membership_rows,
+    validate_tree_e0,
+)
 
 # --- 1. 路径锚点 (Path Anchors) ---
 HERE = Path(__file__).resolve().parent
@@ -40,7 +52,6 @@ PROMPT_PATH = PROJECT_ROOT / "prompts" / "finalize_tree_structure.md"
 
 # --- 4. 默认输出/输入路径 ---
 DEFAULT_L1_DEF = PROJECT_ROOT / "data" / "intermediate_outputs" / "top_level_categories.json"
-DEFAULT_OPS_OUT = PROJECT_ROOT / "data" / "intermediate_outputs" / "policy_tree_final_operations.jsonl"
 DEFAULT_AUDIT = PROJECT_ROOT / "data" / "intermediate_outputs" / "policy_tree_final_audit.json"
 DEFAULT_FLAT = PROJECT_ROOT / "data" / "intermediate_outputs" / "policy_tree_final_flat.csv"
 
@@ -138,6 +149,7 @@ class OverallStructureAudit:
 
         self.redirect_map: Dict[str, str] = {}
         self.audit_entries = []
+        self.operation_records: List[Dict] = []
 
         # 统计
         self.stats = {
@@ -147,7 +159,36 @@ class OverallStructureAudit:
             "ops_skipped": 0,
         }
 
+        membership_input_arg = getattr(self.args, "membership_input", "")
+        self.membership_input_explicit = bool(membership_input_arg)
+        self.membership_input = Path(
+            membership_input_arg or (self.env.outdir / "policy_tree_final_membership.csv")
+        )
+        self.membership_output = Path(
+            getattr(self.args, "membership_out", "")
+            or (Path(self.args.output).parent / "policy_tree_final_membership.csv")
+        )
+        self.lineage_input = Path(
+            getattr(self.args, "lineage_in", "")
+            or (self.env.outdir / "policy_tree_lineage.json")
+        )
+        self.lineage_output = Path(
+            getattr(self.args, "lineage_out", "")
+            or (Path(self.args.output).parent / "policy_tree_final_lineage.json")
+        )
+        self.operations_output = Path(
+            getattr(self.args, "operations_out", "")
+            or (Path(self.args.output).parent / "policy_tree_final_operations.jsonl")
+        )
+        self.operations_input = Path(
+            getattr(self.args, "operations_input", "")
+            or (self.env.outdir / "tree_refinement_operations.jsonl")
+        )
+
     def run(self):
+        self.ops_log.parent.mkdir(parents=True, exist_ok=True)
+        self.ops_log.write_text("", encoding="utf-8")
+
         # 1. 解决挂在 Root 下的非 L1 游离节点 (Pending L1)
         self._resolve_pending_root_nodes()
 
@@ -157,9 +198,6 @@ class OverallStructureAudit:
 
         l1_defs = self._load_l1_defs()
         print(f"[Finalization] Auditing {len(l1_nodes)} L1 categories...")
-
-        with self.ops_log.open("w", encoding="utf-8") as f:
-            pass
 
         for l1 in l1_nodes:
             l1_id = l1["node_id"]
@@ -171,6 +209,7 @@ class OverallStructureAudit:
                     continue
 
                 applied = self._apply_operations(ops, l1_id)
+                self.operation_records.extend(applied)
                 self.audit_entries.append({
                     "l1_id": l1_id,
                     "label": l1.get("label"),
@@ -183,29 +222,153 @@ class OverallStructureAudit:
         # 关键修复：在导出前强制重算层级
         self._realign_tree_levels()
 
-        # 3. 导出结果
-        dump_tree(Path(self.args.output), self.tm.root)
-        self._export_flat_csv()
+        # 3. Build candidate auxiliary outputs without touching formal outputs.
+        candidate_operations = list(self.operation_records)
+        try:
+            source_fieldnames, source_membership = self._load_membership_source()
+            lineage = self._load_lineage()
+            candidate_operations = self._load_operation_history() + self.operation_records
+            candidate_membership = redirect_membership_rows(
+                source_membership, lineage, self.tm.get_all_node_ids()
+            )
+            flat_fieldnames, flat_rows = self._export_flat_csv()
+        except Exception as exc:
+            e0_report = validate_tree_e0(
+                self.tm.root,
+                manager=self.tm,
+                operations=candidate_operations,
+                require_membership=True,
+            )
+            e0_report["violations"].append({
+                "severity": "critical",
+                "code": "CANDIDATE_PREPARATION_FAILED",
+                "message": str(exc),
+                "context": {"exception_type": type(exc).__name__},
+            })
+            e0_report["passed"] = False
+            e0_report["critical_count"] = len(e0_report["violations"])
+            e0_report["violation_counts"] = dict(sorted(Counter(
+                item["code"] for item in e0_report["violations"]
+            ).items()))
+            atomic_write_json(self.args.audit_out, self._audit_payload(e0_report, {}))
+            raise E0ValidationError(
+                f"E0 candidate preparation failed: {exc}"
+            ) from exc
 
-        # 4. 更新 Membership
-        if self.redirect_map:
-            self._update_final_membership()
-
-        # 5. 保存审计报告
-        Path(self.args.audit_out).write_text(
-            json.dumps({
-                "ts": int(time.time()),
-                "entries": self.audit_entries,
-                "stats": self.stats
-            }, ensure_ascii=False, indent=2),
-            encoding="utf-8"
+        # 4. E0 is evaluated against the candidate state before publication.
+        e0_report = validate_tree_e0(
+            self.tm.root,
+            manager=self.tm,
+            membership_rows=candidate_membership,
+            expected_membership_rows=source_membership,
+            lineage=lineage,
+            operations=candidate_operations,
+            require_membership=True,
         )
+        audit_payload = self._audit_payload(e0_report, lineage)
+        atomic_write_json(self.args.audit_out, audit_payload)
+        if not e0_report["passed"]:
+            raise E0ValidationError(
+                f"E0 rejected final candidate with {e0_report['critical_count']} critical violation(s)"
+            )
+
+        # 5. Publish auxiliary files first and the formal tree last.
+        try:
+            self._publish_candidate_outputs(
+                source_fieldnames=source_fieldnames,
+                candidate_membership=candidate_membership,
+                flat_fieldnames=flat_fieldnames,
+                flat_rows=flat_rows,
+                lineage=lineage,
+                candidate_operations=candidate_operations,
+            )
+        except Exception as exc:
+            e0_report["violations"].append({
+                "severity": "critical",
+                "code": "PUBLICATION_FAILED",
+                "message": str(exc),
+                "context": {"exception_type": type(exc).__name__},
+            })
+            e0_report["passed"] = False
+            e0_report["critical_count"] = len(e0_report["violations"])
+            e0_report["violation_counts"] = dict(sorted(Counter(
+                item["code"] for item in e0_report["violations"]
+            ).items()))
+            atomic_write_json(self.args.audit_out, self._audit_payload(e0_report, lineage))
+            raise E0ValidationError(f"Candidate publication failed: {exc}") from exc
 
         # 打印统计
         print(f"\n[Finalization Stats]")
         print(f"  LLM calls: {self.stats['llm_calls']} (failures: {self.stats['llm_failures']})")
         print(f"  Operations: applied={self.stats['ops_applied']}, skipped={self.stats['ops_skipped']}")
-        print(f"[DONE] Audit Completed. Final Tree: {self.args.output}")
+        print(f"  E0: PASS (critical=0)")
+        print(f"[DONE] Audit Completed. Final Tree published: {self.args.output}")
+
+    def _audit_payload(self, e0_report: Dict, lineage: Dict[str, str]) -> Dict:
+        return {
+            "ts": int(time.time()),
+            "entries": self.audit_entries,
+            "stats": self.stats,
+            "lineage": lineage,
+            "e0": e0_report,
+        }
+
+    def _publish_candidate_outputs(
+        self,
+        *,
+        source_fieldnames,
+        candidate_membership,
+        flat_fieldnames,
+        flat_rows,
+        lineage,
+        candidate_operations,
+    ):
+        writes = [
+            (
+                self.membership_output,
+                lambda: atomic_write_csv(
+                    self.membership_output, source_fieldnames, candidate_membership
+                ),
+            ),
+            (
+                Path(self.args.flat_csv),
+                lambda: atomic_write_csv(self.args.flat_csv, flat_fieldnames, flat_rows),
+            ),
+            (
+                self.lineage_output,
+                lambda: atomic_write_json(self.lineage_output, lineage),
+            ),
+            (
+                self.operations_output,
+                lambda: atomic_write_jsonl(self.operations_output, candidate_operations),
+            ),
+            (
+                Path(self.args.output),
+                lambda: atomic_write_json(self.args.output, self.tm.root),
+            ),
+        ]
+        snapshots = {
+            path: path.read_bytes() if path.exists() else None
+            for path, _ in writes
+        }
+        try:
+            for _, write in writes:
+                write()
+        except Exception as exc:
+            rollback_errors = []
+            for path, _ in reversed(writes):
+                try:
+                    previous = snapshots[path]
+                    if previous is None:
+                        path.unlink(missing_ok=True)
+                    else:
+                        atomic_write_bytes(path, previous)
+                except Exception as rollback_exc:
+                    rollback_errors.append(f"{path}: {rollback_exc}")
+            detail = ""
+            if rollback_errors:
+                detail = f" Rollback errors: {'; '.join(rollback_errors)}"
+            raise RuntimeError(f"formal output write failed: {exc}.{detail}") from exc
 
     def _realign_tree_levels(self):
         """
@@ -217,18 +380,13 @@ class OverallStructureAudit:
             node = self.tm.get_node(node_id)
             if not node: return
 
-            new_level_str = f"L{current_depth}"
-
-            if current_depth > 0:
-                node["level"] = new_level_str
+            node["level"] = "ROOT" if current_depth == 0 else f"L{current_depth}"
 
             children = self.tm.get_children(node_id)
             for child in children:
                 dfs(child["node_id"], current_depth + 1)
 
-        root_children = self.tm.get_children(self.tm.root["node_id"])
-        for l1_node in root_children:
-            dfs(l1_node["node_id"], 1)
+        dfs(self.tm.root["node_id"], 0)
         print("[Finalization] Level realignment completed.")
 
     def _load_l1_defs(self) -> Dict[str, str]:
@@ -253,9 +411,13 @@ class OverallStructureAudit:
             node.pop("pending_as_l1", None)
             node.pop("original_level", None)
             node.pop("pending_parent", None)
-            append_jsonl(self.ops_log, {
-                "op": "pending_auto_promote", "node_id": node["node_id"], "reason": "Finalization Auto Fix"
-            })
+            record = {
+                "op": "pending_auto_promote", "type": "pending_auto_promote",
+                "node_id": node["node_id"], "reason": "Finalization Auto Fix",
+                "status": "applied"
+            }
+            self.operation_records.append(record)
+            append_jsonl(self.ops_log, record)
 
     def _call_llm(self, context: str, l1_id: str) -> List[Dict]:
         """
@@ -333,89 +495,124 @@ class OverallStructureAudit:
         return operations
 
     def _apply_operations(self, ops: List[Dict], l1_id: str) -> List[Dict]:
-        applied = []
+        applied: List[Dict] = []
         for op in ops:
+            if not isinstance(op, dict):
+                self.stats["ops_skipped"] += 1
+                applied.append({"status": "skipped", "message": "operation is not an object"})
+                continue
             typ = op.get("type", "").lower()
-            node_id = op.get("node_id")
+            node_id = str(op.get("node_id") or "")
 
             if not node_id or not self.tm.exists(node_id):
-                applied.append({**op, "status": "skipped", "msg": "Node not found"})
+                applied.append({**op, "type": typ, "status": "skipped", "message": "node not found"})
                 self.stats["ops_skipped"] += 1
                 continue
 
-            status = "applied"
-            msg = ""
+            status = "skipped"
+            message = ""
+            record = {**op, "type": typ, "node_id": node_id}
             try:
                 if typ == "rename":
                     new_label = op.get("new_label")
-                    if new_label:
-                        self.tm.get_node(node_id)["label"] = new_label
-                        self.stats["ops_applied"] += 1
+                    if new_label and self.tm.rename_node(node_id, new_label):
+                        status = "applied"
+                        record["source_id"] = node_id
                     else:
-                        status, msg = "skipped", "missing new_label"
-                        self.stats["ops_skipped"] += 1
+                        message = self.tm.last_error or "missing new_label"
 
                 elif typ == "move":
-                    target = op.get("target_parent_id")
+                    target = str(op.get("target_parent_id") or "")
+                    record.update({"source_id": node_id, "target_parent_id": target})
                     if not target or not self.tm.exists(target):
-                        status, msg = "skipped", "target not found"
-                        self.stats["ops_skipped"] += 1
-                    elif self.tm.is_descendant(target, node_id) if hasattr(self.tm, 'is_descendant') else False:
-                        status, msg = "skipped", "target is descendant"
-                        self.stats["ops_skipped"] += 1
+                        message = "target not found"
+                    elif self.tm.is_descendant(target, node_id):
+                        message = "target is descendant"
                     else:
                         t_l1 = get_l1_ancestor(self.tm, target)
                         if t_l1 != l1_id:
-                            status, msg = "skipped", "cross-L1 move forbidden"
-                            self.stats["ops_skipped"] += 1
+                            message = "cross-L1 move forbidden"
+                        elif self.tm.move_node(node_id, target):
+                            status = "applied"
                         else:
-                            self.tm.move_node(node_id, target)
-                            self.stats["ops_applied"] += 1
+                            message = self.tm.last_error or "move failed"
 
                 elif typ == "merge":
-                    target = op.get("merge_into")
+                    target = str(op.get("merge_into") or "")
+                    record.update({"source_id": node_id, "target_id": target})
                     if not target or not self.tm.exists(target):
-                        status, msg = "skipped", "target not found"
-                        self.stats["ops_skipped"] += 1
+                        message = "target not found"
                     elif target == node_id:
-                        status, msg = "skipped", "merge into self"
-                        self.stats["ops_skipped"] += 1
+                        message = "merge into self"
                     else:
                         t_l1 = get_l1_ancestor(self.tm, target)
                         if t_l1 != l1_id:
-                            status, msg = "skipped", "cross-L1 merge forbidden"
-                            self.stats["ops_skipped"] += 1
+                            message = "cross-L1 merge forbidden"
                         else:
-                            if self.tm.absorb_node(target, node_id):
+                            if self.tm.absorb_node(
+                                target, node_id, new_label=op.get("new_label")
+                            ):
                                 self.redirect_map[node_id] = target
-                                self.stats["ops_applied"] += 1
+                                status = "applied"
                             else:
-                                status, msg = "failed", "absorb failed"
-                                self.stats["ops_skipped"] += 1
+                                status = "failed"
+                                message = self.tm.last_error or "absorb failed"
                 else:
-                    status, msg = "skipped", "unknown type"
-                    self.stats["ops_skipped"] += 1
+                    message = "unknown type"
             except Exception as e:
-                status, msg = "error", str(e)
+                status, message = "error", str(e)
+
+            if status == "applied":
+                self.stats["ops_applied"] += 1
+            else:
                 self.stats["ops_skipped"] += 1
-            applied.append({**op, "status": status, "message": msg})
+            applied.append({**record, "status": status, "message": message})
         return applied
 
-    def _update_final_membership(self):
-        csv_path = self.env.outdir / "policy_tree_final_membership.csv"
-        if not csv_path.exists():
-            return
-        print(f"[Finalization] Updating membership trace with {len(self.redirect_map)} ops...")
-        df = pd.read_csv(csv_path, dtype=str)
-        count = 0
-        for idx, row in df.iterrows():
-            curr = str(row.get("final_node_id", ""))
-            if curr in self.redirect_map:
-                while curr in self.redirect_map:
-                    curr = self.redirect_map[curr]
-                df.at[idx, "final_node_id"] = curr
-                count += 1
-        df.to_csv(csv_path, index=False, encoding="utf-8-sig")
+    def _load_membership_source(self):
+        if self.membership_input.exists():
+            fieldnames, rows = read_membership_csv(self.membership_input)
+            if "final_node_id" not in fieldnames:
+                raise E0ValidationError(
+                    f"membership input lacks final_node_id: {self.membership_input}"
+                )
+            return fieldnames, rows
+
+        if self.membership_input_explicit:
+            raise E0ValidationError(
+                f"explicit membership input does not exist: {self.membership_input}"
+            )
+
+        fieldnames = ["sample_id", "final_node_id", "original_node_id", "original_level"]
+        rows = []
+        for level in ["L4", "L3", "L2", "L1"]:
+            path = self.env.outdir / f"tree_node_membership_{level}.csv"
+            if not path.exists():
+                continue
+            _, level_rows = read_membership_csv(path)
+            for row in level_rows:
+                original_node_id = str(row.get("node_id", ""))
+                rows.append({
+                    "sample_id": str(row.get("member_id", "")),
+                    "final_node_id": original_node_id,
+                    "original_node_id": original_node_id,
+                    "original_level": level,
+                })
+        return fieldnames, rows
+
+    def _load_lineage(self) -> Dict[str, str]:
+        existing: Dict[str, str] = {}
+        if self.lineage_input.exists():
+            payload = json.loads(self.lineage_input.read_text(encoding="utf-8"))
+            if not isinstance(payload, dict):
+                raise LineageError("lineage input must be an object")
+            existing = {str(source): str(target) for source, target in payload.items()}
+        return merge_lineage_maps(existing, self.redirect_map)
+
+    def _load_operation_history(self) -> List[Dict]:
+        if not self.operations_input.exists():
+            return []
+        return read_jsonl(self.operations_input)
 
     def _export_flat_csv(self):
         rows = []
@@ -451,9 +648,7 @@ class OverallStructureAudit:
         for l1 in l1_nodes:
             dfs(l1["node_id"], [])
 
-        pd.DataFrame(rows, columns=cols).to_csv(
-            self.args.flat_csv, index=False, encoding="utf-8-sig"
-        )
+        return cols, rows
 
 def main():
     parser = argparse.ArgumentParser(description="PolicyTreeBuilder final replication · Finalization Overall Structure (Fixed)")
@@ -464,6 +659,12 @@ def main():
     parser.add_argument("--l1-def", default=str(DEFAULT_L1_DEF))
     parser.add_argument("--audit-out", default=str(DEFAULT_AUDIT))
     parser.add_argument("--flat-csv", default=str(DEFAULT_FLAT))
+    parser.add_argument("--membership-input", help="Pre-finalization membership CSV")
+    parser.add_argument("--membership-out", help="Published final membership CSV")
+    parser.add_argument("--lineage-in", help="Consolidated pre-finalization lineage JSON")
+    parser.add_argument("--lineage-out", help="Published closed lineage JSON")
+    parser.add_argument("--operations-input", help="Pre-finalization refinement operation JSONL")
+    parser.add_argument("--operations-out", help="Published finalization operation JSONL")
 
     args = parser.parse_args()
 

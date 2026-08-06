@@ -1,6 +1,6 @@
 # PolicyTreeBuilder Technical Workflow
 
-This document describes the public ATRS 2026 replication workflow for the fixed 353-node PolicyTreeBuilder result.
+This document describes the public ATRS 2026 replication workflow and its archived 353-node PolicyTreeBuilder result.
 
 ## Inputs
 
@@ -42,7 +42,7 @@ The public pipeline follows this sequence:
 8. Split administrative trees with `visualization/split_tree_by_administrative_unit.py` and render radial figures with `visualization/render_radial_tree_figure.py` when needed.
 9. Run optional tree-quality evaluation with the public scripts in `evaluation/scripts/`.
 
-Intermediate outputs are stored in `data/intermediate_outputs/`. The fixed publication tree is stored in `data/final_tree/`.
+Intermediate outputs are stored in `data/intermediate_outputs/`. The archived paper tree is stored in `data/final_tree/`; a rerun is a new candidate and must pass E0 before publication.
 
 ## Minimal Rerun Skeleton
 
@@ -66,7 +66,13 @@ python scripts/finalize_policy_tree.py `
   --config configs/tree_refinement_config.yaml `
   --l1-def data/intermediate_outputs/top_level_categories.json `
   --audit-out data/final_tree/policy_tree_final_audit.json `
-  --flat-csv data/final_tree/policy_tree_final_flat.csv
+  --flat-csv data/final_tree/policy_tree_final_flat.csv `
+  --membership-input data/intermediate_outputs/policy_tree_final_membership.csv `
+  --membership-out data/final_tree/policy_tree_final_membership.csv `
+  --lineage-in data/intermediate_outputs/policy_tree_lineage.json `
+  --lineage-out data/final_tree/policy_tree_final_lineage.json `
+  --operations-input data/intermediate_outputs/tree_refinement_operations.jsonl `
+  --operations-out data/final_tree/policy_tree_final_operations.jsonl
 ```
 
 Some steps call external LLM or embedding services. Reviewers without access to the same services can inspect the included intermediate and final outputs directly.
@@ -83,7 +89,7 @@ Copy `configs/llm_profiles.yaml.example` to `configs/llm_profiles.yaml` only if 
 
 ## Evaluation Workflow
 
-The evaluation module defaults to the fixed final tree and writes to `evaluation/outputs/`:
+The evaluation module defaults to the archived paper tree and writes to `evaluation/outputs/`:
 
 ```powershell
 python evaluation/scripts/01_extract_tables.py
@@ -102,9 +108,9 @@ python evaluation/scripts/05_run_path_judge.py --judge A_kimi --limit 3
 
 The archived evaluation outputs include 278 sampled node judgments, 51 sampled path judgments, and the final multi-model framework score reported in `evaluation/outputs/final_summary.json`.
 
-## Final Output Contract
+## Historical Output Contract
 
-The publication tree must satisfy:
+The committed paper snapshot is identified by:
 
 - `data/final_tree/policy_tree_final.json`
 - 353 nodes
@@ -114,3 +120,37 @@ The publication tree must satisfy:
 - SHA256 `9242d4961e417ffa1e30e728d82e73bf669e4facdedd12f4f03f10d19b157983` after repository LF normalization
 
 The source archive extracted-file SHA256 before LF normalization is `6ee8e666dfc5bb7b8611a42c96c8ac93f766290b290115529686f9f3ca67918b`.
+
+These values identify the archived artifact; they do not imply E0 compliance. The frozen tree is retained as a regression negative control and currently fails E0 with 8 exact sibling-duplicate groups and 10 level/depth mismatches. Its final operation log also has 34 `applied` merges whose source nodes remain present.
+
+## E0 Candidate Publication Contract
+
+`finalize_policy_tree.py` validates candidate data before it replaces formal output files. A candidate must have:
+
+- unique non-empty node IDs, one root, no cycles, and exactly one parent per non-root node;
+- raw DFS IDs equal to the live manager index, with every raw child edge equal to `parent_map`;
+- zero exact sibling duplicates and zero exact parent-child duplicates unless explicitly allowlisted;
+- declared `level` equal to physical depth;
+- acyclic, transitively closed lineage whose terminal targets are live and whose redirected sources are absent;
+- no dangling membership targets and exact conservation of membership row identities;
+- true postconditions for every refinement or finalization operation recorded as `applied`.
+
+Step 4 writes fresh operation and membership outputs for each refinement run; an explicitly requested membership input must exist. Finalization combines the operation trace with its own records before E0 validation and publishes the combined JSONL on PASS. The audit report is always written. On any critical violation, the command exits nonzero and leaves the formal tree, membership, flat table, lineage, and operation files unchanged. On PASS, auxiliary files are atomically replaced first and the formal tree JSON is replaced last. If a caught write fails partway through publication, the formal outputs are restored from their pre-publication byte snapshots and the audit is changed to FAIL. The PowerShell wrapper stops immediately on every nonzero exit.
+
+The validator can also be run without API access:
+
+```powershell
+python scripts/validate_tree_e0.py `
+  --tree path/to/candidate.json `
+  --membership path/to/candidate_membership.csv `
+  --lineage path/to/candidate_lineage.json `
+  --operations path/to/candidate_operations.jsonl `
+  --require-membership `
+  --report path/to/e0_report.json
+```
+
+Offline regression tests use the Python standard library:
+
+```powershell
+python -m unittest discover -s tests -v
+```

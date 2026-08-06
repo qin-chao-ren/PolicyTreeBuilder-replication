@@ -17,6 +17,8 @@ from utils.step4_shared import (
     Step4Env, load_tree, dump_tree, append_jsonl
 )
 from utils.tree_manager import TreeManager
+from utils.tree_manager import normalize_label
+from utils.tree_integrity import atomic_write_json
 
 # ==========================================
 # 1. 路径锚点 (Path Anchors) - 保留你的配置
@@ -46,7 +48,7 @@ def get_next_level(lvl):
     return f"L{n}"
 
 def generate_bridge_id(pid, lbl):
-    h = hashlib.md5(f"{pid}_{lbl}_BR".encode()).hexdigest()[:6]
+    h = hashlib.md5(f"{pid}_{normalize_label(lbl)}_BR".encode()).hexdigest()[:6]
     return f"{pid}_BR_{h}"
 
 def describe_node(node, count):
@@ -55,7 +57,11 @@ def describe_node(node, count):
 def calc_depth(tm, nid):
     d = 0
     curr = nid
+    seen = set()
     while curr:
+        if curr in seen:
+            return MAX_DEPTH + 1
+        seen.add(curr)
         p = tm.get_parent_id(curr)
         if not p: break
         d += 1
@@ -67,7 +73,7 @@ class ShapingProcess:
         self.env = env
         self.llm_profile = env.primary_llm_profile()
         self.tm = tm
-        self.ops_log = env.outdir / "tree_edit_operations.jsonl"
+        self.ops_log = env.outdir / "tree_refinement_operations.jsonl"
         self.llm_log = env.log_dir / "llm_balance_tree_structure.jsonl"
         self.trace_map = {}
 
@@ -149,10 +155,18 @@ class ShapingProcess:
         # 简单策略：如果子节点少，直接拍平给爷爷
         if len(children) <= 3:
             print(f"    [Flatten] Node {pid} (depth={depth}) -> lifting {len(children)} children to grandparent")
-            for c in children: self.tm.move_node(c["node_id"], gpid)
-            self.tm.remove_node(pid)
-            append_jsonl(self.ops_log, {"op":"flatten", "node":pid, "depth":depth})
-            return True
+            if self.tm.flatten_node(pid):
+                self.trace_map[pid] = gpid
+                append_jsonl(self.ops_log, {
+                    "op": "flatten", "type": "flatten", "node_id": pid,
+                    "source_id": pid, "target_id": gpid, "depth": depth,
+                    "status": "applied"
+                })
+                return True
+            append_jsonl(self.ops_log, {
+                "op": "flatten", "type": "flatten", "node_id": pid,
+                "status": "rejected", "reason": self.tm.last_error
+            })
         return False
 
     def _apply(self, pid, res, stage):
@@ -169,15 +183,41 @@ class ShapingProcess:
                 for grp in groups:
                     lbl = grp.get("bridge_label")
                     cids = grp.get("child_ids", [])
-                    valid = [c for c in cids if self.tm.get_parent_id(c) == pid]
-                    if not valid or not lbl: continue
+                    candidate_ids = [str(c) for c in cids if self.tm.exists(str(c))]
+                    if not candidate_ids or not lbl: continue
 
                     nid = generate_bridge_id(pid, lbl)
                     nlvl = get_next_level(self.tm.get_node(pid).get("level", "L1"))
-                    if self.tm.add_child_node(pid, {"node_id":nid, "label":lbl, "level":nlvl, "children":[]}):
-                        for c in valid: self.tm.move_node(c, nid)
-                        changed = True
-                        append_jsonl(self.ops_log, {"op":"create_bridge", "parent":pid, "bridge":lbl})
+                    before = {
+                        str(child_id): self.tm.get_parent_id(str(child_id))
+                        for child_id in candidate_ids
+                    }
+                    node_ids_before = set(self.tm.get_all_node_ids())
+                    bridge_id = self.tm.create_or_reuse_bridge(
+                        pid,
+                        {"node_id": nid, "label": lbl, "level": nlvl, "children": []},
+                        candidate_ids,
+                    )
+                    if bridge_id:
+                        moved = any(
+                            before.get(child_id) != self.tm.get_parent_id(child_id)
+                            for child_id in candidate_ids
+                        )
+                        created = bridge_id not in node_ids_before
+                        changed = changed or moved or created
+                        append_jsonl(self.ops_log, {
+                            "op": "create_bridge", "type": "create_bridge",
+                            "parent": pid, "parent_id": pid,
+                            "bridge": lbl, "bridge_id": bridge_id,
+                            "status": "applied"
+                        })
+                    else:
+                        append_jsonl(self.ops_log, {
+                            "op": "create_bridge", "type": "create_bridge",
+                            "parent": pid, "parent_id": pid,
+                            "bridge": lbl, "bridge_id": nid,
+                            "status": "rejected", "reason": self.tm.last_error
+                        })
 
         # 2. Lift as Sibling (New)
         lift = res.get("lift_as_sibling") or res.get("lift_children") or []
@@ -186,9 +226,20 @@ class ShapingProcess:
             if gpid:
                 for c in lift:
                     if self.tm.get_parent_id(c) == pid:
-                        self.tm.move_node(c, gpid)
-                        changed = True
-                        append_jsonl(self.ops_log, {"op":"lift_sibling", "child":c, "new_parent":gpid})
+                        if self.tm.move_node(c, gpid):
+                            changed = True
+                            append_jsonl(self.ops_log, {
+                                "op": "lift_sibling", "type": "lift_sibling",
+                                "child": c, "node": c, "source_id": c,
+                                "new_parent": gpid, "target_parent_id": gpid,
+                                "status": "applied"
+                            })
+                        else:
+                            append_jsonl(self.ops_log, {
+                                "op": "lift_sibling", "type": "lift_sibling",
+                                "child": c, "node": c,
+                                "status": "rejected", "reason": self.tm.last_error
+                            })
 
         return changed
 
@@ -208,7 +259,7 @@ def main():
 
     dump_tree(Path(args.output), proc.tm.root)
     # 兼容性 Trace
-    (env.outdir / "structure_balancing_trace.json").write_text("{}", encoding="utf-8")
+    atomic_write_json(env.outdir / "structure_balancing_trace.json", proc.trace_map)
     print(f"[DONE] Shaping Completed. Tree saved to {args.output}")
 
 if __name__ == "__main__":

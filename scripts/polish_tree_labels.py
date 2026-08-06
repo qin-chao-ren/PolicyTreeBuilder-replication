@@ -12,9 +12,8 @@ Step 4.3 · Polishing (Refactored)
 import argparse
 import time
 import json
-import pandas as pd
 from pathlib import Path
-from typing import Dict, List, Tuple, Set
+from typing import Dict, List
 
 from common_utils import jaccard_overlap
 from llm_runtime import call_llm_json
@@ -28,6 +27,14 @@ from utils.step4_shared import (
     read_title_map
 )
 from utils.tree_manager import TreeManager
+from utils.tree_integrity import (
+    LineageError,
+    atomic_write_csv,
+    atomic_write_json,
+    merge_lineage_maps,
+    read_membership_csv,
+    redirect_membership_rows,
+)
 
 # --- 1. 路径锚点 (Path Anchors) ---
 # 无论在哪里运行命令，__file__ 都能定位到 scripts/ 目录
@@ -58,7 +65,7 @@ class PolishingProcess:
         }
 
         # 日志
-        self.ops_log = env.outdir / "tree_edit_operations.jsonl"
+        self.ops_log = env.outdir / "tree_refinement_operations.jsonl"
         self.llm_log = env.log_dir / "llm_polish_tree_labels.jsonl"
 
         # 本步骤产生的 ID 变更记录 (Old ID -> New ID)
@@ -77,6 +84,7 @@ class PolishingProcess:
         print("[Step 4.3] Consolidating Traces & Exporting Final Membership...")
         final_trace = self._consolidate_all_traces()
         self._export_final_membership(final_trace)
+        atomic_write_json(self.env.outdir / "policy_tree_lineage.json", final_trace)
 
         # 4. 保存最终树
         dump_tree(Path(self.args.output), self.tm.root)
@@ -173,6 +181,13 @@ class PolishingProcess:
         return self.membership.get(node.get("level"), {}).get(node["node_id"], [])
 
     def _process_pair(self, a, b, case, parent_id):
+        # Earlier pairs may have committed a merge and invalidated snapshots.
+        if not self.tm.exists(a["node_id"]) or not self.tm.exists(b["node_id"]):
+            return
+        a = self.tm.get_node(a["node_id"])
+        b = self.tm.get_node(b["node_id"])
+        if not a or not b:
+            return
         # 1. 构造 Context
         ctx_a = self._describe_node(a["node_id"])
         ctx_b = self._describe_node(b["node_id"])
@@ -208,7 +223,7 @@ class PolishingProcess:
         # 3. Execute
         # 注意：不能写 resp.get("json", {})——LLM 调用失败时返回 {"json": None}，
         # key 存在故默认值不生效，res 会是 None。仓库其余 8 处均用 `or {}`。
-        res = resp.get("json") or {}
+        res = (resp.get("json") or {}) if isinstance(resp, dict) else {}
         op = res.get("operation", "keep")
 
         record = {
@@ -226,10 +241,18 @@ class PolishingProcess:
                 return # LLM 幻觉了 ID
 
             # 使用 TreeManager 进行原子合并
-            if self.tm.absorb_node(winner_id, loser_id):
-                if new_label: self.tm.get_node(winner_id)["label"] = new_label
+            if self.tm.absorb_node(winner_id, loser_id, new_label=new_label):
                 self.local_trace_map[loser_id] = winner_id # 记录重定向
-                append_jsonl(self.ops_log, {**record, "winner": winner_id, "loser": loser_id})
+                append_jsonl(self.ops_log, {
+                    **record, "type": "merge", "winner": winner_id,
+                    "loser": loser_id, "source_id": loser_id,
+                    "target_id": winner_id, "status": "applied"
+                })
+            else:
+                append_jsonl(self.ops_log, {
+                    **record, "status": "rejected", "reason": self.tm.last_error,
+                    "winner": winner_id, "loser": loser_id
+                })
 
         elif op == "move":
             # 仅在跨父场景有效
@@ -237,15 +260,33 @@ class PolishingProcess:
             target_parent = res.get("target_parent")
 
             if node_id and target_parent and self.tm.exists(node_id) and self.tm.exists(target_parent):
-                self.tm.move_node(node_id, target_parent)
-                append_jsonl(self.ops_log, {**record, "node": node_id, "new_parent": target_parent})
+                if self.tm.move_node(node_id, target_parent):
+                    append_jsonl(self.ops_log, {
+                        **record, "type": "move", "node": node_id,
+                        "source_id": node_id, "new_parent": target_parent,
+                        "target_parent_id": target_parent, "status": "applied"
+                    })
+                else:
+                    append_jsonl(self.ops_log, {
+                        **record, "status": "rejected", "reason": self.tm.last_error,
+                        "node": node_id, "new_parent": target_parent
+                    })
 
         elif op == "rename":
             node_id = res.get("winner_id")
             new_label = res.get("new_label")
             if node_id and new_label and self.tm.exists(node_id):
-                self.tm.get_node(node_id)["label"] = new_label
-                append_jsonl(self.ops_log, {**record, "node": node_id, "new_label": new_label})
+                if self.tm.rename_node(node_id, new_label):
+                    append_jsonl(self.ops_log, {
+                        **record, "type": "rename", "node": node_id,
+                        "source_id": node_id, "new_label": new_label,
+                        "status": "applied"
+                    })
+                else:
+                    append_jsonl(self.ops_log, {
+                        **record, "status": "rejected", "reason": self.tm.last_error,
+                        "node": node_id, "new_label": new_label
+                    })
 
     def _describe_node(self, node_id):
         node = self.tm.get_node(node_id)
@@ -271,7 +312,7 @@ class PolishingProcess:
         合并 Trace 4.1 + 4.2 + 4.3 (Local)
         逻辑：链式更新 A->B, B->C  =>  A->C
         """
-        full_map = {}
+        maps = []
 
         # 1. 加载历史 Trace
         trace_files = [
@@ -282,74 +323,49 @@ class PolishingProcess:
             if p.exists():
                 try:
                     sub_map = json.loads(p.read_text(encoding="utf-8"))
-                    self._merge_trace_into(full_map, sub_map)
+                    maps.append(sub_map)
                     print(f"  + Loaded {len(sub_map)} redirects from {step}")
-                except Exception as e:
-                    print(f"[WARN] Failed to load trace {step}: {e}")
+                except Exception as exc:
+                    raise RuntimeError(
+                        f"Failed to load required {step} lineage trace {p}: {exc}"
+                    ) from exc
 
         # 2. 合并当前步骤 Trace
-        self._merge_trace_into(full_map, self.local_trace_map)
+        maps.append(self.local_trace_map)
         print(f"  + Loaded {len(self.local_trace_map)} redirects from 4.3 (Local)")
-
-        return full_map
-
-    def _merge_trace_into(self, main_map: Dict[str, str], new_map: Dict[str, str]):
-        """
-        将 new_map 合并入 main_map，并处理链式引用。
-        """
-        # 1. 遍历 main_map，如果其目标在 new_map 中有进一步重定向，则更新 main_map
-        for src, dst in main_map.items():
-            if dst in new_map:
-                main_map[src] = new_map[dst]
-
-        # 2. 将 new_map 中新的映射加入 main_map
-        for src, dst in new_map.items():
-            if src not in main_map:
-                main_map[src] = dst
-            # 如果 src 已经在 main_map，说明是 A->B (old), A->C (new)?
-            # 理论上 ID 是唯一的，不应该出现同一个 ID 在不同阶段作为 Source 出现两次（除非它被移动了而非合并）
-            # 对于 Merge 来说，ID 一旦消失就不应该再出现。
-            # 这里我们假设后来的操作优于先前的操作 (Update)
+        try:
+            return merge_lineage_maps(*maps)
+        except LineageError as exc:
+            raise RuntimeError(f"Lineage consolidation failed: {exc}") from exc
 
     def _export_final_membership(self, trace_map: Dict[str, str]):
         """
         读取原始 CSV，应用 trace_map，生成 policy_tree_final_membership.csv
         """
-        output_rows = []
+        source_rows = []
+        fieldnames = ["sample_id", "final_node_id", "original_node_id", "original_level"]
 
         for level in ["L4", "L3", "L2"]:
             path = self.env.outdir / f"tree_node_membership_{level}.csv"
             if not path.exists(): continue
 
-            df = pd.read_csv(path, dtype=str)
-            print(f"  > Processing {level} membership ({len(df)} rows)...")
-
-            for _, row in df.iterrows():
-                original_nid = str(row["node_id"])
-                sid = str(row["member_id"])
-
-                # 追溯最终 ID
-                # 由于我们已经在 _merge_trace_into 中展平了链条，这里直接查即可
-                final_nid = trace_map.get(original_nid, original_nid)
-
-                # 双重保险：检查 final_nid 是否还存在于当前树中 (可能被级联删除了?)
-                # 如果树中不存在，且没有被进一步映射，说明该节点可能成为了孤儿或被丢弃
-                # 但 public 逻辑尽量避免丢弃。如果真找不到，保留原 ID 或标记为 Unknown
-                if not self.tm.exists(final_nid):
-                     # 尝试看是否能向上找到存在的祖先？暂时不处理太复杂，直接保留
-                     pass
-
-                output_rows.append({
-                    "sample_id": sid,
-                    "final_node_id": final_nid,
+            _, rows = read_membership_csv(path)
+            print(f"  > Processing {level} membership ({len(rows)} rows)...")
+            for row in rows:
+                original_nid = str(row.get("node_id", ""))
+                source_rows.append({
+                    "sample_id": str(row.get("member_id", "")),
+                    "final_node_id": original_nid,
                     "original_node_id": original_nid,
-                    "original_level": level
+                    "original_level": level,
                 })
 
-        if output_rows:
-            out_path = self.env.outdir / "policy_tree_final_membership.csv"
-            pd.DataFrame(output_rows).to_csv(out_path, index=False, encoding="utf-8-sig")
-            print(f"[SUCCESS] Final membership exported to {out_path} ({len(output_rows)} rows)")
+        output_rows = redirect_membership_rows(
+            source_rows, trace_map, self.tm.get_all_node_ids()
+        )
+        out_path = self.env.outdir / "policy_tree_final_membership.csv"
+        atomic_write_csv(out_path, fieldnames, output_rows)
+        print(f"[SUCCESS] Final membership exported to {out_path} ({len(output_rows)} rows)")
 
 def main():
     parser = argparse.ArgumentParser(description="PolicyTreeBuilder final replication · Step4.3 Polishing")
