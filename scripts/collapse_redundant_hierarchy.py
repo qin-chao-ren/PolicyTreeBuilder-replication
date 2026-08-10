@@ -22,6 +22,12 @@ from utils.step4_shared import (
 )
 from utils.tree_manager import TreeManager
 from utils.tree_integrity import atomic_write_json, atomic_write_jsonl
+from utils.semantic_contract import (
+    execute_semantic_decision,
+    membership_counts_from_level_maps,
+    parse_semantic_decisions,
+    rejected_parse_record,
+)
 
 # ==========================================
 # 1. 路径锚点 (Path Anchors) - 保留你的配置
@@ -58,8 +64,11 @@ def describe_node(node_id: str, manager: TreeManager, membership: Dict, title_ma
     # 增加子节点摘要，辅助 LLM 判断
     children_summary = ""
     if children_count > 0:
-        child_labels = [c.get("label", "?")[:20] for c in children[:5]]
-        children_summary = f"\n子节点示例: {', '.join(child_labels)}"
+        child_labels = [
+            f"{c.get('node_id')}={c.get('label', '?')[:20]}"
+            for c in children[:5]
+        ]
+        children_summary = f"\n直属子节点: {', '.join(child_labels)}"
         if children_count > 5:
             children_summary += f" ... 等共 {children_count} 个"
 
@@ -111,6 +120,7 @@ class SkeletonRefiner:
         self.emb_helper = EmbeddingHelper(Path(env.config["paths"]["embeddings"]))
         self.title_map = read_title_map(Path(env.config["paths"]["corpus"]))
         self.membership = {lvl: read_membership_map(env.outdir, lvl) for lvl in ["L4", "L3", "L2", "L1"]}
+        self.membership_counts = membership_counts_from_level_maps(self.membership)
         self.ops_log = env.outdir / "tree_refinement_operations.jsonl"
         self.llm_log = env.log_dir / "llm_collapse_redundant_hierarchy.jsonl"
         self.redirect_map = {}
@@ -154,8 +164,6 @@ class SkeletonRefiner:
 
             # LLM Call
             evidence = self._build_evidence(parent_id, child_id, jac, cos, is_single_child)
-            if not is_single_child:
-                evidence += "\n\n⚠️ 注意：父节点有多个子节点，请勿选择 promote_child，只能选择 keep/rename/absorb。"
 
             resp = call_llm_json(
                 profile=self.llm_profile,
@@ -170,8 +178,15 @@ class SkeletonRefiner:
                 "is_single": is_single_child, "metrics": {"jac":jac, "cos":cos}, "resp": resp
             })
 
-            # 见 polish_tree_labels.py:209 注释：调用失败时 json=None，默认值不生效
-            self._execute_decision(parent_id, parent_node, child_id, resp.get("json") or {}, is_single_child)
+            payload = resp.get("json") if isinstance(resp, dict) else None
+            decisions, errors = parse_semantic_decisions(payload, expected_count=1)
+            if errors:
+                append_jsonl(
+                    self.ops_log,
+                    rejected_parse_record("vertical_collapse", errors),
+                )
+                continue
+            self._execute_decision(decisions[0], parent_id, child_id)
 
     def _build_evidence(self, pid, cid, jac, cos, single):
         note = "【单脉传场景】" if single else "【多子节点场景】"
@@ -182,53 +197,78 @@ class SkeletonRefiner:
             f"相似度: Jaccard={jac:.2f}, Cosine={cos:.2f}\n"
         )
 
-    def _execute_decision(self, pid, pnode, cid, res, is_single):
-        dec = res.get("decision", "keep")
-        new_lbl = res.get("new_label")
-        rec = {"step":"vertical_collapse", "parent":pid, "child":cid, "op":dec}
+    def _execute_decision(self, decision, parent_id, child_id):
+        pair_ids = {str(parent_id), str(child_id)}
+        source_id = str(decision.get("source_id") or "")
+        target_id = str(decision.get("target_id") or "")
+        action = decision.get("action")
+        allowed_actions = {
+            "merge", "rename", "split_reparent",
+            "keep", "reject_merge", "uncertain",
+        }
+        scope_error = None
+        if action not in allowed_actions:
+            scope_error = f"action {action!r} is not allowed in vertical collapse"
+        elif action in {"rename", "split_reparent"} and not (
+            source_id == target_id and source_id in pair_ids
+        ):
+            scope_error = f"{action} must operate on one displayed node"
+        elif action in {"merge", "keep", "reject_merge", "uncertain"} and (
+            {source_id, target_id} != pair_ids
+        ):
+            scope_error = "decision must reference the displayed parent-child pair"
+        elif action == "split_reparent":
+            allowed_targets = pair_ids
+            invalid_targets = sorted({
+                str(item.get("target_parent_id") or "")
+                for item in decision.get("child_plan", [])
+                if isinstance(item, dict)
+            } - allowed_targets)
+            if invalid_targets:
+                scope_error = (
+                    "split_reparent targets must be displayed nodes: "
+                    + ", ".join(invalid_targets)
+                )
 
-        if dec == "rename_then_keep" and new_lbl:
-            if self.tm.rename_node(pid, new_lbl):
-                append_jsonl(self.ops_log, {
-                    **rec, "type": "rename", "node_id": pid,
-                    "new_label": new_lbl, "status": "applied"
-                })
-            else:
-                append_jsonl(self.ops_log, {
-                    **rec, "status": "rejected", "reason": self.tm.last_error
-                })
-
-        elif dec == "absorb_child":
-            if self.tm.absorb_node(pid, cid, new_label=new_lbl):
-                self.redirect_map[cid] = pid
-                append_jsonl(self.ops_log, {
-                    **rec, "type": "merge", "source_id": cid,
-                    "target_id": pid, "new_label": new_lbl,
-                    "status": "applied"
-                })
-            else:
-                append_jsonl(self.ops_log, {
-                    **rec, "status": "rejected", "reason": self.tm.last_error
-                })
-
-        elif dec == "promote_child":
-            # 核心修复点：安全检查
-            ok, reason = can_promote_safely(self.tm, cid, pid)
+        if scope_error:
+            append_jsonl(
+                self.ops_log,
+                rejected_parse_record(
+                    "vertical_collapse",
+                    [{
+                        "code": "DECISION_SCOPE_VIOLATION",
+                        "message": scope_error,
+                    }],
+                ),
+            )
+            return
+        if (
+            decision.get("action") == "merge"
+            and self.tm.exists(source_id)
+            and self.tm.exists(target_id)
+            and self.tm.is_descendant(target_id, source_id)
+        ):
+            ok, reason = can_promote_safely(self.tm, target_id, source_id)
             if not ok:
-                append_jsonl(self.ops_log, {**rec, "status": "rejected", "reason": reason})
-                return
+                decision = dict(decision)
+                evidence = dict(decision.get("evidence") or {})
+                warnings = list(evidence.get("warnings") or [])
+                warnings.append(f"promote_safety:{reason}")
+                evidence["warnings"] = warnings
+                decision["evidence"] = evidence
 
-            if self.tm.promote_child_and_remove_parent(cid, new_label=new_lbl):
-                self.redirect_map[pid] = cid
-                append_jsonl(self.ops_log, {
-                    **rec, "type": "merge", "source_id": pid,
-                    "target_id": cid, "new_label": new_lbl,
-                    "status": "applied"
-                })
-            else:
-                append_jsonl(self.ops_log, {
-                    **rec, "status": "rejected", "reason": self.tm.last_error
-                })
+        record = execute_semantic_decision(
+            self.tm,
+            decision,
+            direct_membership_counts=self.membership_counts,
+            membership_known=True,
+            stage="vertical_collapse",
+            lineage=self.redirect_map,
+            allow_cross_l1=False,
+        )
+        if record.get("status") == "applied" and record.get("lineage_target"):
+            self.redirect_map[record["source_id"]] = record["lineage_target"]
+        append_jsonl(self.ops_log, record)
 
 def main():
     parser = argparse.ArgumentParser(description="PolicyTreeBuilder final replication · Step4.1 Skeleton (Fixed)")

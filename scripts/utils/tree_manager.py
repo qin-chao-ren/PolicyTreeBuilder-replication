@@ -278,6 +278,63 @@ class TreeManager:
 
         return self._atomic(mutate, postcondition)
 
+    def move_nodes_atomically(self, moves: List[Dict[str, str]]) -> bool:
+        """Move a complete reparent plan as one rollback-protected mutation."""
+        if not isinstance(moves, list) or not moves:
+            self.last_error = "atomic move plan must be a non-empty list"
+            return False
+
+        normalized: List[tuple[str, str]] = []
+        seen_sources: Set[str] = set()
+        for item in moves:
+            if not isinstance(item, dict):
+                self.last_error = "every atomic move item must be an object"
+                return False
+            node_id = str(item.get("node_id") or "").strip()
+            new_parent_id = str(item.get("new_parent_id") or "").strip()
+            if not node_id or not new_parent_id:
+                self.last_error = "atomic move source and target must be non-empty"
+                return False
+            if node_id in seen_sources:
+                self.last_error = f"duplicate atomic move source: {node_id}"
+                return False
+            if node_id not in self.index or new_parent_id not in self.index:
+                self.last_error = f"atomic move source or target does not exist: {node_id}"
+                return False
+            if node_id not in self.parent_map:
+                self.last_error = "root cannot be moved"
+                return False
+            if node_id == new_parent_id or self.is_descendant(new_parent_id, node_id):
+                self.last_error = f"atomic move would create a cycle: {node_id}"
+                return False
+            seen_sources.add(node_id)
+            normalized.append((node_id, new_parent_id))
+
+        effective = [
+            (node_id, new_parent_id)
+            for node_id, new_parent_id in normalized
+            if self.parent_map.get(node_id) != new_parent_id
+        ]
+        if not effective:
+            self.last_error = None
+            return True
+
+        def mutate() -> None:
+            for node_id, new_parent_id in effective:
+                if node_id not in self.index or new_parent_id not in self.index:
+                    raise TreeInvariantError("atomic move endpoint disappeared during mutation")
+                if node_id == new_parent_id or self.is_descendant(new_parent_id, node_id):
+                    raise TreeInvariantError("atomic move plan creates an interdependent cycle")
+                self._move_unchecked(node_id, new_parent_id)
+
+        def postcondition() -> bool:
+            return all(
+                self.parent_map.get(node_id) == new_parent_id
+                for node_id, new_parent_id in normalized
+            )
+
+        return self._atomic(mutate, postcondition)
+
     def remove_node(self, node_id: str, keep_children_orphaned: bool = False) -> bool:
         """Remove a node atomically.
 

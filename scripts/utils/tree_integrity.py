@@ -440,7 +440,12 @@ def validate_tree_e0(
 
         def source_id(operation: Mapping[str, Any], operation_type: str) -> str:
             if operation_type == "promote_child":
-                return str(operation.get("parent") or operation.get("parent_id") or "")
+                return str(
+                    operation.get("source_id")
+                    or operation.get("parent")
+                    or operation.get("parent_id")
+                    or ""
+                )
             return str(
                 operation.get("source_id")
                 or operation.get("loser")
@@ -451,7 +456,12 @@ def validate_tree_e0(
 
         def target_id(operation: Mapping[str, Any], operation_type: str) -> str:
             if operation_type == "promote_child":
-                return str(operation.get("child") or operation.get("child_id") or "")
+                return str(
+                    operation.get("target_id")
+                    or operation.get("child")
+                    or operation.get("child_id")
+                    or ""
+                )
             return str(
                 operation.get("target_id")
                 or operation.get("merge_into")
@@ -467,6 +477,15 @@ def validate_tree_e0(
             source = source_id(operation, operation_type)
             if operation_type in {"move", "lift_sibling"} and source:
                 last_move[source] = index
+            elif operation_type == "split_reparent":
+                plan = operation.get("child_plan")
+                if isinstance(plan, list):
+                    for item in plan:
+                        if not isinstance(item, Mapping) or item.get("disposition") != "move":
+                            continue
+                        child_id = str(item.get("child_id") or "")
+                        if child_id:
+                            last_move[child_id] = index
             elif operation_type == "rename" and source:
                 last_rename[source] = index
 
@@ -535,6 +554,51 @@ def validate_tree_e0(
                         node_id=source,
                         target_parent_id=target,
                         actual_parent=raw_parents.get(source),
+                    )
+            elif operation_type == "split_reparent":
+                plan = operation.get("child_plan")
+                if not isinstance(plan, list):
+                    add(
+                        "APPLIED_SPLIT_PLAN_MISSING",
+                        "Applied split_reparent has no child plan",
+                        operation_index=index,
+                    )
+                    continue
+                moved = 0
+                for item in plan:
+                    if not isinstance(item, Mapping) or item.get("disposition") != "move":
+                        continue
+                    child_id = str(item.get("child_id") or "")
+                    planned_target = str(item.get("target_parent_id") or "")
+                    if not child_id or not planned_target:
+                        add(
+                            "APPLIED_SPLIT_PLAN_INVALID",
+                            "Applied split child or target is missing",
+                            operation_index=index,
+                        )
+                        continue
+                    if index != last_move.get(child_id):
+                        continue
+                    moved += 1
+                    final_target = terminal(planned_target)
+                    child_was_deleted_later = child_id not in raw_ids and child_id in closed_lineage
+                    if (
+                        not child_was_deleted_later
+                        and (child_id not in raw_ids or raw_parents.get(child_id) != final_target)
+                    ):
+                        add(
+                            "APPLIED_SPLIT_REPARENT_UNTRUE",
+                            "Applied split child is not attached to its planned parent",
+                            operation_index=index,
+                            child_id=child_id,
+                            target_parent_id=planned_target,
+                            actual_parent=raw_parents.get(child_id),
+                        )
+                if moved == 0:
+                    add(
+                        "APPLIED_SPLIT_HAS_NO_MOVES",
+                        "Applied split_reparent has no terminal move to validate",
+                        operation_index=index,
                     )
             elif operation_type in {"create_bridge", "insert_bridge"}:
                 bridge_id = str(operation.get("bridge_id") or operation.get("node_id") or "")

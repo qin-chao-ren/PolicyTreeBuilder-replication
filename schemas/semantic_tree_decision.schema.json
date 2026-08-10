@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/policy-tree/semantic_tree_decision.schema.json",
+  "title": "Policy tree semantic decision envelope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["decisions"],
+  "properties": {
+    "decisions": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/decision"}
+    }
+  },
+  "$defs": {
+    "relation": {
+      "type": "string",
+      "enum": [
+        "exact_duplicate",
+        "synonym",
+        "broader_narrower",
+        "related",
+        "complementary",
+        "means_goal",
+        "carrier_outcome",
+        "misplaced",
+        "uncertain"
+      ]
+    },
+    "action": {
+      "type": "string",
+      "enum": [
+        "merge",
+        "keep",
+        "reject_merge",
+        "move",
+        "move_across_l1",
+        "split_reparent",
+        "uncertain",
+        "rename",
+        "flatten",
+        "create_bridge"
+      ]
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "summary",
+        "warnings",
+        "target_represents_all_source_members",
+        "membership_basis",
+        "pure_structural_redundancy",
+        "cross_l1_authorized"
+      ],
+      "properties": {
+        "summary": {"type": "string", "minLength": 1},
+        "warnings": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1},
+          "uniqueItems": true
+        },
+        "target_represents_all_source_members": {"type": "boolean"},
+        "membership_basis": {"type": "string"},
+        "pure_structural_redundancy": {"type": "boolean"},
+        "cross_l1_authorized": {"type": "boolean"}
+      }
+    },
+    "childPlanItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "child_id",
+        "disposition",
+        "target_parent_id",
+        "relation",
+        "same_domain",
+        "evidence"
+      ],
+      "properties": {
+        "child_id": {"type": "string", "minLength": 1},
+        "disposition": {
+          "type": "string",
+          "enum": ["move", "keep", "retain_under_source"]
+        },
+        "target_parent_id": {"type": "string", "minLength": 1},
+        "relation": {"$ref": "#/$defs/relation"},
+        "same_domain": {"type": "boolean"},
+        "evidence": {"type": "string", "minLength": 1}
+      }
+    },
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "relation",
+        "action",
+        "source_id",
+        "target_id",
+        "new_label",
+        "confidence",
+        "evidence",
+        "child_plan"
+      ],
+      "properties": {
+        "operation_id": {"type": "string", "minLength": 1},
+        "relation": {"$ref": "#/$defs/relation"},
+        "action": {"$ref": "#/$defs/action"},
+        "source_id": {"type": "string", "minLength": 1},
+        "target_id": {"type": "string", "minLength": 1},
+        "new_label": {"type": ["string", "null"]},
+        "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+        "evidence": {"$ref": "#/$defs/evidence"},
+        "child_plan": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/childPlanItem"}
+        }
+      }
+    }
+  }
+}

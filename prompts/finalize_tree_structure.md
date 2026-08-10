@@ -1,60 +1,65 @@
-# Finalization · 政策骨架语义精修 (Semantic Structure Refinement)
+# Step 14d · L1-bounded semantic finalization
 
-你是 **“AI 政策体系架构师”**。当前展示的是一棵基于政策标题构建的**骨架树**（L1-L4）。
-后续步骤会挂载具体的行动单元（T5），因此当前树主要承载**目录结构**的功能。
+You are auditing one displayed L1 subtree batch. The finalizer has two independent publication gates: structural E0 and the semantic contract below. A structurally valid operation is still rejected when its semantic proof is incomplete.
 
-## 核心任务
-在**绝对不跨越 L1 边界**的前提下，审视 L2-L4 节点的**语义逻辑**，消除冗余层级，优化归类。
+## Output contract
 
-## 决策三原则 (The Iron Triangle)
-1.  **奥卡姆剃刀**：如果一个中间层级（L2或L3）与其父节点或子节点**语义高度重叠**，它就是噪音，必须消除。
-2.  **保留必要骨架**：**不要**仅仅因为一个节点下目前没有子节点（Empty Node）就删除它。只有当它在语义上是废话时才删除。
-3.  **层级适配**：L2 应为宏观领域，L3 为子领域/任务组，L4 为具体事项。
-
-## 必杀技：结构优化指令 (High-Priority Operations)
-
-### 1. 垂直坍缩 (Vertical Collapse) —— 针对“单脉传代”且“语义重复”
-**场景 (Case A)**：L2 -> L3 -> L4 形成单一直线，且三者标签语义近似。
-* *示例*：L2(港区联动) -> L3(加强港区联动) -> L4(推动区港一体化)
-* **操作**：这是极度的层级浪费！请连续提出 `merge`。
-    * 建议：将 L3 合并入 L2，将 L4 合并入 L2（或保留 L4 但挂在 L2 下）。
-    * *目标*：将三层结构压缩为一层或两层。
-
-### 2. 中间商消融 (Middleman Removal) —— 针对 Case B
-**场景**：L2 下面有一个 L3，该 L3 的标签只是 L2 的重复或微弱扩充，且 L3 下面挂了多个 L4。
-* *示例*：L2(延伸产业业态) -> L3(延伸物流链条) -> [L4_A, L4_B...]
-* **操作**：L3 没有提供分类价值。请提出 `merge`，将 L3 合并入 L2。
-* *结果*：L4_A, L4_B 会自动挂载到 L2 下，层级结构更扁平。
-
-### 3. 兄弟归并 (Sibling Merge)
-**场景**：同一父节点下，两个 L4 说是两件事，其实是一件事。
-* *示例*：L4_A(建设跨境产业园) 和 L4_B(推进跨境园区建设)
-* **操作**：提出 `merge`，保留表达更精准的那个。
-
-## ⚠️ 禁区 (Constraints)
-* **禁止** 对 L1 节点做任何修改。
-* **禁止** 跨 L1 移动节点。
-* **审慎** 对待单子节点：如果 L2(基础设施) -> L3(机场建设)，虽然是单子节点，但“机场”是“基础设施”的具体化，提供了**语义增量**，应当保留，**不要合并**。
-
-## 输出格式 (JSON Only)
-仅输出 JSON，无其他废话。
+Return JSON only. Return `{"decisions":[]}` when no safe operation is justified.
 
 ```json
 {
-  "operations": [
+  "decisions": [
     {
-      "type": "merge",
-      "node_id": "被消除的节点ID (Loser)",
-      "merge_into": "保留的节点ID (Winner)",
-      "reason": "垂直冗余：L3(加强港区联动)与L2(港区协同联动)语义完全重复，且未提供新信息，予以合并以扁平化层级。",
-      "confidence": 0.95
-    },
-    {
-      "type": "move",
-      "node_id": "L4_xxxx",
-      "target_parent_id": "L2_yyyy",
-      "reason": "层级修正：该节点描述具体建设动作，原挂载于L2过于宏观，下沉至具体的L3业务组。",
-      "confidence": 0.85
+      "relation": "exact_duplicate|synonym|broader_narrower|related|complementary|means_goal|carrier_outcome|misplaced|uncertain",
+      "action": "merge|move|rename|flatten|split_reparent|keep|reject_merge|uncertain",
+      "source_id": "displayed non-L1 node id",
+      "target_id": "displayed node id",
+      "new_label": null,
+      "confidence": 0.0,
+      "evidence": {
+        "summary": "specific path and membership evidence",
+        "warnings": [],
+        "target_represents_all_source_members": false,
+        "membership_basis": "",
+        "pure_structural_redundancy": false,
+        "cross_l1_authorized": false
+      },
+      "child_plan": []
     }
   ]
 }
+```
+
+Every field is required. Each child plan item must contain:
+
+```json
+{"child_id":"direct child id","disposition":"move|keep|retain_under_source","target_parent_id":"displayed node id","relation":"exact_duplicate|synonym|broader_narrower|related|complementary|means_goal|carrier_outcome|misplaced|uncertain","same_domain":true,"evidence":"specific destination evidence"}
+```
+
+## Publication-safe rules
+
+- Do not modify an L1 node and do not cross the displayed L1 boundary.
+- Relation and action are separate. Only `exact_duplicate` and genuine `synonym` may authorize destructive `merge`.
+- A repeated word, a repetitive path marker, a single-child marker, topical relatedness, broader/narrower scope, means-goal, carrier-outcome, or complementary function does not authorize merge.
+- `source_id` is removed by merge and `target_id` survives. If the displayed source has direct membership above zero, merge only when every source record is represented by the target label; set `target_represents_all_source_members=true` and give a concrete `membership_basis`. The batch does not show record titles, so do not claim this proof merely from labels or counts.
+- A merge with children needs a complete per-child move plan to the target. A parent-into-child merge additionally requires an exact single-child chain and a complete plan to the source parent.
+- `flatten` is distinct from merge. It requires `target_id` equal to the source parent, direct membership exactly zero, `pure_structural_redundancy=true`, and a complete per-child move plan proving the destination domain.
+- `move` uses `relation=misplaced`; preserve every source child with a complete `retain_under_source` plan.
+- `split_reparent` keeps the umbrella with `source_id=target_id`, covers every direct child once, and moves only individually proven mismatches.
+- `rename` uses `source_id=target_id`, requires `new_label`, and has no child plan.
+- `keep`, `reject_merge`, and `uncertain` never mutate and have an empty child plan. `action=uncertain` requires `relation=uncertain`.
+- Do not invent IDs, silently omit a child, or use free-text reasoning as operation authority. Unknown or insufficient evidence must fail closed.
+
+## Safe examples
+
+Non-equivalent single-child chain:
+
+```json
+{"decisions":[{"relation":"broader_narrower","action":"reject_merge","source_id":"N3","target_id":"N2","new_label":null,"confidence":0.97,"evidence":{"summary":"N3 adds a narrower policy domain, so the single-child shape is not semantic redundancy.","warnings":["scope_differs"],"target_represents_all_source_members":false,"membership_basis":"","pure_structural_redundancy":false,"cross_l1_authorized":false},"child_plan":[]}]}
+```
+
+Safe empty-wrapper flatten with all children proven:
+
+```json
+{"decisions":[{"relation":"broader_narrower","action":"flatten","source_id":"W","target_id":"P","new_label":null,"confidence":0.96,"evidence":{"summary":"W has zero direct membership and adds no domain beyond P; both children remain in P's domain.","warnings":[],"target_represents_all_source_members":false,"membership_basis":"","pure_structural_redundancy":true,"cross_l1_authorized":false},"child_plan":[{"child_id":"C1","disposition":"move","target_parent_id":"P","relation":"broader_narrower","same_domain":true,"evidence":"C1 is a direct subtype of P."},{"child_id":"C2","disposition":"move","target_parent_id":"P","relation":"broader_narrower","same_domain":true,"evidence":"C2 is a direct subtype of P."}]}]}
+```

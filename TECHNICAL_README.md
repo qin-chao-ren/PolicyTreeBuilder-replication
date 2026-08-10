@@ -123,9 +123,9 @@ The source archive extracted-file SHA256 before LF normalization is `6ee8e666dfc
 
 These values identify the archived artifact; they do not imply E0 compliance. The frozen tree is retained as a regression negative control and currently fails E0 with 8 exact sibling-duplicate groups and 10 level/depth mismatches. Its final operation log also has 34 `applied` merges whose source nodes remain present.
 
-## E0 Candidate Publication Contract
+## Candidate Publication Contract
 
-`finalize_policy_tree.py` validates candidate data before it replaces formal output files. A candidate must have:
+`finalize_policy_tree.py` validates candidate data before it replaces formal output files. Structural E0 requires:
 
 - unique non-empty node IDs, one root, no cycles, and exactly one parent per non-root node;
 - raw DFS IDs equal to the live manager index, with every raw child edge equal to `parent_map`;
@@ -135,9 +135,11 @@ These values identify the archived artifact; they do not imply E0 compliance. Th
 - no dangling membership targets and exact conservation of membership row identities;
 - true postconditions for every refinement or finalization operation recorded as `applied`.
 
-Step 4 writes fresh operation and membership outputs for each refinement run; an explicitly requested membership input must exist. Finalization combines the operation trace with its own records before E0 validation and publishes the combined JSONL on PASS. The audit report is always written. On any critical violation, the command exits nonzero and leaves the formal tree, membership, flat table, lineage, and operation files unchanged. On PASS, auxiliary files are atomically replaced first and the formal tree JSON is replaced last. If a caught write fails partway through publication, the formal outputs are restored from their pre-publication byte snapshots and the audit is changed to FAIL. The PowerShell wrapper stops immediately on every nonzero exit.
+The separate semantic-contract gate requires every applied semantic operation to retain its pre-operation context and a passing shared decision report. Only `exact_duplicate` or `synonym` may authorize destructive merge; direct source membership needs explicit full-representation evidence; and merge, flatten, move, bridge, and split operations require complete compatible child plans where children are affected. The public schema is `schemas/semantic_tree_decision.schema.json`.
 
-The validator can also be run without API access:
+Step 4 writes fresh operation and membership outputs for each refinement run; an explicitly requested membership input must exist. Finalization combines the operation trace with its own records, reports structural E0 and the semantic contract separately, and publishes the combined JSONL only when both pass. The audit report is always written. On any critical violation, the command exits nonzero and leaves the formal tree, membership, flat table, lineage, and operation files unchanged. On PASS, auxiliary files are atomically replaced first and the formal tree JSON is replaced last. If a caught write fails partway through publication, the formal outputs are restored from their pre-publication byte snapshots and the audit is changed to FAIL. The PowerShell wrapper stops immediately on every nonzero exit.
+
+The structural E0 validator can also be run independently without API access:
 
 ```powershell
 python scripts/validate_tree_e0.py `

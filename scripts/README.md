@@ -17,10 +17,11 @@ This directory contains the public pipeline scripts used to build and refine pol
 | Refinement and finalization | `collapse_redundant_hierarchy.py`, `balance_tree_structure.py`, `polish_tree_labels.py`, `finalize_policy_tree.py` | initial/refined tree states | final tree and audit outputs | Yes |
 | Lineage tracing | `trace_node_lineage.py` | corpus, membership, operation logs | lineage report | No |
 | E0 integrity gate | `validate_tree_e0.py` | candidate tree, membership, lineage, operations | machine-readable PASS/FAIL report | No |
+| Semantic decision contract | `utils/semantic_contract.py`, `../schemas/semantic_tree_decision.schema.json` | shared `decisions[]` responses and operation history | validated decisions and `semantic_contract` report | No |
 
 The full command template is `run_policy_tree_pipeline.ps1` in the repository root.
 
-Tree writes in the refinement stages use rollback plus raw/index/parent-map postconditions and record the current run in `tree_refinement_operations.jsonl`. Finalization validates that trace together with its own operations, then publishes `policy_tree_final.json` only after E0 passes. Run the offline regression suite with `python -m unittest discover -s tests -v`.
+Tree writes in the refinement stages use rollback plus raw/index/parent-map postconditions and record the current run in `tree_refinement_operations.jsonl`. All four refinement/finalization stages parse the same relation/action schema; destructive merge is restricted to exact duplicates or supported synonyms, and every affected child needs an explicit compatible destination plan. Finalization validates the combined history and publishes `policy_tree_final.json` only when both structural `e0` and independent `semantic_contract` reports pass. Run the offline regression suite with `python -m unittest discover -s tests -v`.
 
 ## LLM Runtime Boundary
 

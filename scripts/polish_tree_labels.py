@@ -35,6 +35,12 @@ from utils.tree_integrity import (
     read_membership_csv,
     redirect_membership_rows,
 )
+from utils.semantic_contract import (
+    execute_semantic_decision,
+    membership_counts_from_level_maps,
+    parse_semantic_decisions,
+    rejected_parse_record,
+)
 
 # --- 1. 路径锚点 (Path Anchors) ---
 # 无论在哪里运行命令，__file__ 都能定位到 scripts/ 目录
@@ -63,6 +69,7 @@ class PolishingProcess:
             lvl: read_membership_map(env.outdir, lvl)
             for lvl in ["L4", "L3", "L2", "L1"]
         }
+        self.membership_counts = membership_counts_from_level_maps(self.membership)
 
         # 日志
         self.ops_log = env.outdir / "tree_refinement_operations.jsonl"
@@ -220,85 +227,114 @@ class PolishingProcess:
             "metrics": {"jac": jac, "cos": cos}, "resp": resp
         })
 
-        # 3. Execute
-        # 注意：不能写 resp.get("json", {})——LLM 调用失败时返回 {"json": None}，
-        # key 存在故默认值不生效，res 会是 None。仓库其余 8 处均用 `or {}`。
-        res = (resp.get("json") or {}) if isinstance(resp, dict) else {}
-        op = res.get("operation", "keep")
+        payload = resp.get("json") if isinstance(resp, dict) else None
+        decisions, errors = parse_semantic_decisions(payload, expected_count=1)
+        if errors:
+            append_jsonl(
+                self.ops_log,
+                rejected_parse_record("label_polishing", errors),
+            )
+            return
 
-        record = {
-            "ts": int(time.time()), "step": "label_polishing", "case": case,
-            "op": op, "reason": res.get("reason"), "confidence": res.get("confidence")
+        self._execute_decision(decisions[0], a["node_id"], b["node_id"], case)
+
+    def _execute_decision(self, decision, node_a_id, node_b_id, case):
+        action = decision.get("action")
+        source_id = str(decision.get("source_id") or "")
+        target_id = str(decision.get("target_id") or "")
+        pair_ids = {str(node_a_id), str(node_b_id)}
+        parent_ids = {
+            str(self.tm.get_parent_id(node_a_id) or ""),
+            str(self.tm.get_parent_id(node_b_id) or ""),
         }
+        allowed_actions = {
+            "merge", "move", "rename", "split_reparent",
+            "keep", "reject_merge", "uncertain",
+        }
+        scope_error = None
+        if action not in allowed_actions:
+            scope_error = f"action {action!r} is not allowed in label polishing"
+        elif action == "merge" and {source_id, target_id} != pair_ids:
+            scope_error = "merge source and target must be the displayed pair"
+        elif action == "move" and (
+            source_id not in pair_ids or target_id not in parent_ids
+        ):
+            scope_error = "move must reparent one displayed node to one displayed parent"
+        elif action in {"rename", "split_reparent"} and not (
+            source_id == target_id and source_id in pair_ids
+        ):
+            scope_error = f"{action} must operate on one displayed node"
+        elif action == "split_reparent":
+            allowed_targets = pair_ids | parent_ids
+            invalid_targets = sorted({
+                str(item.get("target_parent_id") or "")
+                for item in decision.get("child_plan", [])
+                if isinstance(item, dict)
+            } - allowed_targets)
+            if invalid_targets:
+                scope_error = (
+                    "split targets must be displayed nodes or displayed parents: "
+                    + ", ".join(invalid_targets)
+                )
+        elif action in {"keep", "reject_merge", "uncertain"} and {source_id, target_id} != pair_ids:
+            scope_error = "non-mutating decision must reference the displayed pair"
 
-        if op == "merge":
-            winner_id = res.get("winner_id")
-            loser_id = res.get("loser_id")
-            new_label = res.get("new_label")
+        if scope_error:
+            append_jsonl(
+                self.ops_log,
+                rejected_parse_record(
+                    "label_polishing",
+                    [{"code": "DECISION_SCOPE_VIOLATION", "message": scope_error}],
+                ),
+            )
+            return
 
-            # 安全检查
-            if winner_id not in [a["node_id"], b["node_id"]] or loser_id not in [a["node_id"], b["node_id"]]:
-                return # LLM 幻觉了 ID
-
-            # 使用 TreeManager 进行原子合并
-            if self.tm.absorb_node(winner_id, loser_id, new_label=new_label):
-                self.local_trace_map[loser_id] = winner_id # 记录重定向
-                append_jsonl(self.ops_log, {
-                    **record, "type": "merge", "winner": winner_id,
-                    "loser": loser_id, "source_id": loser_id,
-                    "target_id": winner_id, "status": "applied"
-                })
-            else:
-                append_jsonl(self.ops_log, {
-                    **record, "status": "rejected", "reason": self.tm.last_error,
-                    "winner": winner_id, "loser": loser_id
-                })
-
-        elif op == "move":
-            # 仅在跨父场景有效
-            node_id = res.get("winner_id") # LLM 可能会把要移动的节点填在 winner_id
-            target_parent = res.get("target_parent")
-
-            if node_id and target_parent and self.tm.exists(node_id) and self.tm.exists(target_parent):
-                if self.tm.move_node(node_id, target_parent):
-                    append_jsonl(self.ops_log, {
-                        **record, "type": "move", "node": node_id,
-                        "source_id": node_id, "new_parent": target_parent,
-                        "target_parent_id": target_parent, "status": "applied"
-                    })
-                else:
-                    append_jsonl(self.ops_log, {
-                        **record, "status": "rejected", "reason": self.tm.last_error,
-                        "node": node_id, "new_parent": target_parent
-                    })
-
-        elif op == "rename":
-            node_id = res.get("winner_id")
-            new_label = res.get("new_label")
-            if node_id and new_label and self.tm.exists(node_id):
-                if self.tm.rename_node(node_id, new_label):
-                    append_jsonl(self.ops_log, {
-                        **record, "type": "rename", "node": node_id,
-                        "source_id": node_id, "new_label": new_label,
-                        "status": "applied"
-                    })
-                else:
-                    append_jsonl(self.ops_log, {
-                        **record, "status": "rejected", "reason": self.tm.last_error,
-                        "node": node_id, "new_label": new_label
-                    })
+        record = execute_semantic_decision(
+            self.tm,
+            decision,
+            direct_membership_counts=self.membership_counts,
+            membership_known=True,
+            stage="label_polishing",
+            lineage=self._current_lineage(),
+            allow_cross_l1=False,
+        )
+        record["case"] = case
+        append_jsonl(self.ops_log, record)
+        if record.get("status") == "applied" and record.get("lineage_target"):
+            self.local_trace_map[record["source_id"]] = record["lineage_target"]
 
     def _describe_node(self, node_id):
         node = self.tm.get_node(node_id)
         pid = self.tm.get_parent_id(node_id)
         p_label = self.tm.get_node(pid)["label"] if pid and self.tm.exists(pid) else "ROOT"
+        children = self.tm.get_children(node_id)
+        child_text = ", ".join(
+            f"{child.get('node_id')}={child.get('label', '')}"
+            for child in children
+        ) or "none"
 
         titles = self._collect_titles(node_id)
         return (
             f"ID: {node_id} · Label: {node.get('label','')}\n"
-            f"Level: {node.get('level')} · Parent: {p_label}\n"
+            f"Level: {node.get('level')} · Parent: {pid or 'ROOT'}={p_label}\n"
+            f"Direct children: {child_text}\n"
+            f"Direct membership count: {len(self._get_members(node))}\n"
             f"Examples: {', '.join(titles)}"
         )
+
+    def _current_lineage(self) -> Dict[str, str]:
+        maps = []
+        for path in (
+            self.env.outdir / "vertical_collapse_trace.json",
+            self.env.outdir / "structure_balancing_trace.json",
+        ):
+            if path.exists():
+                payload = json.loads(path.read_text(encoding="utf-8"))
+                if not isinstance(payload, dict):
+                    raise RuntimeError(f"lineage trace must be an object: {path}")
+                maps.append(payload)
+        maps.append(self.local_trace_map)
+        return merge_lineage_maps(*maps)
 
     def _collect_titles(self, node_id):
         node = self.tm.get_node(node_id)

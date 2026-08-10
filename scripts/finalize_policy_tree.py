@@ -39,6 +39,14 @@ from utils.tree_integrity import (
     redirect_membership_rows,
     validate_tree_e0,
 )
+from utils.semantic_contract import (
+    SemanticContractError,
+    execute_semantic_decision,
+    membership_counts_from_rows,
+    parse_semantic_decisions,
+    rejected_parse_record,
+    validate_semantic_history,
+)
 
 # --- 1. 路径锚点 (Path Anchors) ---
 HERE = Path(__file__).resolve().parent
@@ -69,7 +77,12 @@ def get_l1_ancestor(tm: TreeManager, node_id: str) -> Optional[str]:
         curr = tm.get_parent_id(curr)
     return None
 
-def render_subtree(tm: TreeManager, node_id: str, prefix_path: List[str]) -> List[str]:
+def render_subtree(
+    tm: TreeManager,
+    node_id: str,
+    prefix_path: List[str],
+    direct_membership_counts: Optional[Dict[str, int]] = None,
+) -> List[str]:
     node = tm.get_node(node_id)
     if not node: return []
 
@@ -91,15 +104,32 @@ def render_subtree(tm: TreeManager, node_id: str, prefix_path: List[str]) -> Lis
             markers.append(f'⚡Repetitive({int(sim * 100)}%)')
 
     suffix = f" << {' '.join(markers)} >>" if markers else ''
-    lines = [f"- [{level}] {path_str} ({node_id}){suffix}"]
+    member_count = (
+        str(direct_membership_counts.get(node_id, 0))
+        if direct_membership_counts is not None else "unknown"
+    )
+    lines = [
+        f"- [{level}] {path_str} ({node_id})"
+        f" · direct_membership={member_count}{suffix}"
+    ]
 
     next_path = prefix_path + [label]
     for ch in structural_children:
-        lines.extend(render_subtree(tm, ch["node_id"], next_path))
+        lines.extend(render_subtree(
+            tm,
+            ch["node_id"],
+            next_path,
+            direct_membership_counts,
+        ))
 
     return lines
 
-def generate_l1_batches(tm: TreeManager, l1_id: str, definition: str) -> Generator[str, None, None]:
+def generate_l1_batches(
+    tm: TreeManager,
+    l1_id: str,
+    definition: str,
+    direct_membership_counts: Optional[Dict[str, int]] = None,
+) -> Generator[str, None, None]:
     l1_node = tm.get_node(l1_id)
     header_lines = [
         f"# L1 节点\nID={l1_id} · label={l1_node.get('label','')}\n定义：{definition or '未提供'}",
@@ -115,7 +145,12 @@ def generate_l1_batches(tm: TreeManager, l1_id: str, definition: str) -> Generat
 
     current_batch_lines = []
     for l2 in l2_nodes:
-        l2_block = render_subtree(tm, l2["node_id"], [])
+        l2_block = render_subtree(
+            tm,
+            l2["node_id"],
+            [],
+            direct_membership_counts,
+        )
         current_size = len(header_lines) + len(current_batch_lines)
         block_size = len(l2_block)
 
@@ -197,13 +232,23 @@ class OverallStructureAudit:
                     if str(n.get("level", "")).upper() == "L1"]
 
         l1_defs = self._load_l1_defs()
+        try:
+            _, prompt_membership_rows = self._load_membership_source()
+            prompt_membership_counts = membership_counts_from_rows(prompt_membership_rows)
+        except Exception:
+            prompt_membership_counts = None
         print(f"[Finalization] Auditing {len(l1_nodes)} L1 categories...")
 
         for l1 in l1_nodes:
             l1_id = l1["node_id"]
             definition = l1_defs.get(l1_id, "")
 
-            for batch_ctx in generate_l1_batches(self.tm, l1_id, definition):
+            for batch_ctx in generate_l1_batches(
+                self.tm,
+                l1_id,
+                definition,
+                prompt_membership_counts,
+            ):
                 ops = self._call_llm(batch_ctx, l1_id)
                 if not ops:
                     continue
@@ -233,6 +278,7 @@ class OverallStructureAudit:
             )
             flat_fieldnames, flat_rows = self._export_flat_csv()
         except Exception as exc:
+            semantic_report = validate_semantic_history(candidate_operations)
             e0_report = validate_tree_e0(
                 self.tm.root,
                 manager=self.tm,
@@ -250,12 +296,16 @@ class OverallStructureAudit:
             e0_report["violation_counts"] = dict(sorted(Counter(
                 item["code"] for item in e0_report["violations"]
             ).items()))
-            atomic_write_json(self.args.audit_out, self._audit_payload(e0_report, {}))
+            atomic_write_json(
+                self.args.audit_out,
+                self._audit_payload(e0_report, {}, semantic_report),
+            )
             raise E0ValidationError(
                 f"E0 candidate preparation failed: {exc}"
             ) from exc
 
-        # 4. E0 is evaluated against the candidate state before publication.
+        # 4. Structural E0 and the semantic contract are separate publication gates.
+        semantic_report = validate_semantic_history(candidate_operations)
         e0_report = validate_tree_e0(
             self.tm.root,
             manager=self.tm,
@@ -265,11 +315,16 @@ class OverallStructureAudit:
             operations=candidate_operations,
             require_membership=True,
         )
-        audit_payload = self._audit_payload(e0_report, lineage)
+        audit_payload = self._audit_payload(e0_report, lineage, semantic_report)
         atomic_write_json(self.args.audit_out, audit_payload)
         if not e0_report["passed"]:
             raise E0ValidationError(
                 f"E0 rejected final candidate with {e0_report['critical_count']} critical violation(s)"
+            )
+        if not semantic_report["passed"]:
+            raise SemanticContractError(
+                "semantic contract rejected final candidate with "
+                f"{semantic_report['critical_count']} critical violation(s)"
             )
 
         # 5. Publish auxiliary files first and the formal tree last.
@@ -294,7 +349,10 @@ class OverallStructureAudit:
             e0_report["violation_counts"] = dict(sorted(Counter(
                 item["code"] for item in e0_report["violations"]
             ).items()))
-            atomic_write_json(self.args.audit_out, self._audit_payload(e0_report, lineage))
+            atomic_write_json(
+                self.args.audit_out,
+                self._audit_payload(e0_report, lineage, semantic_report),
+            )
             raise E0ValidationError(f"Candidate publication failed: {exc}") from exc
 
         # 打印统计
@@ -302,15 +360,22 @@ class OverallStructureAudit:
         print(f"  LLM calls: {self.stats['llm_calls']} (failures: {self.stats['llm_failures']})")
         print(f"  Operations: applied={self.stats['ops_applied']}, skipped={self.stats['ops_skipped']}")
         print(f"  E0: PASS (critical=0)")
+        print(f"  Semantic contract: PASS (critical=0)")
         print(f"[DONE] Audit Completed. Final Tree published: {self.args.output}")
 
-    def _audit_payload(self, e0_report: Dict, lineage: Dict[str, str]) -> Dict:
+    def _audit_payload(
+        self,
+        e0_report: Dict,
+        lineage: Dict[str, str],
+        semantic_report: Dict,
+    ) -> Dict:
         return {
             "ts": int(time.time()),
             "entries": self.audit_entries,
             "stats": self.stats,
             "lineage": lineage,
             "e0": e0_report,
+            "semantic_contract": semantic_report,
         }
 
     def _publish_candidate_outputs(
@@ -431,8 +496,9 @@ class OverallStructureAudit:
             instruction = PROMPT_PATH.read_text(encoding="utf-8")
         except FileNotFoundError:
             print(f"[ERROR] Prompt file not found: {PROMPT_PATH}")
-            self.stats["llm_failures"] += 1
-            return []
+            return self._record_llm_rejection(
+                [{"code": "PROMPT_NOT_FOUND", "message": str(PROMPT_PATH)}]
+            )
 
         # 调用 LLM
         try:
@@ -444,12 +510,13 @@ class OverallStructureAudit:
             )
         except Exception as e:
             print(f"[ERROR] LLM call raised exception: {e}")
-            self.stats["llm_failures"] += 1
             append_jsonl(self.llm_log, {
                 "ts": int(time.time()), "l1_id": l1_id,
                 "error": str(e), "resp": None
             })
-            return []
+            return self._record_llm_rejection(
+                [{"code": "LLM_CALL_FAILED", "message": str(e)}]
+            )
 
         # 记录日志
         append_jsonl(self.llm_log, {
@@ -461,113 +528,112 @@ class OverallStructureAudit:
         # =====================================================
         if resp is None:
             print(f"[WARN] LLM call returned None for L1: {l1_id}. Skipping this batch.")
-            self.stats["llm_failures"] += 1
-            return []
+            return self._record_llm_rejection(
+                [{"code": "LLM_RESPONSE_MISSING", "message": "LLM response is null"}]
+            )
 
         if not isinstance(resp, dict):
             print(f"[WARN] LLM response is not a dict: {type(resp)}. Skipping.")
-            self.stats["llm_failures"] += 1
-            return []
+            return self._record_llm_rejection(
+                [{"code": "LLM_RESPONSE_NOT_OBJECT", "message": type(resp).__name__}]
+            )
 
         if "json" not in resp:
             # 可能 LLM 返回了纯文本或解析失败
             print(f"[WARN] LLM response missing 'json' key. Raw snippet: {str(resp)[:200]}")
-            self.stats["llm_failures"] += 1
-            return []
+            return self._record_llm_rejection(
+                [{"code": "LLM_JSON_FIELD_MISSING", "message": "response lacks json"}]
+            )
 
         json_data = resp.get("json")
         if json_data is None:
             print(f"[WARN] resp['json'] is None. Skipping.")
-            self.stats["llm_failures"] += 1
-            return []
+            return self._record_llm_rejection(
+                [{"code": "LLM_JSON_MISSING", "message": "response json is null"}]
+            )
 
         if not isinstance(json_data, dict):
             print(f"[WARN] resp['json'] is not a dict: {type(json_data)}. Skipping.")
-            self.stats["llm_failures"] += 1
-            return []
+            return self._record_llm_rejection(
+                [{"code": "LLM_JSON_NOT_OBJECT", "message": type(json_data).__name__}]
+            )
 
-        operations = json_data.get("operations", [])
-        if not isinstance(operations, list):
-            print(f"[WARN] 'operations' is not a list: {type(operations)}. Skipping.")
-            self.stats["llm_failures"] += 1
-            return []
+        decisions, errors = parse_semantic_decisions(json_data)
+        if errors:
+            print(f"[WARN] Semantic response rejected: {errors}")
+            return self._record_llm_rejection(errors)
+        return decisions
 
-        return operations
+    def _record_llm_rejection(self, errors) -> List[Dict]:
+        self.stats["llm_failures"] += 1
+        record = rejected_parse_record("finalization", errors)
+        self.operation_records.append(record)
+        append_jsonl(self.ops_log, record)
+        return []
 
     def _apply_operations(self, ops: List[Dict], l1_id: str) -> List[Dict]:
-        applied: List[Dict] = []
+        records: List[Dict] = []
+        try:
+            _, membership_rows = self._load_membership_source()
+            membership_counts = membership_counts_from_rows(membership_rows)
+            membership_known = True
+        except Exception:
+            membership_counts = {}
+            membership_known = False
+
+        allowed_actions = {
+            "merge",
+            "keep",
+            "reject_merge",
+            "move",
+            "move_across_l1",
+            "split_reparent",
+            "uncertain",
+            "rename",
+            "flatten",
+        }
         for op in ops:
             if not isinstance(op, dict):
                 self.stats["ops_skipped"] += 1
-                applied.append({"status": "skipped", "message": "operation is not an object"})
+                records.append(rejected_parse_record(
+                    "finalization",
+                    [{
+                        "code": "DECISION_NOT_OBJECT",
+                        "message": "operation is not an object",
+                    }],
+                ))
                 continue
-            typ = op.get("type", "").lower()
-            node_id = str(op.get("node_id") or "")
 
-            if not node_id or not self.tm.exists(node_id):
-                applied.append({**op, "type": typ, "status": "skipped", "message": "node not found"})
+            action = op.get("action")
+            if action not in allowed_actions:
                 self.stats["ops_skipped"] += 1
+                records.append(rejected_parse_record(
+                    "finalization",
+                    [{
+                        "code": "ACTION_NOT_ALLOWED_IN_STAGE",
+                        "message": f"action {action!r} is not allowed in finalization",
+                    }],
+                ))
                 continue
 
-            status = "skipped"
-            message = ""
-            record = {**op, "type": typ, "node_id": node_id}
-            try:
-                if typ == "rename":
-                    new_label = op.get("new_label")
-                    if new_label and self.tm.rename_node(node_id, new_label):
-                        status = "applied"
-                        record["source_id"] = node_id
-                    else:
-                        message = self.tm.last_error or "missing new_label"
-
-                elif typ == "move":
-                    target = str(op.get("target_parent_id") or "")
-                    record.update({"source_id": node_id, "target_parent_id": target})
-                    if not target or not self.tm.exists(target):
-                        message = "target not found"
-                    elif self.tm.is_descendant(target, node_id):
-                        message = "target is descendant"
-                    else:
-                        t_l1 = get_l1_ancestor(self.tm, target)
-                        if t_l1 != l1_id:
-                            message = "cross-L1 move forbidden"
-                        elif self.tm.move_node(node_id, target):
-                            status = "applied"
-                        else:
-                            message = self.tm.last_error or "move failed"
-
-                elif typ == "merge":
-                    target = str(op.get("merge_into") or "")
-                    record.update({"source_id": node_id, "target_id": target})
-                    if not target or not self.tm.exists(target):
-                        message = "target not found"
-                    elif target == node_id:
-                        message = "merge into self"
-                    else:
-                        t_l1 = get_l1_ancestor(self.tm, target)
-                        if t_l1 != l1_id:
-                            message = "cross-L1 merge forbidden"
-                        else:
-                            if self.tm.absorb_node(
-                                target, node_id, new_label=op.get("new_label")
-                            ):
-                                self.redirect_map[node_id] = target
-                                status = "applied"
-                            else:
-                                status = "failed"
-                                message = self.tm.last_error or "absorb failed"
-                else:
-                    message = "unknown type"
-            except Exception as e:
-                status, message = "error", str(e)
-
-            if status == "applied":
+            record = execute_semantic_decision(
+                self.tm,
+                op,
+                direct_membership_counts=membership_counts,
+                membership_known=membership_known,
+                stage="finalization",
+                lineage=self.redirect_map,
+                allow_cross_l1=False,
+                allowed_l1_id=l1_id,
+            )
+            if record.get("status") == "applied":
                 self.stats["ops_applied"] += 1
+                if record.get("lineage_target"):
+                    self.redirect_map[record["source_id"]] = record["lineage_target"]
             else:
                 self.stats["ops_skipped"] += 1
-            applied.append({**record, "status": status, "message": message})
-        return applied
+            records.append(record)
+        return records
 
     def _load_membership_source(self):
         if self.membership_input.exists():

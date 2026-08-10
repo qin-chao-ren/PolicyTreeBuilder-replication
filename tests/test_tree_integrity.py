@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import hashlib
 import json
 import sys
@@ -141,6 +142,33 @@ class TreeIntegrityTests(unittest.TestCase):
             operations=operations,
         )
         self.assertTrue(report["passed"], report["violations"])
+
+    def test_applied_split_reparent_has_a_structural_postcondition(self):
+        tree = node(
+            "ROOT", "ROOT", "ROOT",
+            [node("L1", "domain", "L1", [
+                node("P", "umbrella", "L2"),
+                node("T", "target", "L2", [node("C", "child", "L3")]),
+            ])],
+        )
+        operation = {
+            "type": "split_reparent",
+            "source_id": "P",
+            "target_id": "P",
+            "status": "applied",
+            "child_plan": [{
+                "child_id": "C",
+                "disposition": "move",
+                "target_parent_id": "T",
+            }],
+        }
+        report = validate_tree_e0(tree, operations=[operation])
+        self.assertTrue(report["passed"], report["violations"])
+
+        false_operation = copy.deepcopy(operation)
+        false_operation["child_plan"][0]["target_parent_id"] = "P"
+        report = validate_tree_e0(tree, operations=[false_operation])
+        self.assertIn("APPLIED_SPLIT_REPARENT_UNTRUE", report["violation_counts"])
 
     def test_lineage_sources_and_unknown_applied_operations_fail_closed(self):
         tree = node(

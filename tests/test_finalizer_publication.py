@@ -239,6 +239,40 @@ class FinalizerPublicationTests(unittest.TestCase):
             self.assertEqual(json.loads(Path(args.output).read_text(encoding="utf-8")), tree)
             audit = json.loads(Path(args.audit_out).read_text(encoding="utf-8"))
             self.assertTrue(audit["e0"]["passed"])
+            self.assertTrue(audit["semantic_contract"]["passed"])
+
+    def test_semantic_gate_blocks_structurally_true_legacy_operation(self):
+        with tempfile.TemporaryDirectory() as temporary_dir:
+            root_dir = Path(temporary_dir)
+            env = FakeEnv(root_dir)
+            args = self.make_args(root_dir)
+            tree = node("ROOT", "ROOT", "ROOT", [node("A", "alpha", "L1")])
+            self.prepare_membership(env, "A")
+            (env.outdir / "tree_refinement_operations.jsonl").write_text(
+                json.dumps({
+                    "type": "rename",
+                    "source_id": "A",
+                    "node_id": "A",
+                    "new_label": "alpha",
+                    "status": "applied",
+                }) + "\n",
+                encoding="utf-8",
+            )
+            Path(args.output).write_text("sentinel", encoding="utf-8")
+
+            process = self.finalizer.OverallStructureAudit(env, TreeManager(tree), args)
+            process._call_llm = lambda context, l1_id: []
+            with self.assertRaises(self.finalizer.SemanticContractError):
+                process.run()
+
+            self.assertEqual(Path(args.output).read_text(encoding="utf-8"), "sentinel")
+            audit = json.loads(Path(args.audit_out).read_text(encoding="utf-8"))
+            self.assertTrue(audit["e0"]["passed"], audit["e0"]["violations"])
+            self.assertFalse(audit["semantic_contract"]["passed"])
+            self.assertIn(
+                "APPLIED_SEMANTIC_CONTEXT_MISSING",
+                audit["semantic_contract"]["violation_counts"],
+            )
 
     def test_publication_write_failure_rolls_back_all_formal_outputs(self):
         with tempfile.TemporaryDirectory() as temporary_dir:

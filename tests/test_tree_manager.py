@@ -116,6 +116,20 @@ class TreeManagerTests(unittest.TestCase):
         self.assertFalse(manager.move_node("A", "B"))
         self.assertEqual(root, before)
 
+    def test_batch_reparent_is_atomic_and_rejects_interdependent_cycle(self):
+        root = node(
+            "ROOT", "ROOT", "ROOT",
+            [node("P", "parent", "L1", [node("A", "a", "L2"), node("B", "b", "L2")])],
+        )
+        manager = TreeManager(root)
+        before = copy.deepcopy(root)
+        self.assertFalse(manager.move_nodes_atomically([
+            {"node_id": "A", "new_parent_id": "B"},
+            {"node_id": "B", "new_parent_id": "A"},
+        ]))
+        self.assertEqual(root, before)
+        self.assertEqual(manager.validate_consistency(), [])
+
     def test_bridge_creation_is_deterministic_idempotent_and_conflict_closed(self):
         parent = node("P", "parent", "L1", [node("C1", "one", "L2"), node("C2", "two", "L2")])
         root = node("ROOT", "ROOT", "ROOT", [parent])

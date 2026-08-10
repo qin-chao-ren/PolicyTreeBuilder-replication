@@ -21,7 +21,7 @@ The older 317-node package is superseded and is not part of this public replicat
 
 The committed 353-node tree is preserved byte-for-byte as the historical paper snapshot; the hardening changes do not silently replace it. The deterministic E0 validator rejects that snapshot as a negative control: it contains 8 exact sibling-duplicate groups, 10 declared-level/physical-depth mismatches, and 34 logged `applied` merges whose sources are still present. These findings affect the engineering integrity of the archived output, not the ability to inspect the exact artifact used for the paper.
 
-New pipeline candidates are fail-closed: `finalize_policy_tree.py` publishes the formal tree only after raw/index/parent consistency, unique IDs, acyclicity, exact-label uniqueness, level/depth alignment, closed lineage, membership conservation, and applied-operation postconditions all pass. An explicitly requested membership input must exist, and a caught write failure restores the pre-publication formal outputs. The historical 353-node tree remains unchanged until a separately versioned corrected run passes that contract.
+New pipeline candidates are fail-closed behind two independently reported gates. Structural E0 checks raw/index/parent consistency, unique IDs, acyclicity, exact-label uniqueness, level/depth alignment, closed lineage, membership conservation, and applied-operation postconditions. The semantic-contract gate revalidates every applied refinement decision against the shared relation/action schema, including the exact-duplicate/synonym merge whitelist, direct-membership proof, and complete per-child reparent plans. `finalize_policy_tree.py` publishes only when both `e0.passed` and `semantic_contract.passed` are true. An explicitly requested membership input must exist, and a caught write failure restores the pre-publication formal outputs. The historical 353-node tree remains unchanged until a separately versioned corrected run passes both gates.
 
 ## Reviewer Quick Check
 
@@ -57,7 +57,7 @@ python scripts/validate_tree_e0.py `
   --report evaluation/outputs_scratch/policy_tree_e0_report.json
 ```
 
-The command intentionally exits nonzero for the frozen 353-node negative control. A newly published candidate must exit zero.
+The command intentionally exits nonzero for the frozen 353-node structural negative control. It runs structural E0 independently; the integrated finalizer additionally enforces the semantic-contract gate over the complete operation history. A newly published candidate must pass both.
 
 The full pipeline rerun is optional and requires local credentials for external LLM, embedding, and reranking services. Use the included outputs for review when those services are unavailable.
 
@@ -107,7 +107,7 @@ Do not commit `evaluation/.env`.
 
 ## Main Reproduction Path
 
-The archived outputs are already included. To create a new candidate from the source input, use `run_policy_tree_pipeline.ps1` and the workflow in `TECHNICAL_README.md`. The wrapper stops on the first nonzero Python exit, and finalization replaces formal outputs only after E0 passes.
+The archived outputs are already included. To create a new candidate from the source input, use `run_policy_tree_pipeline.ps1` and the workflow in `TECHNICAL_README.md`. The wrapper stops on the first nonzero Python exit, and finalization replaces formal outputs only after structural E0 and the independent semantic-contract gate both pass.
 
 Primary input:
 

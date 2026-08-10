@@ -9,16 +9,24 @@ Step 4.2 · Shaping (Fixed Version + Stable Paths)
 import argparse
 import time
 import hashlib
+import json
 from pathlib import Path
 from typing import Dict, List
 
 from llm_runtime import call_llm_json
 from utils.step4_shared import (
-    Step4Env, load_tree, dump_tree, append_jsonl
+    Step4Env, load_tree, dump_tree, append_jsonl, read_membership_map
 )
 from utils.tree_manager import TreeManager
 from utils.tree_manager import normalize_label
 from utils.tree_integrity import atomic_write_json
+from utils.tree_integrity import merge_lineage_maps
+from utils.semantic_contract import (
+    execute_semantic_decision,
+    membership_counts_from_level_maps,
+    parse_semantic_decisions,
+    rejected_parse_record,
+)
 
 # ==========================================
 # 1. 路径锚点 (Path Anchors) - 保留你的配置
@@ -42,6 +50,7 @@ LEVEL_MAP = {"ROOT": 0, "L1": 1, "L2": 2, "L3": 3, "L4": 4}
 MAX_DEPTH = 4
 MAX_FANOUT = 7
 MAX_ROUNDS = 10
+BRIDGE_TARGET_PLACEHOLDER = "__NEW_BRIDGE__"
 
 def get_next_level(lvl):
     n = min(LEVEL_MAP.get(str(lvl).upper(), 99) + 1, 4)
@@ -76,6 +85,24 @@ class ShapingProcess:
         self.ops_log = env.outdir / "tree_refinement_operations.jsonl"
         self.llm_log = env.log_dir / "llm_balance_tree_structure.jsonl"
         self.trace_map = {}
+        self.membership = {
+            level: read_membership_map(env.outdir, level)
+            for level in ["L4", "L3", "L2", "L1"]
+        }
+        self.membership_counts = membership_counts_from_level_maps(self.membership)
+        self.prior_lineage = self._load_prior_lineage()
+
+    def _load_prior_lineage(self):
+        path = self.env.outdir / "vertical_collapse_trace.json"
+        if not path.exists():
+            return {}
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        if not isinstance(payload, dict):
+            raise ValueError(f"vertical collapse trace must be an object: {path}")
+        return {str(source): str(target) for source, target in payload.items()}
+
+    def _current_lineage(self):
+        return merge_lineage_maps(self.prior_lineage, self.trace_map)
 
     def run(self):
         print("[Step 4.2] Starting Jump Fix...")
@@ -99,8 +126,25 @@ class ShapingProcess:
 
     def _fmt_ctx(self, pid, children, scene):
         p = self.tm.get_node(pid)
-        c_desc = "\n".join([f"- {c['node_id']} · {c.get('label','')} · level={c.get('level')}" for c in children])
-        return f"# 场景：{scene}\n# 父节点\n{describe_node(p, len(children))}\n# 子节点\n{c_desc}\n"
+        parent_id = str(self.tm.get_parent_id(pid) or "")
+        parent = self.tm.get_node(parent_id) if parent_id else None
+        parent_desc = (
+            describe_node(parent, len(self.tm.get_children(parent_id)))
+            if parent else "none"
+        )
+        c_desc = "\n".join([
+            f"- {c['node_id']} · {c.get('label','')} · level={c.get('level')}"
+            f" · direct_membership={self.membership_counts.get(c['node_id'], 0)}"
+            for c in children
+        ])
+        return (
+            f"# 场景：{scene}\n"
+            f"# 当前候选节点\n{describe_node(p, len(children))}\n"
+            f"直属 membership={self.membership_counts.get(pid, 0)}\n"
+            f"# 当前候选的父节点\n{parent_desc}\n"
+            f"# 当前候选的直属子节点\n{c_desc}\n"
+            f"create_bridge 的占位 target_id 固定为 {BRIDGE_TARGET_PLACEHOLDER}\n"
+        )
 
     # 逻辑1：层级跳跃
     def _fix_jump(self, pid):
@@ -119,8 +163,8 @@ class ShapingProcess:
             task="balance_tree_jump_fix",
         )
         append_jsonl(self.llm_log, {"ts":int(time.time()), "case":"jump", "parent":pid, "resp":resp})
-        # 见 polish_tree_labels.py:209 注释：调用失败时 json=None，默认值不生效
-        return self._apply(pid, resp.get("json") or {}, "jump")
+        payload = resp.get("json") if isinstance(resp, dict) else None
+        return self._apply(pid, payload, "jump")
 
     # 逻辑2：扇出过大
     def _fix_fanout(self, pid):
@@ -141,7 +185,8 @@ class ShapingProcess:
             task="balance_tree_fanout",
         )
         append_jsonl(self.llm_log, {"ts":int(time.time()), "case":"fanout", "parent":pid, "resp":resp})
-        return self._apply(pid, resp.get("json") or {}, "fanout")
+        payload = resp.get("json") if isinstance(resp, dict) else None
+        return self._apply(pid, payload, "fanout")
 
     # 逻辑3：深度压平 (New)
     def _fix_depth(self, pid):
@@ -152,94 +197,174 @@ class ShapingProcess:
         gpid = self.tm.get_parent_id(pid)
         if not gpid: return False
 
-        # 简单策略：如果子节点少，直接拍平给爷爷
+        # Small deep branches are candidates, not automatic flatten approvals.
         if len(children) <= 3:
-            print(f"    [Flatten] Node {pid} (depth={depth}) -> lifting {len(children)} children to grandparent")
-            if self.tm.flatten_node(pid):
-                self.trace_map[pid] = gpid
-                append_jsonl(self.ops_log, {
-                    "op": "flatten", "type": "flatten", "node_id": pid,
-                    "source_id": pid, "target_id": gpid, "depth": depth,
-                    "status": "applied"
-                })
-                return True
-            append_jsonl(self.ops_log, {
-                "op": "flatten", "type": "flatten", "node_id": pid,
-                "status": "rejected", "reason": self.tm.last_error
-            })
+            source = self.tm.get_node(pid)
+            parent = self.tm.get_node(gpid)
+            ctx = (
+                "# Scene: depth flatten candidate\n"
+                f"# Candidate source\n{describe_node(source, len(children))}\n"
+                f"# New parent if flattened\n{describe_node(parent, len(self.tm.get_children(gpid)))}\n"
+                "# Direct children requiring an explicit plan\n"
+                + "\n".join(
+                    f"- {child['node_id']} · {child.get('label', '')} · level={child.get('level')}"
+                    for child in children
+                )
+                + f"\nsource_direct_membership={self.membership_counts.get(pid, 0)}\n"
+            )
+            resp = call_llm_json(
+                profile=self.llm_profile,
+                system=PROMPT_BALANCE.read_text(encoding="utf-8"),
+                user=ctx,
+                task="balance_tree_depth_flatten",
+            )
+            append_jsonl(
+                self.llm_log,
+                {"ts": int(time.time()), "case": "depth", "parent": pid, "resp": resp},
+            )
+            payload = resp.get("json") if isinstance(resp, dict) else None
+            return self._apply(pid, payload, "depth")
         return False
 
-    def _apply(self, pid, res, stage):
-        act = res.get("action", "keep")
+    def _apply(self, pid, payload, stage):
+        decisions, errors = parse_semantic_decisions(payload)
+        if errors:
+            append_jsonl(
+                self.ops_log,
+                rejected_parse_record(f"structure_balancing_{stage}", errors),
+            )
+            return False
+
         changed = False
 
-        # 1. Bridge/Group
-        if act in ["insert_bridge", "create_groups"]:
-            # 深度保护：如果已经太深，禁止创建 Bridge
-            if calc_depth(self.tm, pid) >= MAX_DEPTH - 1:
-                print(f"    [Skip Bridge] Parent {pid} too deep.")
-            else:
-                groups = res.get("groups") or []
-                for grp in groups:
-                    lbl = grp.get("bridge_label")
-                    cids = grp.get("child_ids", [])
-                    candidate_ids = [str(c) for c in cids if self.tm.exists(str(c))]
-                    if not candidate_ids or not lbl: continue
+        for raw_decision in decisions:
+            decision = dict(raw_decision)
+            action = decision.get("action")
+            source_id = str(decision.get("source_id") or "")
+            target_id = str(decision.get("target_id") or "")
+            allowed_actions = {
+                "create_bridge", "move", "split_reparent", "flatten",
+                "keep", "reject_merge", "uncertain",
+            }
+            scope_error = None
+            new_node_level = None
 
-                    nid = generate_bridge_id(pid, lbl)
-                    nlvl = get_next_level(self.tm.get_node(pid).get("level", "L1"))
-                    before = {
-                        str(child_id): self.tm.get_parent_id(str(child_id))
-                        for child_id in candidate_ids
-                    }
-                    node_ids_before = set(self.tm.get_all_node_ids())
-                    bridge_id = self.tm.create_or_reuse_bridge(
-                        pid,
-                        {"node_id": nid, "label": lbl, "level": nlvl, "children": []},
-                        candidate_ids,
+            if action not in allowed_actions:
+                scope_error = f"action {action!r} is not allowed in structure balancing"
+            elif action in {"create_bridge", "flatten", "split_reparent"} and source_id != pid:
+                scope_error = f"{action} source must be the current candidate {pid}"
+            elif action == "create_bridge":
+                if calc_depth(self.tm, pid) >= MAX_DEPTH - 1:
+                    scope_error = "bridge parent is too deep"
+                elif target_id != BRIDGE_TARGET_PLACEHOLDER:
+                    scope_error = (
+                        f"create_bridge target must be {BRIDGE_TARGET_PLACEHOLDER}"
                     )
-                    if bridge_id:
-                        moved = any(
-                            before.get(child_id) != self.tm.get_parent_id(child_id)
-                            for child_id in candidate_ids
+                else:
+                    direct_children = {
+                        str(child.get("node_id")) for child in self.tm.get_children(pid)
+                    }
+                    plan_items = [
+                        item for item in decision.get("child_plan", [])
+                        if isinstance(item, dict)
+                    ]
+                    invalid_children = sorted({
+                        str(item.get("child_id") or "") for item in plan_items
+                    } - direct_children)
+                    invalid_targets = sorted({
+                        str(item.get("target_parent_id") or "") for item in plan_items
+                    } - {BRIDGE_TARGET_PLACEHOLDER})
+                    if invalid_children:
+                        scope_error = (
+                            "bridge plan contains non-direct children: "
+                            + ", ".join(invalid_children)
                         )
-                        created = bridge_id not in node_ids_before
-                        changed = changed or moved or created
-                        append_jsonl(self.ops_log, {
-                            "op": "create_bridge", "type": "create_bridge",
-                            "parent": pid, "parent_id": pid,
-                            "bridge": lbl, "bridge_id": bridge_id,
-                            "status": "applied"
-                        })
-                    else:
-                        append_jsonl(self.ops_log, {
-                            "op": "create_bridge", "type": "create_bridge",
-                            "parent": pid, "parent_id": pid,
-                            "bridge": lbl, "bridge_id": nid,
-                            "status": "rejected", "reason": self.tm.last_error
-                        })
+                    elif invalid_targets:
+                        scope_error = (
+                            f"bridge child targets must be {BRIDGE_TARGET_PLACEHOLDER}"
+                        )
+                    label = decision.get("new_label")
+                    if not scope_error and isinstance(label, str) and label.strip():
+                        bridge_id = generate_bridge_id(pid, label)
+                        decision["target_id"] = bridge_id
+                        decision["child_plan"] = [
+                            {**item, "target_parent_id": bridge_id}
+                            if isinstance(item, dict) else item
+                            for item in decision.get("child_plan", [])
+                        ]
+                    new_node_level = get_next_level(
+                        self.tm.get_node(pid).get("level", "L1")
+                    )
+            elif action == "flatten" and target_id != str(self.tm.get_parent_id(pid) or ""):
+                scope_error = "flatten target must be the current candidate parent"
+            elif action == "split_reparent":
+                if target_id != pid:
+                    scope_error = "split_reparent target must equal the current candidate"
+                else:
+                    allowed_targets = {
+                        pid,
+                        str(self.tm.get_parent_id(pid) or ""),
+                        *(
+                            str(child.get("node_id"))
+                            for child in self.tm.get_children(pid)
+                        ),
+                    }
+                    invalid_targets = sorted({
+                        str(item.get("target_parent_id") or "")
+                        for item in decision.get("child_plan", [])
+                        if isinstance(item, dict)
+                    } - allowed_targets)
+                    if invalid_targets:
+                        scope_error = (
+                            "split targets must be visible in the current candidate context: "
+                            + ", ".join(invalid_targets)
+                        )
+            elif action == "move":
+                current_children = {
+                    str(child.get("node_id")) for child in self.tm.get_children(pid)
+                }
+                if source_id not in current_children:
+                    scope_error = "move source must be a direct child of the current candidate"
+                elif target_id != str(self.tm.get_parent_id(pid) or ""):
+                    scope_error = "balancing move target must be the candidate grandparent"
+            elif action in {"keep", "reject_merge", "uncertain"} and not (
+                source_id == target_id == pid
+            ):
+                scope_error = "non-mutating decision must reference only the current candidate"
 
-        # 2. Lift as Sibling (New)
-        lift = res.get("lift_as_sibling") or res.get("lift_children") or []
-        if lift:
-            gpid = self.tm.get_parent_id(pid)
-            if gpid:
-                for c in lift:
-                    if self.tm.get_parent_id(c) == pid:
-                        if self.tm.move_node(c, gpid):
-                            changed = True
-                            append_jsonl(self.ops_log, {
-                                "op": "lift_sibling", "type": "lift_sibling",
-                                "child": c, "node": c, "source_id": c,
-                                "new_parent": gpid, "target_parent_id": gpid,
-                                "status": "applied"
-                            })
-                        else:
-                            append_jsonl(self.ops_log, {
-                                "op": "lift_sibling", "type": "lift_sibling",
-                                "child": c, "node": c,
-                                "status": "rejected", "reason": self.tm.last_error
-                            })
+            if scope_error:
+                append_jsonl(
+                    self.ops_log,
+                    rejected_parse_record(
+                        f"structure_balancing_{stage}",
+                        [{"code": "DECISION_SCOPE_VIOLATION", "message": scope_error}],
+                    ),
+                )
+                continue
+
+            before_structure = (
+                set(self.tm.get_all_node_ids()),
+                dict(self.tm.parent_map),
+            )
+            record = execute_semantic_decision(
+                self.tm,
+                decision,
+                direct_membership_counts=self.membership_counts,
+                membership_known=True,
+                stage=f"structure_balancing_{stage}",
+                lineage=self._current_lineage(),
+                allow_cross_l1=False,
+                new_node_level=new_node_level,
+            )
+            append_jsonl(self.ops_log, record)
+            if record.get("status") == "applied":
+                after_structure = (
+                    set(self.tm.get_all_node_ids()),
+                    dict(self.tm.parent_map),
+                )
+                changed = changed or before_structure != after_structure
+                if record.get("action") == "flatten" and record.get("lineage_target"):
+                    self.trace_map[record["source_id"]] = record["lineage_target"]
 
         return changed
 

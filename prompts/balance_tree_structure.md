@@ -1,106 +1,64 @@
-# Step 4 · 结构塑形 / 扇出平衡（LLM 指令）
+# Step 14b · Structure balancing semantic decision
 
-系统提示（System）
-你是政策树结构工程师，负责在 L 级树中创建或调整“中间层”以改善结构。你将收到父节点及其子节点列表，可能存在以下问题：
+You are reviewing one current candidate node, its parent, and its direct children. The scene may be a level gap, excessive fanout, or a deep branch. Structural pressure never authorizes deleting a semantic category.
 
-1. **扇出过大**：父节点下的子节点数量 > 7，必须考虑是否创建若干聚合分组（bridge nodes），并为每个分组命名。
-2. **层级跳跃**：父节点与子节点之间存在跨级（例如 L2 直连 L4），需要插入清晰的中间层或调整挂载。
+## Output contract
 
-请根据输入，输出 JSON 以指导程序如何重新组织结构。
+Return JSON only:
 
-### JSON 输出格式
 ```json
 {
-  "action": "create_groups|insert_bridge|keep",
-  "groups": [
+  "decisions": [
     {
-      "bridge_label": "融资支持",
-      "child_ids": ["L3_Na1", "L3_Na2", "L3_Na3"]
-    }
-  ],
-  "keep_children": ["L3_Nb1", "L3_Nb2"],
-  "lift_children": ["L4_Nc8"]
-}
-```
-- `action`：
-  - `create_groups`：需要创建若干中间层分组。
-  - `insert_bridge`：针对层级跳跃，插入一个新的桥接节点（bridge），并指定其覆盖的子节点。
-  - `keep`：保持当前结构不变（仅在确实无需调整时选择）。
-- `groups`：当 action 为 `create_groups` 或 `insert_bridge` 时，列出每个新分组的名称及包含的子节点 ID。
-  - `bridge_label`：≤12 字，动作+对象（例如“融资贴息”“园区协同”）。
-  - `child_ids`：被该分组收纳的子节点 ID（至少 2 个）。
-- `keep_children`：直接保留在当前父节点下的子节点 ID（可为空）。
-- `lift_children`：在层级跳跃场景下需要“提升”到上层父节点的子节点 ID（可为空）。
-
-### 参考要点
-- 聚合逻辑：同主题、同工具、同对象的子节点应被合并到同一个 bridge；混合不同主题会导致结构混乱。
-- 命名规则：动作 + 对象，≤12 字，不含地名/年份/百分比，风格与兄弟节点一致。
-- 层级跳跃：优先插入 bridge；只有在 bridge 不可行时才考虑提升（lift_children）。
-- 如证据不足，请返回 `action=keep` 并给出理由。
-
-### 示例 1 · 扇出 > 7（创建两个分组）
-输入要点：
-```
-父：L2_N1001 · “金融支持”
-子节点（10 个）：
-1) L3_N2001 · 贷款贴息管理
-2) L3_N2002 · 贴息审批
-3) L3_N2003 · 贴息兑付
-4) L3_N2004 · 融资担保风险补偿
-5) L3_N2005 · 担保费补贴
-6) L3_N2006 · 信用增进计划
-7) L3_N2007 · 债券贴息
-8) L3_N2008 · 融资租赁支持
-9) L3_N2009 · 保险贴息
-10) L3_N2010 · 金融机构激励
-```
-期望输出：
-```json
-{
-  "action": "create_groups",
-  "groups": [
-    {
-      "bridge_label": "贷款贴息",
-      "child_ids": ["L3_N2001","L3_N2002","L3_N2003","L3_N2007","L3_N2009"]
-    },
-    {
-      "bridge_label": "担保与增信",
-      "child_ids": ["L3_N2004","L3_N2005","L3_N2006","L3_N2008"]
-    }
-  ],
-  "keep_children": ["L3_N2010"]
-}
-```
-
-### 示例 2 · 层级跳跃（插入 bridge）
-输入要点：
-```
-父：L2_N3001 · “园区建设”
-子：L4_N9001 · “智能制造先行区建设指南”（L4）
-level_gap = 2
-```
-期望输出：
-```json
-{
-  "action": "insert_bridge",
-  "groups": [
-    {
-      "bridge_label": "示范区建设",
-      "child_ids": ["L4_N9001"]
+      "relation": "exact_duplicate|synonym|broader_narrower|related|complementary|means_goal|carrier_outcome|misplaced|uncertain",
+      "action": "create_bridge|move|flatten|split_reparent|keep|reject_merge|uncertain",
+      "source_id": "node id",
+      "target_id": "node id or __NEW_BRIDGE__",
+      "new_label": null,
+      "confidence": 0.0,
+      "evidence": {
+        "summary": "specific semantic and membership evidence",
+        "warnings": [],
+        "target_represents_all_source_members": false,
+        "membership_basis": "",
+        "pure_structural_redundancy": false,
+        "cross_l1_authorized": false
+      },
+      "child_plan": []
     }
   ]
 }
 ```
 
-### 示例 3 · 保持不动
-```
-父：L2_N5001 · “公共服务”
-子节点：5 个，主题差异大，且彼此已有清晰标签。
-```
-期望输出：
+Every field is required. Each child plan item must contain:
+
 ```json
-{
-  "action": "keep",
-  "reason": "扇出数量合理且主题差异大，保留现状。"
-}
+{"child_id":"id","disposition":"move|keep|retain_under_source","target_parent_id":"id or __NEW_BRIDGE__","relation":"exact_duplicate|synonym|broader_narrower|related|complementary|means_goal|carrier_outcome|misplaced|uncertain","same_domain":true,"evidence":"specific destination evidence"}
+```
+
+Several `create_bridge` decisions may be returned for a fanout scene. Otherwise return only operations justified by the displayed context. If no mutation is safe, return one non-mutating decision for the current candidate.
+
+## Stage rules
+
+- `merge` is not available in this stage. Use `flatten` only for a genuinely empty structural wrapper; use `split_reparent` when only some children are misplaced.
+- `create_bridge`: `source_id` is the current candidate; `target_id` and every selected child's `target_parent_id` must literally be `__NEW_BRIDGE__`; `new_label` is required. List only direct children that share a coherent broader domain. The program deterministically materializes the bridge ID after validation.
+- `flatten`: `source_id` is the current candidate and `target_id` is its displayed parent. It is allowed only when direct membership is exactly zero, the source is pure structural redundancy, and `child_plan` covers every direct child with `disposition=move`, the displayed parent as target, and explicit same-domain evidence.
+- `split_reparent`: preserve the candidate with `source_id=target_id`. Cover every direct child exactly once. A kept child targets the source; a moved child may target only a node visible in the current context and needs same-domain evidence.
+- `move`: the source must be a displayed direct child and the target must be the displayed parent of the current candidate. If the moved source has children, list every child with `retain_under_source` and target the source itself.
+- `keep`, `reject_merge`, and `uncertain` use `source_id=target_id` equal to the current candidate and an empty child plan.
+- Cross-L1 changes are forbidden. Use `relation=uncertain, action=uncertain` when destination evidence is insufficient.
+- Similar labels, high vector similarity, a depth limit, or fanout greater than seven are candidate signals only. Never regroup heterogeneous policy domains merely to improve shape.
+
+## Examples
+
+Safe bridge over two coherent direct children:
+
+```json
+{"decisions":[{"relation":"broader_narrower","action":"create_bridge","source_id":"P","target_id":"__NEW_BRIDGE__","new_label":"Financing support","confidence":0.94,"evidence":{"summary":"C1 and C2 are distinct financing instruments under one coherent financing-support domain.","warnings":[],"target_represents_all_source_members":false,"membership_basis":"","pure_structural_redundancy":false,"cross_l1_authorized":false},"child_plan":[{"child_id":"C1","disposition":"move","target_parent_id":"__NEW_BRIDGE__","relation":"broader_narrower","same_domain":true,"evidence":"C1 is a financing-support instrument."},{"child_id":"C2","disposition":"move","target_parent_id":"__NEW_BRIDGE__","relation":"broader_narrower","same_domain":true,"evidence":"C2 is a financing-support instrument."}]}]}
+```
+
+Unsafe flatten because the wrapper carries records:
+
+```json
+{"decisions":[{"relation":"broader_narrower","action":"keep","source_id":"P","target_id":"P","new_label":null,"confidence":0.98,"evidence":{"summary":"P has direct membership, so it is not an empty structural wrapper.","warnings":["direct_membership_present"],"target_represents_all_source_members":false,"membership_basis":"","pure_structural_redundancy":false,"cross_l1_authorized":false},"child_plan":[]}]}
 ```

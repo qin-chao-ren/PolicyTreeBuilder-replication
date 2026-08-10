@@ -24,7 +24,7 @@ The former local `policy_tree_eval` materials have been integrated as the public
 
 ## Corrected Candidate Policy
 
-Any future corrected tree is a separately versioned candidate. It must pass `scripts/validate_tree_e0.py`, including structure, exact-label uniqueness, level/depth, lineage, membership-conservation, and applied-operation checks, before `finalize_policy_tree.py` publishes it. Whether such a candidate replaces the historical default is a separate release decision.
+Any future corrected tree is a separately versioned candidate. Before publication, it must pass structural E0, including structure, exact-label uniqueness, level/depth, lineage, membership-conservation, and applied-operation checks, plus the independent semantic-contract gate over every applied refinement decision. Whether such a candidate replaces the historical default is a separate release decision.
 
 ## Non-public Material
 
