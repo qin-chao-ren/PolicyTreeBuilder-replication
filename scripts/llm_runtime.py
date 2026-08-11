@@ -392,7 +392,8 @@ def _result_dict(
     error: Optional[str] = None,
     status: Optional[int] = None,
     latency_ms: Optional[int] = None,
-    attempts: int = 1,
+    attempts: int = 0,
+    attempt_history: Optional[List[Dict[str, Any]]] = None,
 ) -> Dict[str, Any]:
     return {
         "ok": bool(ok),
@@ -405,6 +406,7 @@ def _result_dict(
         "provider": profile.provider,
         "model": profile.model,
         "attempts": int(attempts),
+        "attempt_history": list(attempt_history or []),
     }
 
 
@@ -456,6 +458,7 @@ def call_llm_json(
     last_error = ""
     last_status: Optional[int] = None
     last_latency: Optional[int] = None
+    attempt_history: List[Dict[str, Any]] = []
     attempts = max(1, cfg.retries + 1)
     for attempt in range(1, attempts + 1):
         started = _now_ms()
@@ -464,9 +467,64 @@ def call_llm_json(
             last_latency = _now_ms() - started
             last_status = resp.status_code
             if resp.status_code == 200:
-                data = resp.json()
-                content = (data.get("choices") or [{}])[0].get("message", {}).get("content", "")
+                try:
+                    data = resp.json()
+                except Exception as exc:
+                    body = resp.text[:500]
+                    last_error = f"{type(exc).__name__}: {exc}"
+                    attempt_history.append({
+                        "attempt": attempt,
+                        "status": 200,
+                        "latency_ms": last_latency,
+                        "raw": body,
+                        "parse_ok": False,
+                        "error": last_error,
+                    })
+                    if attempt < attempts:
+                        time.sleep(cfg.backoff ** (attempt - 1))
+                        continue
+                    break
+                try:
+                    if not isinstance(data, dict):
+                        raise TypeError("HTTP 200 response JSON must be an object")
+                    choices = data.get("choices") or [{}]
+                    if not isinstance(choices, list) or not choices or not isinstance(choices[0], dict):
+                        raise TypeError("HTTP 200 response choices must be a non-empty object list")
+                    message = choices[0].get("message", {})
+                    if not isinstance(message, dict):
+                        raise TypeError("HTTP 200 response message must be an object")
+                    content = message.get("content", "")
+                    if not isinstance(content, str):
+                        raise TypeError("HTTP 200 response content must be a string")
+                except Exception as exc:
+                    body = resp.text[:500]
+                    last_error = f"{type(exc).__name__}: {exc}"
+                    attempt_history.append({
+                        "attempt": attempt,
+                        "status": 200,
+                        "latency_ms": last_latency,
+                        "raw": body,
+                        "parse_ok": False,
+                        "error": last_error,
+                    })
+                    if attempt < attempts:
+                        time.sleep(cfg.backoff ** (attempt - 1))
+                        continue
+                    break
                 ok, obj, parse_err = parse_json_safe(content)
+                attempt_history.append({
+                    "attempt": attempt,
+                    "status": 200,
+                    "latency_ms": last_latency,
+                    "raw": content,
+                    "parse_ok": bool(ok),
+                    "error": parse_err,
+                })
+                if not ok:
+                    last_error = parse_err or "unable to parse JSON object"
+                    if attempt < attempts:
+                        time.sleep(cfg.backoff ** (attempt - 1))
+                        continue
                 result = _result_dict(
                     ok=ok,
                     profile=cfg,
@@ -476,20 +534,39 @@ def call_llm_json(
                     status=200,
                     latency_ms=last_latency,
                     attempts=attempt,
+                    attempt_history=attempt_history,
                 )
                 if log_path:
                     append_jsonl(log_path, {"ts": int(time.time()), "task": task, "result": result})
                 return result
             body = resp.text[:500]
             last_error = f"HTTP {resp.status_code}: {body}"
+            attempt_history.append({
+                "attempt": attempt,
+                "status": resp.status_code,
+                "latency_ms": last_latency,
+                "raw": body,
+                "parse_ok": False,
+                "error": last_error,
+            })
             if resp.status_code not in (408, 409, 425, 429, 500, 502, 503, 504):
                 break
         except Exception as exc:
             last_latency = _now_ms() - started
+            last_status = None
             last_error = f"{type(exc).__name__}: {exc}"
+            attempt_history.append({
+                "attempt": attempt,
+                "status": None,
+                "latency_ms": last_latency,
+                "raw": "",
+                "parse_ok": False,
+                "error": last_error,
+            })
         if attempt < attempts:
             time.sleep(cfg.backoff ** (attempt - 1))
 
+    actual_attempts = len(attempt_history)
     result = _result_dict(
         ok=False,
         profile=cfg,
@@ -497,7 +574,8 @@ def call_llm_json(
         error=last_error or "request failed",
         status=last_status,
         latency_ms=last_latency,
-        attempts=attempts,
+        attempts=actual_attempts,
+        attempt_history=attempt_history,
     )
     if log_path:
         append_jsonl(log_path, {"ts": int(time.time()), "task": task, "result": result})

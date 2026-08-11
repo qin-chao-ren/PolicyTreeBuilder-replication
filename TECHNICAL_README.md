@@ -87,6 +87,14 @@ All external model calls use `scripts/llm_runtime.py` and named profiles from `c
 
 Copy `configs/llm_profiles.yaml.example` to `configs/llm_profiles.yaml` only if you need to change provider/profile wiring. Credentials and endpoints should stay in local `.env` files.
 
+### Call-local semantic references
+
+The four refinement/finalization model stages (14a–14d) never ask a model to reproduce persistent tree node IDs. For each logical call, the runtime creates a one-call mapping such as `PARENT`, `CHILD`, `LEFT`, `RIGHT`, or `N0`, plus a deterministic `context_token`. That token locks the localized user context, known-node-set digest, system prompt/schema contract, task, and expected decision count. The model-facing schema is `schemas/local_reference_semantic_tree_decision.schema.json`; `scripts/utils/local_reference_binding.py` verifies the token and exact refs, runs the stage's pure scope check, binds refs to persistent IDs, and only then hands the bound decision to the existing semantic contract.
+
+Unknown, duplicate, differently cased, cross-context, or real-ID values fail before a live-tree mutation. There is no prefix, edit-distance, or similar-ID fallback. A parseable local-schema or reference-scope error may receive at most one reference-only repair, and the repair must preserve the decision count/order and every non-reference semantic field. A repair is not sent if its prompt would echo a real-ID-shaped value. Transport/JSON retries and that repair share one limit of four actual request attempts. `scripts/llm_runtime.py` records each actual attempt so the logical-call log can be reconciled with request logs. Multi-decision 14b/14d responses execute as candidate-tree transactions and commit to the live tree only when the whole batch passes.
+
+Every model-response field, including free-text evidence, rejects known or real-ID-shaped values. Historical replay keeps original archived evidence byte-locked as source provenance, but its synthetic model-facing copy replaces ID tokens with deterministic local archival refs before binding. Candidate-tree, lineage/stat sidecars, in-memory audit rows, and each logical-call JSONL batch are committed together or restored to their pre-call state if persistence fails.
+
 ## Evaluation Workflow
 
 The evaluation module defaults to the archived paper tree and writes to `evaluation/outputs/`:

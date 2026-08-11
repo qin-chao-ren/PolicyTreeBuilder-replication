@@ -631,6 +631,10 @@ def validate_semantic_decision(
             add("MOVE_RELATION_CONFLICT", "move requires misplaced relation")
         if source_id == target_id:
             add("MOVE_INTO_SELF", "move source and target must differ")
+        if target_id == context.get("source_parent_id"):
+            add("MOVE_ALREADY_UNDER_TARGET", "move target is already the source parent")
+        if context.get("target_is_descendant_of_source"):
+            add("MOVE_TARGET_DESCENDANT", "move target cannot be inside the source subtree")
         is_cross_l1 = bool(source_l1 and target_l1 and source_l1 != target_l1)
         if is_cross_l1:
             if action != "move_across_l1":
@@ -680,6 +684,19 @@ def validate_semantic_decision(
             if disposition != "move":
                 continue
             moved += 1
+            child_id = _clean_id(item.get("child_id"))
+            if plan_target == source_id:
+                add(
+                    "SPLIT_MOVE_TARGET_SOURCE",
+                    "moved child target must differ from the split source",
+                    child_index=index,
+                )
+            if plan_target == child_id:
+                add(
+                    "SPLIT_MOVE_TARGET_SELF",
+                    "moved child cannot target itself",
+                    child_index=index,
+                )
             target_context = plan_targets.get(plan_target, {}) if isinstance(plan_targets, Mapping) else {}
             if target_context.get("exists") is not True:
                 add(

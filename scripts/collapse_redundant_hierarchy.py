@@ -10,6 +10,7 @@ Step 4.1 · Skeleton (Fixed Version + Stable Paths)
 """
 
 import argparse
+import copy
 import time
 from pathlib import Path
 from typing import Dict, Tuple
@@ -21,12 +22,19 @@ from utils.step4_shared import (
     append_jsonl, read_membership_map, read_title_map
 )
 from utils.tree_manager import TreeManager
-from utils.tree_integrity import atomic_write_json, atomic_write_jsonl
+from utils.tree_integrity import atomic_write_bytes, atomic_write_json, atomic_write_jsonl
 from utils.semantic_contract import (
     execute_semantic_decision,
     membership_counts_from_level_maps,
     parse_semantic_decisions,
     rejected_parse_record,
+)
+from utils.local_reference_binding import (
+    assert_call_audit_payload,
+    attach_operation_audit,
+    canonical_payload_sha256,
+    build_local_reference_context,
+    call_local_reference_json,
 )
 
 # ==========================================
@@ -66,11 +74,9 @@ def describe_node(node_id: str, manager: TreeManager, membership: Dict, title_ma
     if children_count > 0:
         child_labels = [
             f"{c.get('node_id')}={c.get('label', '?')[:20]}"
-            for c in children[:5]
+            for c in children
         ]
         children_summary = f"\n直属子节点: {', '.join(child_labels)}"
-        if children_count > 5:
-            children_summary += f" ... 等共 {children_count} 个"
 
     return (
         f"ID: {node_id} · level={level} · label={node.get('label','')}\n"
@@ -165,12 +171,33 @@ class SkeletonRefiner:
             # LLM Call
             evidence = self._build_evidence(parent_id, child_id, jac, cos, is_single_child)
 
-            resp = call_llm_json(
-                profile=self.llm_profile,
-                system=PROMPT_COLLAPSE.read_text(encoding="utf-8"),
-                user=evidence,
+            system_prompt = PROMPT_COLLAPSE.read_text(encoding="utf-8")
+            preferred_refs = [("PARENT", parent_id), ("CHILD", child_id)]
+            grandparent_id = str(self.tm.get_parent_id(parent_id) or "")
+            if grandparent_id:
+                preferred_refs.append(("GRANDPARENT", grandparent_id))
+            local_context = build_local_reference_context(
                 task="collapse_redundant_hierarchy",
+                user_text=evidence,
+                candidate_node_ids=self.tm.get_all_node_ids(),
+                preferred_refs=preferred_refs,
+                contract_text=system_prompt,
+                expected_count=1,
+            )
+            resp = call_local_reference_json(
+                transport=call_llm_json,
+                profile=self.llm_profile,
+                system=system_prompt,
+                context=local_context,
+                task="collapse_redundant_hierarchy",
+                expected_count=1,
                 temperature=0.0,
+                protected_manager=self.tm,
+                bound_validator=lambda payload: self._scope_issues(
+                    payload,
+                    parent_id,
+                    child_id,
+                ),
             )
 
             append_jsonl(self.llm_log, {
@@ -186,62 +213,152 @@ class SkeletonRefiner:
                     rejected_parse_record("vertical_collapse", errors),
                 )
                 continue
-            self._execute_decision(decisions[0], parent_id, child_id)
+            self._execute_decision(
+                decisions[0], parent_id, child_id, call_audit=resp
+            )
 
     def _build_evidence(self, pid, cid, jac, cos, single):
         note = "【单脉传场景】" if single else "【多子节点场景】"
+        grandparent_id = str(self.tm.get_parent_id(pid) or "")
+        grandparent = (
+            "# 父节点的父节点（用于完整 child plan）\n"
+            + describe_node(grandparent_id, self.tm, self.membership, self.title_map)
+            + "\n"
+            if grandparent_id else "# 父节点无父节点\n"
+        )
         return (
             f"# 场景：父子语义重叠检测 {note}\n"
+            f"{grandparent}"
             f"# 父节点\n{describe_node(pid, self.tm, self.membership, self.title_map)}\n"
             f"# 子节点\n{describe_node(cid, self.tm, self.membership, self.title_map)}\n"
             f"相似度: Jaccard={jac:.2f}, Cosine={cos:.2f}\n"
         )
 
-    def _execute_decision(self, decision, parent_id, child_id):
+    def _scope_issues(self, payload, parent_id, child_id):
+        decisions = payload.get("decisions", []) if isinstance(payload, dict) else []
         pair_ids = {str(parent_id), str(child_id)}
-        source_id = str(decision.get("source_id") or "")
-        target_id = str(decision.get("target_id") or "")
-        action = decision.get("action")
+        displayed_ids = set(pair_ids)
+        for node_id in tuple(pair_ids):
+            displayed_ids.update(
+                str(item.get("node_id")) for item in self.tm.get_children(node_id)
+            )
+            displayed_parent = str(self.tm.get_parent_id(node_id) or "")
+            if displayed_parent:
+                displayed_ids.add(displayed_parent)
         allowed_actions = {
             "merge", "rename", "split_reparent",
             "keep", "reject_merge", "uncertain",
         }
-        scope_error = None
-        if action not in allowed_actions:
-            scope_error = f"action {action!r} is not allowed in vertical collapse"
-        elif action in {"rename", "split_reparent"} and not (
-            source_id == target_id and source_id in pair_ids
-        ):
-            scope_error = f"{action} must operate on one displayed node"
-        elif action in {"merge", "keep", "reject_merge", "uncertain"} and (
-            {source_id, target_id} != pair_ids
-        ):
-            scope_error = "decision must reference the displayed parent-child pair"
-        elif action == "split_reparent":
-            allowed_targets = pair_ids
-            invalid_targets = sorted({
-                str(item.get("target_parent_id") or "")
-                for item in decision.get("child_plan", [])
-                if isinstance(item, dict)
-            } - allowed_targets)
-            if invalid_targets:
-                scope_error = (
-                    "split_reparent targets must be displayed nodes: "
-                    + ", ".join(invalid_targets)
-                )
+        issues = []
+        for index, decision in enumerate(decisions):
+            source_id = str(decision.get("source_id") or "")
+            target_id = str(decision.get("target_id") or "")
+            action = decision.get("action")
+            mutable = []
+            messages = []
+            repairable = True
+            if action not in allowed_actions:
+                messages.append("action is not allowed in vertical collapse")
+                repairable = False
+            elif action in {"rename", "split_reparent"} and not (
+                source_id == target_id and source_id in pair_ids
+            ):
+                messages.append(f"{action} must operate on one displayed node")
+                mutable.extend([
+                    f"decisions[{index}].source_ref",
+                    f"decisions[{index}].target_ref",
+                ])
+            elif action in {"merge", "keep", "reject_merge", "uncertain"} and (
+                {source_id, target_id} != pair_ids
+            ):
+                messages.append("decision must reference the displayed parent-child pair")
+                mutable.extend([
+                    f"decisions[{index}].source_ref",
+                    f"decisions[{index}].target_ref",
+                ])
 
-        if scope_error:
+            if action in {"merge", "split_reparent"}:
+                source_children = {
+                    str(item.get("node_id"))
+                    for item in self.tm.get_children(source_id)
+                }
+                for child_index, item in enumerate(decision.get("child_plan", [])):
+                    if not isinstance(item, dict):
+                        continue
+                    if str(item.get("child_id") or "") not in source_children:
+                        messages.append("child plan contains a non-source child")
+                        mutable.append(
+                            f"decisions[{index}].child_plan[{child_index}].child_ref"
+                        )
+                    plan_target = str(item.get("target_parent_id") or "")
+                    if action == "merge":
+                        expected_target = (
+                            str(self.tm.get_parent_id(source_id) or "")
+                            if self.tm.is_descendant(target_id, source_id)
+                            else target_id
+                        )
+                        if plan_target != expected_target:
+                            messages.append("merge child target is outside the exact pair role")
+                            mutable.append(
+                                f"decisions[{index}].child_plan[{child_index}].target_parent_ref"
+                            )
+                    elif plan_target not in displayed_ids:
+                        messages.append("split target is outside the displayed call context")
+                        mutable.append(
+                            f"decisions[{index}].child_plan[{child_index}].target_parent_ref"
+                        )
+                    if action == "split_reparent":
+                        child_id = str(item.get("child_id") or "")
+                        disposition = item.get("disposition")
+                        invalid_role = (
+                            disposition == "keep" and plan_target != source_id
+                        ) or (
+                            disposition == "move"
+                            and (
+                                plan_target in {source_id, child_id}
+                                or self.tm.is_descendant(plan_target, child_id)
+                            )
+                        )
+                        if invalid_role:
+                            messages.append("split child target does not match its disposition role")
+                            mutable.append(
+                                f"decisions[{index}].child_plan[{child_index}].target_parent_ref"
+                            )
+            if messages:
+                issues.append({
+                    "code": "DECISION_SCOPE_VIOLATION",
+                    "message": "; ".join(dict.fromkeys(messages)),
+                    "context": {
+                        "decision_index": index,
+                        "mutable_ref_paths": list(dict.fromkeys(mutable)),
+                        "repairable": repairable,
+                    },
+                })
+        return issues
+
+    def _execute_decision(
+        self, decision, parent_id, child_id, call_audit=None
+    ):
+        if isinstance(call_audit, dict) and call_audit.get("ok") is True:
+            assert_call_audit_payload(
+                call_audit, {"decisions": [decision]}
+            )
+        scope_issues = self._scope_issues(
+            {"decisions": [decision]},
+            parent_id,
+            child_id,
+        )
+        if scope_issues:
             append_jsonl(
                 self.ops_log,
                 rejected_parse_record(
                     "vertical_collapse",
-                    [{
-                        "code": "DECISION_SCOPE_VIOLATION",
-                        "message": scope_error,
-                    }],
+                    scope_issues,
                 ),
             )
             return
+        source_id = str(decision.get("source_id") or "")
+        target_id = str(decision.get("target_id") or "")
         if (
             decision.get("action") == "merge"
             and self.tm.exists(source_id)
@@ -257,18 +374,48 @@ class SkeletonRefiner:
                 evidence["warnings"] = warnings
                 decision["evidence"] = evidence
 
-        record = execute_semantic_decision(
-            self.tm,
-            decision,
-            direct_membership_counts=self.membership_counts,
-            membership_known=True,
-            stage="vertical_collapse",
-            lineage=self.redirect_map,
-            allow_cross_l1=False,
-        )
-        if record.get("status") == "applied" and record.get("lineage_target"):
-            self.redirect_map[record["source_id"]] = record["lineage_target"]
-        append_jsonl(self.ops_log, record)
+        original_root = copy.deepcopy(self.tm.root)
+        original_redirect = dict(self.redirect_map)
+        log_existed = self.ops_log.exists()
+        original_log = self.ops_log.read_bytes() if log_existed else b""
+        try:
+            live_before = canonical_payload_sha256(self.tm.root)
+            record = execute_semantic_decision(
+                self.tm,
+                decision,
+                direct_membership_counts=self.membership_counts,
+                membership_known=True,
+                stage="vertical_collapse",
+                lineage=self.redirect_map,
+                allow_cross_l1=False,
+            )
+            live_after = canonical_payload_sha256(self.tm.root)
+            attach_operation_audit(
+                record,
+                call_audit=call_audit,
+                decision_index=0,
+                executed_decision=decision,
+                live_tree_before_sha256=live_before,
+                live_tree_after_sha256=live_after,
+                execution_transform=(
+                    "promote_safety_fail_closed_warning"
+                    if decision
+                    != call_audit.get("final_bound", {}).get("decisions", [decision])[0]
+                    else None
+                ) if isinstance(call_audit, dict) else None,
+            )
+            if record.get("status") == "applied" and record.get("lineage_target"):
+                self.redirect_map[record["source_id"]] = record["lineage_target"]
+            append_jsonl(self.ops_log, record)
+        except Exception:
+            self.tm._restore(original_root)
+            self.redirect_map.clear()
+            self.redirect_map.update(original_redirect)
+            if log_existed:
+                atomic_write_bytes(self.ops_log, original_log)
+            elif self.ops_log.exists():
+                self.ops_log.unlink()
+            raise
 
 def main():
     parser = argparse.ArgumentParser(description="PolicyTreeBuilder final replication · Step4.1 Skeleton (Fixed)")

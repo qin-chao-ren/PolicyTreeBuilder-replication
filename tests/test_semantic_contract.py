@@ -404,6 +404,27 @@ class SemanticContractTests(unittest.TestCase):
         self.assertIn("SPLIT_TARGET_CONFLICT", record["semantic_contract"]["violation_counts"])
         self.assertEqual(manager.get_parent_id("C"), "P")
 
+        for plan, violation in (
+            (child_plan("C", "P"), "SPLIT_MOVE_TARGET_SOURCE"),
+            (child_plan("C", "C"), "SPLIT_MOVE_TARGET_SELF"),
+            (child_plan("C", "T", disposition="keep"), "SPLIT_KEEP_TARGET_CONFLICT"),
+        ):
+            with self.subTest(violation=violation):
+                manager = TreeManager(copy.deepcopy(tree))
+                record = self.execute(
+                    manager,
+                    decision(
+                        "split_reparent", "related", "P", "P",
+                        children=[plan],
+                    ),
+                )
+                self.assertEqual(record["status"], "rejected")
+                self.assertIn(
+                    violation,
+                    record["semantic_contract"]["violation_counts"],
+                )
+                self.assertEqual(manager.get_parent_id("C"), "P")
+
     def test_move_of_parent_requires_child_compatibility_plan(self):
         tree = node(
             "ROOT", "ROOT", "ROOT",
@@ -443,6 +464,37 @@ class SemanticContractTests(unittest.TestCase):
             record["semantic_contract"]["violation_counts"],
         )
         self.assertEqual(manager.get_parent_id("S"), "P1")
+
+        manager = TreeManager(copy.deepcopy(tree))
+        record = self.execute(manager, decision("move", "misplaced", "S", "P1"))
+        self.assertEqual(record["status"], "rejected")
+        self.assertIn(
+            "MOVE_ALREADY_UNDER_TARGET",
+            record["semantic_contract"]["violation_counts"],
+        )
+
+        descendant_tree = node(
+            "ROOT", "ROOT", "ROOT",
+            [node("L1", "domain", "L1", [
+                node("P", "parent", "L2", [
+                    node("S", "source", "L3", [node("T", "target", "L4")]),
+                ]),
+            ])],
+        )
+        manager = TreeManager(descendant_tree)
+        record = self.execute(
+            manager,
+            decision(
+                "move", "misplaced", "S", "T",
+                children=[child_plan("T", "S", disposition="retain_under_source")],
+            ),
+        )
+        self.assertEqual(record["status"], "rejected")
+        self.assertIn(
+            "MOVE_TARGET_DESCENDANT",
+            record["semantic_contract"]["violation_counts"],
+        )
+        self.assertEqual(manager.get_parent_id("S"), "P")
 
     def test_cross_l1_move_requires_explicit_action_and_two_authorizations(self):
         tree = node(

@@ -7,6 +7,7 @@ Step 4.2 · Shaping (Fixed Version + Stable Paths)
 """
 
 import argparse
+import copy
 import time
 import hashlib
 import json
@@ -19,13 +20,20 @@ from utils.step4_shared import (
 )
 from utils.tree_manager import TreeManager
 from utils.tree_manager import normalize_label
-from utils.tree_integrity import atomic_write_json
+from utils.tree_integrity import atomic_write_bytes, atomic_write_json
 from utils.tree_integrity import merge_lineage_maps
 from utils.semantic_contract import (
     execute_semantic_decision,
     membership_counts_from_level_maps,
     parse_semantic_decisions,
     rejected_parse_record,
+)
+from utils.local_reference_binding import (
+    assert_call_audit_payload,
+    attach_operation_audit,
+    canonical_payload_sha256,
+    build_local_reference_context,
+    call_local_reference_json,
 )
 
 # ==========================================
@@ -51,6 +59,45 @@ MAX_DEPTH = 4
 MAX_FANOUT = 7
 MAX_ROUNDS = 10
 BRIDGE_TARGET_PLACEHOLDER = "__NEW_BRIDGE__"
+AUDITED_DECISION_FIELDS = (
+    "relation",
+    "action",
+    "source_id",
+    "target_id",
+    "new_label",
+    "confidence",
+    "evidence",
+    "child_plan",
+)
+
+
+def _atomic_append_jsonl_batch(path: Path, records) -> None:
+    """Append a complete logical-call batch with one atomic replacement."""
+
+    previous = path.read_bytes() if path.exists() else b""
+    payload = "".join(
+        json.dumps(dict(record), ensure_ascii=False) + "\n"
+        for record in records
+    ).encode("utf-8")
+    atomic_write_bytes(path, previous + payload)
+
+
+def _restore_file_snapshot(path: Path, existed: bool, payload: bytes) -> None:
+    if existed:
+        atomic_write_bytes(path, payload)
+    elif path.exists():
+        path.unlink()
+
+
+def _retain_executed_decision(record, decision):
+    """Make a non-applied audit row independently hash-reconstructable."""
+
+    record.update({
+        field: copy.deepcopy(decision.get(field))
+        for field in AUDITED_DECISION_FIELDS
+    })
+    return record
+
 
 def get_next_level(lvl):
     n = min(LEVEL_MAP.get(str(lvl).upper(), 99) + 1, 4)
@@ -132,18 +179,55 @@ class ShapingProcess:
             describe_node(parent, len(self.tm.get_children(parent_id)))
             if parent else "none"
         )
-        c_desc = "\n".join([
-            f"- {c['node_id']} · {c.get('label','')} · level={c.get('level')}"
-            f" · direct_membership={self.membership_counts.get(c['node_id'], 0)}"
-            for c in children
-        ])
+        child_lines = []
+        for child in children:
+            child_id = str(child["node_id"])
+            child_lines.append(
+                f"- {child_id} · {child.get('label','')} · level={child.get('level')}"
+                f" · direct_membership={self.membership_counts.get(child_id, 0)}"
+            )
+            for grandchild in self.tm.get_children(child_id):
+                child_lines.append(
+                    f"  - direct child of {child_id}: {grandchild['node_id']}"
+                    f" · {grandchild.get('label','')} · level={grandchild.get('level')}"
+                )
+        c_desc = "\n".join(child_lines)
         return (
             f"# 场景：{scene}\n"
             f"# 当前候选节点\n{describe_node(p, len(children))}\n"
             f"直属 membership={self.membership_counts.get(pid, 0)}\n"
             f"# 当前候选的父节点\n{parent_desc}\n"
             f"# 当前候选的直属子节点\n{c_desc}\n"
-            f"create_bridge 的占位 target_id 固定为 {BRIDGE_TARGET_PLACEHOLDER}\n"
+            f"create_bridge 的虚拟 target ref 固定为 {BRIDGE_TARGET_PLACEHOLDER}\n"
+        )
+
+    def _call_local(self, pid, context_text, task):
+        preferred_refs = [("CANDIDATE", str(pid))]
+        parent_id = str(self.tm.get_parent_id(pid) or "")
+        if parent_id and parent_id in context_text:
+            preferred_refs.append(("PARENT", parent_id))
+        virtual_refs = (
+            (("NEW_BRIDGE", BRIDGE_TARGET_PLACEHOLDER),)
+            if BRIDGE_TARGET_PLACEHOLDER in context_text else ()
+        )
+        system_prompt = PROMPT_BALANCE.read_text(encoding="utf-8")
+        local_context = build_local_reference_context(
+            task=task,
+            user_text=context_text,
+            candidate_node_ids=self.tm.get_all_node_ids(),
+            preferred_refs=preferred_refs,
+            virtual_refs=virtual_refs,
+            contract_text=system_prompt,
+            expected_count=None,
+        )
+        return call_local_reference_json(
+            transport=call_llm_json,
+            profile=self.llm_profile,
+            system=system_prompt,
+            context=local_context,
+            task=task,
+            protected_manager=self.tm,
+            bound_validator=lambda payload: self._scope_issues(pid, payload),
         )
 
     # 逻辑1：层级跳跃
@@ -156,15 +240,10 @@ class ShapingProcess:
         if not jumps: return False
 
         ctx = self._fmt_ctx(pid, jumps, "层级跳跃(Level Gap > 1)")
-        resp = call_llm_json(
-            profile=self.llm_profile,
-            system=PROMPT_BALANCE.read_text(encoding="utf-8"),
-            user=ctx,
-            task="balance_tree_jump_fix",
-        )
+        resp = self._call_local(pid, ctx, "balance_tree_jump_fix")
         append_jsonl(self.llm_log, {"ts":int(time.time()), "case":"jump", "parent":pid, "resp":resp})
         payload = resp.get("json") if isinstance(resp, dict) else None
-        return self._apply(pid, payload, "jump")
+        return self._apply(pid, payload, "jump", call_audit=resp)
 
     # 逻辑2：扇出过大
     def _fix_fanout(self, pid):
@@ -177,16 +256,11 @@ class ShapingProcess:
         children = self.tm.get_children(pid)
         if len(children) <= MAX_FANOUT: return False
 
-        ctx = self._fmt_ctx(pid, children[:30], f"扇出过大({len(children)}>{MAX_FANOUT})")
-        resp = call_llm_json(
-            profile=self.llm_profile,
-            system=PROMPT_BALANCE.read_text(encoding="utf-8"),
-            user=ctx,
-            task="balance_tree_fanout",
-        )
+        ctx = self._fmt_ctx(pid, children, f"扇出过大({len(children)}>{MAX_FANOUT})")
+        resp = self._call_local(pid, ctx, "balance_tree_fanout")
         append_jsonl(self.llm_log, {"ts":int(time.time()), "case":"fanout", "parent":pid, "resp":resp})
         payload = resp.get("json") if isinstance(resp, dict) else None
-        return self._apply(pid, payload, "fanout")
+        return self._apply(pid, payload, "fanout", call_audit=resp)
 
     # 逻辑3：深度压平 (New)
     def _fix_depth(self, pid):
@@ -212,21 +286,214 @@ class ShapingProcess:
                 )
                 + f"\nsource_direct_membership={self.membership_counts.get(pid, 0)}\n"
             )
-            resp = call_llm_json(
-                profile=self.llm_profile,
-                system=PROMPT_BALANCE.read_text(encoding="utf-8"),
-                user=ctx,
-                task="balance_tree_depth_flatten",
-            )
+            resp = self._call_local(pid, ctx, "balance_tree_depth_flatten")
             append_jsonl(
                 self.llm_log,
                 {"ts": int(time.time()), "case": "depth", "parent": pid, "resp": resp},
             )
             payload = resp.get("json") if isinstance(resp, dict) else None
-            return self._apply(pid, payload, "depth")
+            return self._apply(pid, payload, "depth", call_audit=resp)
         return False
 
-    def _apply(self, pid, payload, stage):
+    def _prepare_decision(self, pid, raw_decision):
+        decision = dict(raw_decision)
+        action = decision.get("action")
+        source_id = str(decision.get("source_id") or "")
+        target_id = str(decision.get("target_id") or "")
+        allowed_actions = {
+            "create_bridge", "move", "split_reparent", "flatten",
+            "keep", "reject_merge", "uncertain",
+        }
+        scope_messages = []
+        mutable_ref_paths = []
+        terminal = False
+        new_node_level = None
+
+        if action not in allowed_actions:
+            scope_messages.append("action is not allowed in structure balancing")
+            terminal = True
+        elif action in {"create_bridge", "flatten", "split_reparent"} and source_id != pid:
+            scope_messages.append(f"{action} source must be the current candidate")
+            mutable_ref_paths.append("source_ref")
+
+        if action == "create_bridge":
+            if calc_depth(self.tm, pid) >= MAX_DEPTH - 1:
+                scope_messages.append("bridge parent is too deep")
+                terminal = True
+            if target_id != BRIDGE_TARGET_PLACEHOLDER:
+                scope_messages.append("create_bridge target must be NEW_BRIDGE")
+                mutable_ref_paths.append("target_ref")
+            direct_children = {
+                str(child.get("node_id")) for child in self.tm.get_children(pid)
+            }
+            plan_items = [
+                item for item in decision.get("child_plan", [])
+                if isinstance(item, dict)
+            ]
+            for child_index, item in enumerate(plan_items):
+                if str(item.get("child_id") or "") not in direct_children:
+                    scope_messages.append("bridge plan contains a non-direct child")
+                    mutable_ref_paths.append(f"child_plan[{child_index}].child_ref")
+                if str(item.get("target_parent_id") or "") != BRIDGE_TARGET_PLACEHOLDER:
+                    scope_messages.append("bridge child target must be NEW_BRIDGE")
+                    mutable_ref_paths.append(
+                        f"child_plan[{child_index}].target_parent_ref"
+                    )
+            label = decision.get("new_label")
+            if not scope_messages and isinstance(label, str) and label.strip():
+                bridge_id = generate_bridge_id(pid, label)
+                decision["target_id"] = bridge_id
+                decision["child_plan"] = [
+                    {**item, "target_parent_id": bridge_id}
+                    if isinstance(item, dict) else item
+                    for item in decision.get("child_plan", [])
+                ]
+            new_node_level = get_next_level(
+                self.tm.get_node(pid).get("level", "L1")
+            )
+        elif action == "flatten":
+            if target_id != str(self.tm.get_parent_id(pid) or ""):
+                scope_messages.append("flatten target must be the current candidate parent")
+                mutable_ref_paths.append("target_ref")
+            direct_children = {
+                str(child.get("node_id")) for child in self.tm.get_children(pid)
+            }
+            for child_index, item in enumerate(decision.get("child_plan", [])):
+                if not isinstance(item, dict):
+                    continue
+                if str(item.get("child_id") or "") not in direct_children:
+                    scope_messages.append("flatten plan contains a non-direct child")
+                    mutable_ref_paths.append(
+                        f"child_plan[{child_index}].child_ref"
+                    )
+                if str(item.get("target_parent_id") or "") != target_id:
+                    scope_messages.append("flatten child target must equal the flatten target")
+                    mutable_ref_paths.append(
+                        f"child_plan[{child_index}].target_parent_ref"
+                    )
+        elif action == "split_reparent":
+            if target_id != pid:
+                scope_messages.append("split_reparent target must equal the current candidate")
+                mutable_ref_paths.append("target_ref")
+            direct_children = {
+                str(child.get("node_id")) for child in self.tm.get_children(pid)
+            }
+            allowed_targets = {
+                pid,
+                str(self.tm.get_parent_id(pid) or ""),
+                *direct_children,
+            }
+            for child_index, item in enumerate(decision.get("child_plan", [])):
+                if not isinstance(item, dict):
+                    continue
+                if str(item.get("child_id") or "") not in direct_children:
+                    scope_messages.append("split plan contains a non-direct child")
+                    mutable_ref_paths.append(
+                        f"child_plan[{child_index}].child_ref"
+                    )
+                if str(item.get("target_parent_id") or "") not in allowed_targets:
+                    scope_messages.append("split target is outside the candidate context")
+                    mutable_ref_paths.append(
+                        f"child_plan[{child_index}].target_parent_ref"
+                    )
+                child_id = str(item.get("child_id") or "")
+                plan_target = str(item.get("target_parent_id") or "")
+                disposition = item.get("disposition")
+                invalid_role = (
+                    disposition == "keep" and plan_target != source_id
+                ) or (
+                    disposition == "move"
+                    and (
+                        plan_target in {source_id, child_id}
+                        or self.tm.is_descendant(plan_target, child_id)
+                    )
+                )
+                if invalid_role:
+                    scope_messages.append("split child target does not match its disposition role")
+                    mutable_ref_paths.append(
+                        f"child_plan[{child_index}].target_parent_ref"
+                    )
+        elif action == "move":
+            current_children = {
+                str(child.get("node_id")) for child in self.tm.get_children(pid)
+            }
+            if source_id not in current_children:
+                scope_messages.append("move source must be a direct candidate child")
+                mutable_ref_paths.append("source_ref")
+            if target_id != str(self.tm.get_parent_id(pid) or ""):
+                scope_messages.append("move target must be the candidate parent")
+                mutable_ref_paths.append("target_ref")
+            source_children = {
+                str(child.get("node_id")) for child in self.tm.get_children(source_id)
+            }
+            for child_index, item in enumerate(decision.get("child_plan", [])):
+                if not isinstance(item, dict):
+                    continue
+                if str(item.get("child_id") or "") not in source_children:
+                    scope_messages.append("move plan contains a non-source child")
+                    mutable_ref_paths.append(
+                        f"child_plan[{child_index}].child_ref"
+                    )
+                if str(item.get("target_parent_id") or "") != source_id:
+                    scope_messages.append("moved node children must remain under their source")
+                    mutable_ref_paths.append(
+                        f"child_plan[{child_index}].target_parent_ref"
+                    )
+        elif action in {"keep", "reject_merge", "uncertain"} and not (
+            source_id == target_id == pid
+        ):
+            scope_messages.append("non-mutating decision must reference only the candidate")
+            mutable_ref_paths.extend(["source_ref", "target_ref"])
+
+        scope_issue = None
+        if scope_messages:
+            scope_issue = {
+                "code": "DECISION_SCOPE_VIOLATION",
+                "message": "; ".join(dict.fromkeys(scope_messages)),
+                "mutable_ref_paths": list(dict.fromkeys(mutable_ref_paths)),
+                "repairable": not terminal,
+            }
+        return decision, new_node_level, scope_issue
+
+    def _scope_issues(self, pid, payload):
+        decisions = payload.get("decisions", []) if isinstance(payload, dict) else []
+        issues = []
+        for index, raw_decision in enumerate(decisions):
+            _, _, issue = self._prepare_decision(pid, raw_decision)
+            if not issue:
+                continue
+            issues.append({
+                "code": issue["code"],
+                "message": issue["message"],
+                "context": {
+                    "decision_index": index,
+                    "mutable_ref_paths": [
+                        f"decisions[{index}].{path}"
+                        for path in issue["mutable_ref_paths"]
+                    ],
+                    "repairable": issue["repairable"],
+                },
+            })
+        return issues
+
+    def _apply(self, pid, payload, stage, call_audit=None):
+        if isinstance(call_audit, dict) and call_audit.get("ok") is True:
+            assert_call_audit_payload(call_audit, payload)
+
+        def execution_transform(index, executed_decision):
+            if not isinstance(call_audit, dict):
+                return None
+            bound_decisions = call_audit.get("final_bound", {}).get(
+                "decisions", []
+            )
+            if index >= len(bound_decisions):
+                return None
+            if executed_decision == bound_decisions[index]:
+                return None
+            if bound_decisions[index].get("action") == "create_bridge":
+                return "materialize_new_bridge"
+            return None
+
         decisions, errors = parse_semantic_decisions(payload)
         if errors:
             append_jsonl(
@@ -235,137 +502,187 @@ class ShapingProcess:
             )
             return False
 
-        changed = False
-
-        for raw_decision in decisions:
-            decision = dict(raw_decision)
-            action = decision.get("action")
-            source_id = str(decision.get("source_id") or "")
-            target_id = str(decision.get("target_id") or "")
-            allowed_actions = {
-                "create_bridge", "move", "split_reparent", "flatten",
-                "keep", "reject_merge", "uncertain",
-            }
-            scope_error = None
-            new_node_level = None
-
-            if action not in allowed_actions:
-                scope_error = f"action {action!r} is not allowed in structure balancing"
-            elif action in {"create_bridge", "flatten", "split_reparent"} and source_id != pid:
-                scope_error = f"{action} source must be the current candidate {pid}"
-            elif action == "create_bridge":
-                if calc_depth(self.tm, pid) >= MAX_DEPTH - 1:
-                    scope_error = "bridge parent is too deep"
-                elif target_id != BRIDGE_TARGET_PLACEHOLDER:
-                    scope_error = (
-                        f"create_bridge target must be {BRIDGE_TARGET_PLACEHOLDER}"
-                    )
-                else:
-                    direct_children = {
-                        str(child.get("node_id")) for child in self.tm.get_children(pid)
-                    }
-                    plan_items = [
-                        item for item in decision.get("child_plan", [])
-                        if isinstance(item, dict)
-                    ]
-                    invalid_children = sorted({
-                        str(item.get("child_id") or "") for item in plan_items
-                    } - direct_children)
-                    invalid_targets = sorted({
-                        str(item.get("target_parent_id") or "") for item in plan_items
-                    } - {BRIDGE_TARGET_PLACEHOLDER})
-                    if invalid_children:
-                        scope_error = (
-                            "bridge plan contains non-direct children: "
-                            + ", ".join(invalid_children)
-                        )
-                    elif invalid_targets:
-                        scope_error = (
-                            f"bridge child targets must be {BRIDGE_TARGET_PLACEHOLDER}"
-                        )
-                    label = decision.get("new_label")
-                    if not scope_error and isinstance(label, str) and label.strip():
-                        bridge_id = generate_bridge_id(pid, label)
-                        decision["target_id"] = bridge_id
-                        decision["child_plan"] = [
-                            {**item, "target_parent_id": bridge_id}
-                            if isinstance(item, dict) else item
-                            for item in decision.get("child_plan", [])
-                        ]
-                    new_node_level = get_next_level(
-                        self.tm.get_node(pid).get("level", "L1")
-                    )
-            elif action == "flatten" and target_id != str(self.tm.get_parent_id(pid) or ""):
-                scope_error = "flatten target must be the current candidate parent"
-            elif action == "split_reparent":
-                if target_id != pid:
-                    scope_error = "split_reparent target must equal the current candidate"
-                else:
-                    allowed_targets = {
-                        pid,
-                        str(self.tm.get_parent_id(pid) or ""),
-                        *(
-                            str(child.get("node_id"))
-                            for child in self.tm.get_children(pid)
-                        ),
-                    }
-                    invalid_targets = sorted({
-                        str(item.get("target_parent_id") or "")
-                        for item in decision.get("child_plan", [])
-                        if isinstance(item, dict)
-                    } - allowed_targets)
-                    if invalid_targets:
-                        scope_error = (
-                            "split targets must be visible in the current candidate context: "
-                            + ", ".join(invalid_targets)
-                        )
-            elif action == "move":
-                current_children = {
-                    str(child.get("node_id")) for child in self.tm.get_children(pid)
+        prepared = [self._prepare_decision(pid, decision) for decision in decisions]
+        scope_errors = [error for _, _, error in prepared if error]
+        if scope_errors:
+            aborted_records = []
+            for index, (executed_decision, _level, own_error) in enumerate(prepared):
+                error = own_error or {
+                    "code": "BATCH_SCOPE_ABORTED",
+                    "message": "another decision in the batch failed scope preflight",
                 }
-                if source_id not in current_children:
-                    scope_error = "move source must be a direct child of the current candidate"
-                elif target_id != str(self.tm.get_parent_id(pid) or ""):
-                    scope_error = "balancing move target must be the candidate grandparent"
-            elif action in {"keep", "reject_merge", "uncertain"} and not (
-                source_id == target_id == pid
-            ):
-                scope_error = "non-mutating decision must reference only the current candidate"
-
-            if scope_error:
-                append_jsonl(
-                    self.ops_log,
-                    rejected_parse_record(
-                        f"structure_balancing_{stage}",
-                        [{"code": "DECISION_SCOPE_VIOLATION", "message": scope_error}],
+                aborted = rejected_parse_record(
+                    f"structure_balancing_{stage}",
+                    [
+                        {
+                            "code": error["code"],
+                            "message": error["message"],
+                            "context": error,
+                        }
+                    ],
+                )
+                aborted["batch_status"] = "aborted"
+                aborted["batch_index"] = index
+                aborted["batch_size"] = len(prepared)
+                _retain_executed_decision(aborted, executed_decision)
+                attach_operation_audit(
+                    aborted,
+                    call_audit=call_audit,
+                    decision_index=index,
+                    executed_decision=executed_decision,
+                    execution_transform=execution_transform(
+                        index, executed_decision
                     ),
                 )
-                continue
+                aborted_records.append(aborted)
+            _atomic_append_jsonl_batch(self.ops_log, aborted_records)
+            return False
 
-            before_structure = (
-                set(self.tm.get_all_node_ids()),
-                dict(self.tm.parent_map),
-            )
-            record = execute_semantic_decision(
-                self.tm,
-                decision,
-                direct_membership_counts=self.membership_counts,
-                membership_known=True,
-                stage=f"structure_balancing_{stage}",
-                lineage=self._current_lineage(),
-                allow_cross_l1=False,
-                new_node_level=new_node_level,
-            )
-            append_jsonl(self.ops_log, record)
-            if record.get("status") == "applied":
-                after_structure = (
-                    set(self.tm.get_all_node_ids()),
-                    dict(self.tm.parent_map),
+        original_root = copy.deepcopy(self.tm.root)
+        candidate_tm = TreeManager(copy.deepcopy(original_root))
+        candidate_trace = dict(getattr(self, "trace_map", {}))
+        candidate_lineage = self._current_lineage()
+        records = []
+        failure = None
+        mutating_actions = {
+            "merge", "move", "move_across_l1", "split_reparent",
+            "flatten", "create_bridge", "rename",
+        }
+        try:
+            for index, (decision, new_node_level, _) in enumerate(prepared):
+                record = execute_semantic_decision(
+                    candidate_tm,
+                    decision,
+                    direct_membership_counts=self.membership_counts,
+                    membership_known=True,
+                    stage=f"structure_balancing_{stage}",
+                    lineage=candidate_lineage,
+                    allow_cross_l1=False,
+                    new_node_level=new_node_level,
                 )
-                changed = changed or before_structure != after_structure
-                if record.get("action") == "flatten" and record.get("lineage_target"):
-                    self.trace_map[record["source_id"]] = record["lineage_target"]
+                records.append(record)
+                action = record.get("action")
+                status = record.get("status")
+                contract_passed = (
+                    isinstance(record.get("semantic_contract"), dict)
+                    and record["semantic_contract"].get("passed") is True
+                )
+                accepted_status = (
+                    (action in mutating_actions and status == "applied")
+                    or (action == "keep" and status == "skipped")
+                    or (action in {"reject_merge", "uncertain"} and status == "rejected")
+                )
+                if not contract_passed or not accepted_status:
+                    failure = {
+                        "decision_index": index,
+                        "status": status,
+                        "violation_counts": (
+                            record.get("semantic_contract", {}).get("violation_counts", {})
+                            if isinstance(record.get("semantic_contract"), dict) else {}
+                        ),
+                    }
+                    break
+                if action == "flatten" and record.get("lineage_target"):
+                    candidate_trace[record["source_id"]] = record["lineage_target"]
+                    candidate_lineage = merge_lineage_maps(
+                        candidate_lineage,
+                        {record["source_id"]: record["lineage_target"]},
+                    )
+        except Exception as exc:
+            failure = {
+                "decision_index": len(records),
+                "exception_type": type(exc).__name__,
+            }
 
+        if failure is not None:
+            aborted_records = []
+            for index, (executed_decision, _level, _error) in enumerate(prepared):
+                violation_code = (
+                    "BATCH_SEMANTIC_ABORTED"
+                    if index == failure.get("decision_index")
+                    else "BATCH_TRANSACTION_ABORTED"
+                )
+                aborted = rejected_parse_record(
+                    f"structure_balancing_{stage}",
+                    [{
+                        "code": violation_code,
+                        "message": "the whole decision batch was discarded before live-tree commit",
+                        "context": failure,
+                    }],
+                )
+                aborted["batch_status"] = "aborted"
+                aborted["batch_index"] = index
+                aborted["batch_size"] = len(prepared)
+                _retain_executed_decision(aborted, executed_decision)
+                attach_operation_audit(
+                    aborted,
+                    call_audit=call_audit,
+                    decision_index=index,
+                    executed_decision=executed_decision,
+                    execution_transform=execution_transform(
+                        index, executed_decision
+                    ),
+                )
+                aborted_records.append(aborted)
+            _atomic_append_jsonl_batch(self.ops_log, aborted_records)
+            return False
+
+        changed = candidate_tm.root != original_root
+        for index, record in enumerate(records):
+            record["batch_status"] = "committed"
+            record["batch_index"] = index
+            record["batch_size"] = len(records)
+
+        original_trace = dict(getattr(self, "trace_map", {}))
+        log_existed = self.ops_log.exists()
+        original_log = self.ops_log.read_bytes() if log_existed else b""
+        try:
+            self.tm._restore(copy.deepcopy(candidate_tm.root))
+            if not hasattr(self, "trace_map"):
+                self.trace_map = {}
+            self.trace_map.clear()
+            self.trace_map.update(candidate_trace)
+            live_before = canonical_payload_sha256(original_root)
+            live_after = canonical_payload_sha256(self.tm.root)
+            for index, record in enumerate(records):
+                attach_operation_audit(
+                    record,
+                    call_audit=call_audit,
+                    decision_index=index,
+                    executed_decision=prepared[index][0],
+                    live_tree_before_sha256=live_before,
+                    live_tree_after_sha256=live_after,
+                    execution_transform=execution_transform(
+                        index, prepared[index][0]
+                    ),
+                )
+            _atomic_append_jsonl_batch(self.ops_log, records)
+        except Exception as exc:
+            rollback_errors = []
+            try:
+                self.tm._restore(copy.deepcopy(original_root))
+            except Exception as rollback_exc:
+                rollback_errors.append(f"tree={type(rollback_exc).__name__}")
+            try:
+                if not hasattr(self, "trace_map"):
+                    self.trace_map = {}
+                self.trace_map.clear()
+                self.trace_map.update(original_trace)
+            except Exception as rollback_exc:
+                rollback_errors.append(f"trace={type(rollback_exc).__name__}")
+            try:
+                _restore_file_snapshot(
+                    self.ops_log, log_existed, original_log
+                )
+            except Exception as rollback_exc:
+                rollback_errors.append(f"log={type(rollback_exc).__name__}")
+            suffix = (
+                f"; rollback_errors={','.join(rollback_errors)}"
+                if rollback_errors else ""
+            )
+            raise RuntimeError(
+                f"structure-balancing batch commit failed: {type(exc).__name__}{suffix}"
+            ) from exc
         return changed
 
 def main():

@@ -10,6 +10,7 @@ Step 4.3 · Polishing (Refactored)
 """
 
 import argparse
+import copy
 import time
 import json
 from pathlib import Path
@@ -29,6 +30,7 @@ from utils.step4_shared import (
 from utils.tree_manager import TreeManager
 from utils.tree_integrity import (
     LineageError,
+    atomic_write_bytes,
     atomic_write_csv,
     atomic_write_json,
     merge_lineage_maps,
@@ -40,6 +42,13 @@ from utils.semantic_contract import (
     membership_counts_from_level_maps,
     parse_semantic_decisions,
     rejected_parse_record,
+)
+from utils.local_reference_binding import (
+    assert_call_audit_payload,
+    attach_operation_audit,
+    canonical_payload_sha256,
+    build_local_reference_context,
+    call_local_reference_json,
 )
 
 # --- 1. 路径锚点 (Path Anchors) ---
@@ -213,12 +222,40 @@ class PolishingProcess:
             "请根据 label 语义、父节点语境和样本内容，决定是否合并、移动或重命名。\n"
         )
 
-        # 2. Call LLM
-        resp = call_llm_json(
-            profile=self.llm_profile,
-            system=PROMPT_POLISH.read_text(encoding="utf-8"),
-            user=evidence,
+        preferred_refs = [("LEFT", a["node_id"]), ("RIGHT", b["node_id"])]
+        parent_a = str(self.tm.get_parent_id(a["node_id"]) or "")
+        parent_b = str(self.tm.get_parent_id(b["node_id"]) or "")
+        if parent_a and parent_a == parent_b:
+            preferred_refs.append(("SHARED_PARENT", parent_a))
+        else:
+            if parent_a:
+                preferred_refs.append(("LEFT_PARENT", parent_a))
+            if parent_b:
+                preferred_refs.append(("RIGHT_PARENT", parent_b))
+        system_prompt = PROMPT_POLISH.read_text(encoding="utf-8")
+        local_context = build_local_reference_context(
             task="polish_tree_labels",
+            user_text=evidence,
+            candidate_node_ids=self.tm.get_all_node_ids(),
+            preferred_refs=preferred_refs,
+            contract_text=system_prompt,
+            expected_count=1,
+        )
+
+        # 2. Call LLM
+        resp = call_local_reference_json(
+            transport=call_llm_json,
+            profile=self.llm_profile,
+            system=system_prompt,
+            context=local_context,
+            task="polish_tree_labels",
+            expected_count=1,
+            protected_manager=self.tm,
+            bound_validator=lambda payload: self._scope_issues(
+                payload,
+                a["node_id"],
+                b["node_id"],
+            ),
         )
 
         append_jsonl(self.llm_log, {
@@ -236,72 +273,182 @@ class PolishingProcess:
             )
             return
 
-        self._execute_decision(decisions[0], a["node_id"], b["node_id"], case)
+        self._execute_decision(
+            decisions[0], a["node_id"], b["node_id"], case,
+            call_audit=resp,
+        )
 
-    def _execute_decision(self, decision, node_a_id, node_b_id, case):
-        action = decision.get("action")
-        source_id = str(decision.get("source_id") or "")
-        target_id = str(decision.get("target_id") or "")
+    def _scope_issues(self, payload, node_a_id, node_b_id):
+        decisions = payload.get("decisions", []) if isinstance(payload, dict) else []
         pair_ids = {str(node_a_id), str(node_b_id)}
         parent_ids = {
             str(self.tm.get_parent_id(node_a_id) or ""),
             str(self.tm.get_parent_id(node_b_id) or ""),
         }
+        parent_ids.discard("")
+        displayed_ids = set(pair_ids) | set(parent_ids)
+        for node_id in tuple(pair_ids):
+            displayed_ids.update(
+                str(item.get("node_id")) for item in self.tm.get_children(node_id)
+            )
         allowed_actions = {
             "merge", "move", "rename", "split_reparent",
             "keep", "reject_merge", "uncertain",
         }
-        scope_error = None
-        if action not in allowed_actions:
-            scope_error = f"action {action!r} is not allowed in label polishing"
-        elif action == "merge" and {source_id, target_id} != pair_ids:
-            scope_error = "merge source and target must be the displayed pair"
-        elif action == "move" and (
-            source_id not in pair_ids or target_id not in parent_ids
-        ):
-            scope_error = "move must reparent one displayed node to one displayed parent"
-        elif action in {"rename", "split_reparent"} and not (
-            source_id == target_id and source_id in pair_ids
-        ):
-            scope_error = f"{action} must operate on one displayed node"
-        elif action == "split_reparent":
-            allowed_targets = pair_ids | parent_ids
-            invalid_targets = sorted({
-                str(item.get("target_parent_id") or "")
-                for item in decision.get("child_plan", [])
-                if isinstance(item, dict)
-            } - allowed_targets)
-            if invalid_targets:
-                scope_error = (
-                    "split targets must be displayed nodes or displayed parents: "
-                    + ", ".join(invalid_targets)
-                )
-        elif action in {"keep", "reject_merge", "uncertain"} and {source_id, target_id} != pair_ids:
-            scope_error = "non-mutating decision must reference the displayed pair"
+        issues = []
+        for index, decision in enumerate(decisions):
+            action = decision.get("action")
+            source_id = str(decision.get("source_id") or "")
+            target_id = str(decision.get("target_id") or "")
+            messages = []
+            mutable = []
+            repairable = True
+            if action not in allowed_actions:
+                messages.append("action is not allowed in label polishing")
+                repairable = False
+            elif action == "merge" and {source_id, target_id} != pair_ids:
+                messages.append("merge source and target must be the displayed pair")
+                mutable.extend([f"decisions[{index}].source_ref", f"decisions[{index}].target_ref"])
+            elif action == "move" and (
+                source_id not in pair_ids or target_id not in parent_ids
+            ):
+                messages.append("move must reparent one displayed node to one displayed parent")
+                if source_id not in pair_ids:
+                    mutable.append(f"decisions[{index}].source_ref")
+                if target_id not in parent_ids:
+                    mutable.append(f"decisions[{index}].target_ref")
+            elif action in {"rename", "split_reparent"} and not (
+                source_id == target_id and source_id in pair_ids
+            ):
+                messages.append(f"{action} must operate on one displayed node")
+                mutable.extend([f"decisions[{index}].source_ref", f"decisions[{index}].target_ref"])
+            elif action in {"keep", "reject_merge", "uncertain"} and {source_id, target_id} != pair_ids:
+                messages.append("non-mutating decision must reference the displayed pair")
+                mutable.extend([f"decisions[{index}].source_ref", f"decisions[{index}].target_ref"])
 
-        if scope_error:
+            if action in {"merge", "move", "split_reparent"}:
+                source_children = {
+                    str(item.get("node_id"))
+                    for item in self.tm.get_children(source_id)
+                }
+                for child_index, item in enumerate(decision.get("child_plan", [])):
+                    if not isinstance(item, dict):
+                        continue
+                    if str(item.get("child_id") or "") not in source_children:
+                        messages.append("child plan contains a non-source child")
+                        mutable.append(
+                            f"decisions[{index}].child_plan[{child_index}].child_ref"
+                        )
+                    plan_target = str(item.get("target_parent_id") or "")
+                    if action == "merge":
+                        expected_target = (
+                            str(self.tm.get_parent_id(source_id) or "")
+                            if self.tm.is_descendant(target_id, source_id)
+                            else target_id
+                        )
+                        if plan_target != expected_target:
+                            messages.append("merge child target is outside the exact pair role")
+                            mutable.append(
+                                f"decisions[{index}].child_plan[{child_index}].target_parent_ref"
+                            )
+                    elif action == "move" and plan_target != source_id:
+                        messages.append("moved node children must remain under their source")
+                        mutable.append(
+                            f"decisions[{index}].child_plan[{child_index}].target_parent_ref"
+                        )
+                    elif action == "split_reparent" and plan_target not in displayed_ids:
+                        messages.append("split target is outside the displayed call context")
+                        mutable.append(
+                            f"decisions[{index}].child_plan[{child_index}].target_parent_ref"
+                        )
+                    if action == "split_reparent":
+                        child_id = str(item.get("child_id") or "")
+                        disposition = item.get("disposition")
+                        invalid_role = (
+                            disposition == "keep" and plan_target != source_id
+                        ) or (
+                            disposition == "move"
+                            and (
+                                plan_target in {source_id, child_id}
+                                or self.tm.is_descendant(plan_target, child_id)
+                            )
+                        )
+                        if invalid_role:
+                            messages.append("split child target does not match its disposition role")
+                            mutable.append(
+                                f"decisions[{index}].child_plan[{child_index}].target_parent_ref"
+                            )
+            if messages:
+                issues.append({
+                    "code": "DECISION_SCOPE_VIOLATION",
+                    "message": "; ".join(dict.fromkeys(messages)),
+                    "context": {
+                        "decision_index": index,
+                        "mutable_ref_paths": list(dict.fromkeys(mutable)),
+                        "repairable": repairable,
+                    },
+                })
+        return issues
+
+    def _execute_decision(
+        self, decision, node_a_id, node_b_id, case, call_audit=None
+    ):
+        if isinstance(call_audit, dict) and call_audit.get("ok") is True:
+            assert_call_audit_payload(
+                call_audit, {"decisions": [decision]}
+            )
+        scope_issues = self._scope_issues(
+            {"decisions": [decision]},
+            node_a_id,
+            node_b_id,
+        )
+        if scope_issues:
             append_jsonl(
                 self.ops_log,
                 rejected_parse_record(
                     "label_polishing",
-                    [{"code": "DECISION_SCOPE_VIOLATION", "message": scope_error}],
+                    scope_issues,
                 ),
             )
             return
 
-        record = execute_semantic_decision(
-            self.tm,
-            decision,
-            direct_membership_counts=self.membership_counts,
-            membership_known=True,
-            stage="label_polishing",
-            lineage=self._current_lineage(),
-            allow_cross_l1=False,
-        )
-        record["case"] = case
-        append_jsonl(self.ops_log, record)
-        if record.get("status") == "applied" and record.get("lineage_target"):
-            self.local_trace_map[record["source_id"]] = record["lineage_target"]
+        original_root = copy.deepcopy(self.tm.root)
+        original_trace = dict(self.local_trace_map)
+        log_existed = self.ops_log.exists()
+        original_log = self.ops_log.read_bytes() if log_existed else b""
+        try:
+            live_before = canonical_payload_sha256(self.tm.root)
+            record = execute_semantic_decision(
+                self.tm,
+                decision,
+                direct_membership_counts=self.membership_counts,
+                membership_known=True,
+                stage="label_polishing",
+                lineage=self._current_lineage(),
+                allow_cross_l1=False,
+            )
+            live_after = canonical_payload_sha256(self.tm.root)
+            attach_operation_audit(
+                record,
+                call_audit=call_audit,
+                decision_index=0,
+                executed_decision=decision,
+                live_tree_before_sha256=live_before,
+                live_tree_after_sha256=live_after,
+            )
+            record["case"] = case
+            append_jsonl(self.ops_log, record)
+            if record.get("status") == "applied" and record.get("lineage_target"):
+                self.local_trace_map[record["source_id"]] = record["lineage_target"]
+        except Exception:
+            self.tm._restore(original_root)
+            self.local_trace_map.clear()
+            self.local_trace_map.update(original_trace)
+            if log_existed:
+                atomic_write_bytes(self.ops_log, original_log)
+            elif self.ops_log.exists():
+                self.ops_log.unlink()
+            raise
 
     def _describe_node(self, node_id):
         node = self.tm.get_node(node_id)

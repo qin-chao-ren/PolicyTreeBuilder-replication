@@ -11,6 +11,7 @@ Finalization · Overall Structure (Fixed Version)
 """
 
 import argparse
+import copy
 import time
 import json
 from collections import Counter
@@ -47,6 +48,13 @@ from utils.semantic_contract import (
     rejected_parse_record,
     validate_semantic_history,
 )
+from utils.local_reference_binding import (
+    assert_call_audit_payload,
+    attach_operation_audit,
+    canonical_payload_sha256,
+    build_local_reference_context,
+    call_local_reference_json,
+)
 
 # --- 1. 路径锚点 (Path Anchors) ---
 HERE = Path(__file__).resolve().parent
@@ -64,6 +72,44 @@ DEFAULT_AUDIT = PROJECT_ROOT / "data" / "intermediate_outputs" / "policy_tree_fi
 DEFAULT_FLAT = PROJECT_ROOT / "data" / "intermediate_outputs" / "policy_tree_final_flat.csv"
 
 BATCH_SIZE_LIMIT = 200
+AUDITED_DECISION_FIELDS = (
+    "relation",
+    "action",
+    "source_id",
+    "target_id",
+    "new_label",
+    "confidence",
+    "evidence",
+    "child_plan",
+)
+
+
+def _atomic_append_jsonl_batch(path: Path, records) -> None:
+    """Append one complete logical-call batch with an atomic replacement."""
+
+    previous = path.read_bytes() if path.exists() else b""
+    payload = "".join(
+        json.dumps(dict(record), ensure_ascii=False) + "\n"
+        for record in records
+    ).encode("utf-8")
+    atomic_write_bytes(path, previous + payload)
+
+
+def _restore_file_snapshot(path: Path, existed: bool, payload: bytes) -> None:
+    if existed:
+        atomic_write_bytes(path, payload)
+    elif path.exists():
+        path.unlink()
+
+
+def _retain_executed_decision(record: Dict, decision: Dict) -> Dict:
+    """Make a non-applied audit row independently hash-reconstructable."""
+
+    record.update({
+        field: copy.deepcopy(decision.get(field))
+        for field in AUDITED_DECISION_FIELDS
+    })
+    return record
 
 # --- Helper Functions ---
 
@@ -250,19 +296,13 @@ class OverallStructureAudit:
                 prompt_membership_counts,
             ):
                 ops = self._call_llm(batch_ctx, l1_id)
+                call_audit = getattr(self, "_pending_call_audit", None)
                 if not ops:
                     continue
 
-                applied = self._apply_operations(ops, l1_id)
-                self.operation_records.extend(applied)
-                self.audit_entries.append({
-                    "l1_id": l1_id,
-                    "label": l1.get("label"),
-                    "raw_ops": ops,
-                    "applied": applied
-                })
-                for item in applied:
-                    append_jsonl(self.ops_log, item)
+                self._apply_operations(
+                    ops, l1_id, call_audit=call_audit
+                )
 
         # 关键修复：在导出前强制重算层级
         self._realign_tree_levels()
@@ -491,6 +531,7 @@ class OverallStructureAudit:
         【修复】添加防御性检查，防止 resp 为 None 时崩溃
         """
         self.stats["llm_calls"] += 1
+        self._pending_call_audit = None
 
         try:
             instruction = PROMPT_PATH.read_text(encoding="utf-8")
@@ -502,12 +543,24 @@ class OverallStructureAudit:
 
         # 调用 LLM
         try:
-            resp = call_llm_json(
+            local_context = build_local_reference_context(
+                task="finalize_policy_tree",
+                user_text=context,
+                candidate_node_ids=self.tm.get_all_node_ids(),
+                preferred_refs=(("L1", l1_id),),
+                contract_text=instruction,
+                expected_count=None,
+            )
+            resp = call_local_reference_json(
+                transport=call_llm_json,
                 profile=self.llm_profile,
                 system=instruction,
-                user=context,
+                context=local_context,
                 task="finalize_policy_tree",
+                protected_manager=self.tm,
+                bound_validator=lambda payload: self._scope_issues(payload, l1_id),
             )
+            self._pending_call_audit = resp
         except Exception as e:
             print(f"[ERROR] LLM call raised exception: {e}")
             append_jsonl(self.llm_log, {
@@ -571,7 +624,252 @@ class OverallStructureAudit:
         append_jsonl(self.ops_log, record)
         return []
 
-    def _apply_operations(self, ops: List[Dict], l1_id: str) -> List[Dict]:
+    def _scope_issues(self, payload: Dict, l1_id: str) -> List[Dict]:
+        decisions = payload.get("decisions", []) if isinstance(payload, dict) else []
+        allowed_actions = {
+            "merge",
+            "keep",
+            "reject_merge",
+            "move",
+            "split_reparent",
+            "uncertain",
+            "rename",
+            "flatten",
+        }
+        issues: List[Dict] = []
+        for index, op in enumerate(decisions):
+            if not isinstance(op, dict):
+                issues.append({
+                    "code": "DECISION_NOT_OBJECT",
+                    "message": "operation is not an object",
+                    "context": {
+                        "decision_index": index,
+                        "mutable_ref_paths": [],
+                        "repairable": False,
+                    },
+                })
+                continue
+            action = op.get("action")
+            source_id = str(op.get("source_id") or "")
+            target_id = str(op.get("target_id") or "")
+            messages: List[str] = []
+            mutable: List[str] = []
+            terminal = False
+            if action not in allowed_actions:
+                messages.append("action is not allowed in finalization")
+                terminal = True
+            else:
+                if source_id == str(l1_id) or get_l1_ancestor(self.tm, source_id) != str(l1_id):
+                    messages.append("operation source must be a displayed non-L1 node in the audited L1")
+                    mutable.append(f"decisions[{index}].source_ref")
+                if get_l1_ancestor(self.tm, target_id) != str(l1_id):
+                    messages.append("operation target must remain in the audited L1")
+                    mutable.append(f"decisions[{index}].target_ref")
+
+                if action == "rename" and source_id != target_id:
+                    messages.append("rename source and target must be the same displayed node")
+                    mutable.extend([
+                        f"decisions[{index}].source_ref",
+                        f"decisions[{index}].target_ref",
+                    ])
+                elif action == "split_reparent" and source_id != target_id:
+                    messages.append("split_reparent source and target must be the same displayed node")
+                    mutable.extend([
+                        f"decisions[{index}].source_ref",
+                        f"decisions[{index}].target_ref",
+                    ])
+                elif action == "flatten" and target_id != str(self.tm.get_parent_id(source_id) or ""):
+                    messages.append("flatten target must be the displayed source parent")
+                    mutable.append(f"decisions[{index}].target_ref")
+                elif action in {"merge", "move"} and source_id == target_id:
+                    messages.append(f"{action} source and target must differ")
+                    mutable.append(f"decisions[{index}].target_ref")
+                elif action == "move" and (
+                    target_id == str(self.tm.get_parent_id(source_id) or "")
+                    or self.tm.is_descendant(target_id, source_id)
+                ):
+                    messages.append("move target must change parent without entering the source subtree")
+                    mutable.append(f"decisions[{index}].target_ref")
+
+                if action in {"merge", "move", "split_reparent", "flatten"}:
+                    source_children = {
+                        str(item.get("node_id"))
+                        for item in self.tm.get_children(source_id)
+                    }
+                    for child_index, item in enumerate(op.get("child_plan", [])):
+                        if not isinstance(item, dict):
+                            continue
+                        if str(item.get("child_id") or "") not in source_children:
+                            messages.append("child plan contains a non-source child")
+                            mutable.append(
+                                f"decisions[{index}].child_plan[{child_index}].child_ref"
+                            )
+                        plan_target = str(item.get("target_parent_id") or "")
+                        expected_target = None
+                        if action == "merge":
+                            expected_target = (
+                                str(self.tm.get_parent_id(source_id) or "")
+                                if self.tm.is_descendant(target_id, source_id)
+                                else target_id
+                            )
+                        elif action == "move":
+                            expected_target = source_id
+                        elif action == "flatten":
+                            expected_target = target_id
+                        elif action == "split_reparent" and item.get("disposition") == "keep":
+                            expected_target = source_id
+                        elif action == "split_reparent" and (
+                            plan_target in {
+                                source_id,
+                                str(item.get("child_id") or ""),
+                            }
+                            or self.tm.is_descendant(
+                                plan_target,
+                                str(item.get("child_id") or ""),
+                            )
+                        ):
+                            messages.append("split move target cannot be source, child, or child descendant")
+                            mutable.append(
+                                f"decisions[{index}].child_plan[{child_index}].target_parent_ref"
+                            )
+                        if expected_target is not None and plan_target != expected_target:
+                            messages.append("child target does not match the operation role")
+                            mutable.append(
+                                f"decisions[{index}].child_plan[{child_index}].target_parent_ref"
+                            )
+                        elif (
+                            expected_target is None
+                            and get_l1_ancestor(self.tm, plan_target) != str(l1_id)
+                        ):
+                            messages.append("split child target is outside the audited L1")
+                            mutable.append(
+                                f"decisions[{index}].child_plan[{child_index}].target_parent_ref"
+                            )
+            if messages:
+                issues.append({
+                    "code": (
+                        "ACTION_NOT_ALLOWED_IN_STAGE"
+                        if terminal else "DECISION_SCOPE_VIOLATION"
+                    ),
+                    "message": "; ".join(dict.fromkeys(messages)),
+                    "context": {
+                        "decision_index": index,
+                        "mutable_ref_paths": list(dict.fromkeys(mutable)),
+                        "repairable": not terminal,
+                    },
+                })
+        return issues
+
+    def _commit_operation_batch(
+        self,
+        *,
+        raw_ops: List[Dict],
+        l1_id: str,
+        records: List[Dict],
+        committed: bool,
+        candidate_root: Optional[Dict] = None,
+        candidate_redirect: Optional[Dict[str, str]] = None,
+        call_audit=None,
+    ) -> List[Dict]:
+        """Commit tree, sidecars, audit memory, stats, and JSONL as one unit."""
+
+        if not hasattr(self, "operation_records"):
+            self.operation_records = []
+        if not hasattr(self, "audit_entries"):
+            self.audit_entries = []
+        original_root = copy.deepcopy(self.tm.root)
+        original_redirect = dict(getattr(self, "redirect_map", {}))
+        original_stats = dict(self.stats)
+        original_operation_records = copy.deepcopy(self.operation_records)
+        original_audit_entries = copy.deepcopy(self.audit_entries)
+        ops_log = getattr(self, "ops_log", None)
+        log_path = Path(ops_log) if ops_log is not None else None
+        log_existed = bool(log_path is not None and log_path.exists())
+        original_log = (
+            log_path.read_bytes() if log_path is not None and log_existed else b""
+        )
+
+        try:
+            if committed:
+                if candidate_root is None or candidate_redirect is None:
+                    raise ValueError("committed batch is missing candidate state")
+                self.tm._restore(copy.deepcopy(candidate_root))
+                self.redirect_map.clear()
+                self.redirect_map.update(candidate_redirect)
+
+            live_before = canonical_payload_sha256(original_root)
+            live_after = canonical_payload_sha256(self.tm.root)
+            for index, record in enumerate(records):
+                if record.get("status") != "applied":
+                    _retain_executed_decision(record, raw_ops[index])
+                attach_operation_audit(
+                    record,
+                    call_audit=call_audit,
+                    decision_index=index,
+                    executed_decision=raw_ops[index],
+                    live_tree_before_sha256=live_before,
+                    live_tree_after_sha256=live_after,
+                )
+
+            applied_count = sum(
+                1 for record in records if record.get("status") == "applied"
+            ) if committed else 0
+            self.stats["ops_applied"] += applied_count
+            self.stats["ops_skipped"] += len(raw_ops) - applied_count
+            self.operation_records.extend(records)
+            current_l1 = self.tm.get_node(l1_id)
+            self.audit_entries.append({
+                "l1_id": l1_id,
+                "label": current_l1.get("label") if current_l1 else None,
+                "raw_ops": copy.deepcopy(raw_ops),
+                "applied": records,
+            })
+            if log_path is not None:
+                _atomic_append_jsonl_batch(log_path, records)
+        except Exception as exc:
+            rollback_errors = []
+            try:
+                self.tm._restore(copy.deepcopy(original_root))
+            except Exception as rollback_exc:
+                rollback_errors.append(f"tree={type(rollback_exc).__name__}")
+            try:
+                self.redirect_map.clear()
+                self.redirect_map.update(original_redirect)
+            except Exception as rollback_exc:
+                rollback_errors.append(f"redirect={type(rollback_exc).__name__}")
+            try:
+                self.stats.clear()
+                self.stats.update(original_stats)
+            except Exception as rollback_exc:
+                rollback_errors.append(f"stats={type(rollback_exc).__name__}")
+            try:
+                self.operation_records[:] = original_operation_records
+                self.audit_entries[:] = original_audit_entries
+            except Exception as rollback_exc:
+                rollback_errors.append(f"memory={type(rollback_exc).__name__}")
+            if log_path is not None:
+                try:
+                    _restore_file_snapshot(
+                        log_path, log_existed, original_log
+                    )
+                except Exception as rollback_exc:
+                    rollback_errors.append(f"log={type(rollback_exc).__name__}")
+            suffix = (
+                f"; rollback_errors={','.join(rollback_errors)}"
+                if rollback_errors else ""
+            )
+            raise RuntimeError(
+                f"finalization batch commit failed: {type(exc).__name__}{suffix}"
+            ) from exc
+        return records
+
+    def _apply_operations(
+        self, ops: List[Dict], l1_id: str, call_audit=None
+    ) -> List[Dict]:
+        if isinstance(call_audit, dict) and call_audit.get("ok") is True:
+            assert_call_audit_payload(
+                call_audit, {"decisions": ops}
+            )
         records: List[Dict] = []
         try:
             _, membership_rows = self._load_membership_source()
@@ -581,59 +879,120 @@ class OverallStructureAudit:
             membership_counts = {}
             membership_known = False
 
-        allowed_actions = {
-            "merge",
-            "keep",
-            "reject_merge",
-            "move",
-            "move_across_l1",
-            "split_reparent",
-            "uncertain",
-            "rename",
-            "flatten",
-        }
-        for op in ops:
-            if not isinstance(op, dict):
-                self.stats["ops_skipped"] += 1
-                records.append(rejected_parse_record(
-                    "finalization",
-                    [{
-                        "code": "DECISION_NOT_OBJECT",
-                        "message": "operation is not an object",
-                    }],
-                ))
-                continue
-
-            action = op.get("action")
-            if action not in allowed_actions:
-                self.stats["ops_skipped"] += 1
-                records.append(rejected_parse_record(
-                    "finalization",
-                    [{
-                        "code": "ACTION_NOT_ALLOWED_IN_STAGE",
-                        "message": f"action {action!r} is not allowed in finalization",
-                    }],
-                ))
-                continue
-
-            record = execute_semantic_decision(
-                self.tm,
-                op,
-                direct_membership_counts=membership_counts,
-                membership_known=membership_known,
-                stage="finalization",
-                lineage=self.redirect_map,
-                allow_cross_l1=False,
-                allowed_l1_id=l1_id,
+        scope_issues = self._scope_issues({"decisions": ops}, l1_id)
+        if scope_issues:
+            for index in range(len(ops)):
+                violation = next(
+                    (
+                        issue for issue in scope_issues
+                        if issue.get("context", {}).get("decision_index") == index
+                    ),
+                    None,
+                ) or {
+                    "code": "BATCH_SCOPE_ABORTED",
+                    "message": "another decision in the same response failed scope preflight",
+                }
+                record = rejected_parse_record("finalization", [violation])
+                record["batch_status"] = "aborted"
+                record["batch_index"] = index
+                record["batch_size"] = len(ops)
+                records.append(record)
+            return self._commit_operation_batch(
+                raw_ops=ops,
+                l1_id=l1_id,
+                records=records,
+                committed=False,
+                call_audit=call_audit,
             )
-            if record.get("status") == "applied":
-                self.stats["ops_applied"] += 1
-                if record.get("lineage_target"):
-                    self.redirect_map[record["source_id"]] = record["lineage_target"]
-            else:
-                self.stats["ops_skipped"] += 1
+
+        candidate_tm = TreeManager(copy.deepcopy(self.tm.root))
+        candidate_redirect = dict(self.redirect_map)
+        staged_records: List[Dict] = []
+        failure = None
+        mutating_actions = {
+            "merge", "move", "move_across_l1", "split_reparent",
+            "flatten", "create_bridge", "rename",
+        }
+        try:
+            for index, op in enumerate(ops):
+                record = execute_semantic_decision(
+                    candidate_tm,
+                    op,
+                    direct_membership_counts=membership_counts,
+                    membership_known=membership_known,
+                    stage="finalization",
+                    lineage=candidate_redirect,
+                    allow_cross_l1=False,
+                    allowed_l1_id=l1_id,
+                )
+                staged_records.append(record)
+                action = record.get("action")
+                status = record.get("status")
+                contract_passed = (
+                    isinstance(record.get("semantic_contract"), dict)
+                    and record["semantic_contract"].get("passed") is True
+                )
+                accepted_status = (
+                    (action in mutating_actions and status == "applied")
+                    or (action == "keep" and status == "skipped")
+                    or (action in {"reject_merge", "uncertain"} and status == "rejected")
+                )
+                if not contract_passed or not accepted_status:
+                    failure = {
+                        "decision_index": index,
+                        "status": status,
+                        "violation_counts": (
+                            record.get("semantic_contract", {}).get("violation_counts", {})
+                            if isinstance(record.get("semantic_contract"), dict) else {}
+                        ),
+                    }
+                    break
+                if record.get("status") == "applied" and record.get("lineage_target"):
+                    candidate_redirect[record["source_id"]] = record["lineage_target"]
+        except Exception as exc:
+            failure = {
+                "decision_index": len(staged_records),
+                "exception_type": type(exc).__name__,
+            }
+
+        if failure is not None:
+            for index in range(len(ops)):
+                violation = {
+                    "code": (
+                        "BATCH_SEMANTIC_ABORTED"
+                        if index == failure.get("decision_index")
+                        else "BATCH_TRANSACTION_ABORTED"
+                    ),
+                    "message": "the whole decision batch was discarded before live-tree commit",
+                    "context": failure,
+                }
+                record = rejected_parse_record("finalization", [violation])
+                record["batch_status"] = "aborted"
+                record["batch_index"] = index
+                record["batch_size"] = len(ops)
+                records.append(record)
+            return self._commit_operation_batch(
+                raw_ops=ops,
+                l1_id=l1_id,
+                records=records,
+                committed=False,
+                call_audit=call_audit,
+            )
+
+        for index, record in enumerate(staged_records):
+            record["batch_status"] = "committed"
+            record["batch_index"] = index
+            record["batch_size"] = len(staged_records)
             records.append(record)
-        return records
+        return self._commit_operation_batch(
+            raw_ops=ops,
+            l1_id=l1_id,
+            records=records,
+            committed=True,
+            candidate_root=candidate_tm.root,
+            candidate_redirect=candidate_redirect,
+            call_audit=call_audit,
+        )
 
     def _load_membership_source(self):
         if self.membership_input.exists():
