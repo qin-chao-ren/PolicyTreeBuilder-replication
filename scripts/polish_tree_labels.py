@@ -38,6 +38,7 @@ from utils.tree_integrity import (
     redirect_membership_rows,
 )
 from utils.semantic_contract import (
+    deferred_restructure_record,
     execute_semantic_decision,
     membership_counts_from_level_maps,
     parse_semantic_decisions,
@@ -267,9 +268,22 @@ class PolishingProcess:
         payload = resp.get("json") if isinstance(resp, dict) else None
         decisions, errors = parse_semantic_decisions(payload, expected_count=1)
         if errors:
+            if self._is_deferrable_response(resp):
+                append_jsonl(
+                    self.ops_log,
+                    self._deferred_record(resp, "label_polishing"),
+                )
+                return
             append_jsonl(
                 self.ops_log,
-                rejected_parse_record("label_polishing", errors),
+                rejected_parse_record(
+                    "label_polishing",
+                    errors,
+                    logical_call_id=(
+                        resp.get("logical_call_id")
+                        if isinstance(resp, dict) else None
+                    ),
+                ),
             )
             return
 
@@ -379,16 +393,93 @@ class PolishingProcess:
                                 f"decisions[{index}].child_plan[{child_index}].target_parent_ref"
                             )
             if messages:
+                unique_messages = list(dict.fromkeys(messages))
+                inexpressible = (
+                    action == "merge"
+                    and repairable
+                    and unique_messages == [
+                        "merge child target is outside the exact pair role"
+                    ]
+                )
                 issues.append({
-                    "code": "DECISION_SCOPE_VIOLATION",
-                    "message": "; ".join(dict.fromkeys(messages)),
+                    "code": (
+                        "DECISION_SCOPE_INEXPRESSIBLE"
+                        if inexpressible else "DECISION_SCOPE_VIOLATION"
+                    ),
+                    "message": (
+                        "merge with a pair-external child target is not expressible in this stage"
+                        if inexpressible else "; ".join(unique_messages)
+                    ),
                     "context": {
                         "decision_index": index,
-                        "mutable_ref_paths": list(dict.fromkeys(mutable)),
-                        "repairable": repairable,
+                        **({
+                            "child_indexes": [
+                                child_index
+                                for child_index, item in enumerate(
+                                    decision.get("child_plan", [])
+                                )
+                                if isinstance(item, dict)
+                                and str(item.get("target_parent_id") or "")
+                                != (
+                                    str(self.tm.get_parent_id(source_id) or "")
+                                    if self.tm.is_descendant(target_id, source_id)
+                                    else target_id
+                                )
+                            ],
+                            "mutable_ref_paths": [],
+                            "repairable": False,
+                        } if inexpressible else {
+                            "mutable_ref_paths": list(dict.fromkeys(mutable)),
+                            "repairable": repairable,
+                        }),
                     },
                 })
         return issues
+
+    @staticmethod
+    def _is_deferrable_response(resp):
+        if not isinstance(resp, dict):
+            return False
+        scope_errors = resp.get("initial_scope_errors")
+        return (
+            resp.get("ok") is not True
+            and resp.get("final_disposition") == "scope_rejected"
+            and resp.get("error") == "BOUND_SCOPE_VALIDATION_FAILED"
+            and resp.get("mutation_before_validation") is False
+            and resp.get("final_bound") is None
+            and resp.get("repair_count") == 0
+            and isinstance(scope_errors, list)
+            and bool(scope_errors)
+            and all(
+                isinstance(item, dict)
+                and item.get("code") == "DECISION_SCOPE_INEXPRESSIBLE"
+                for item in scope_errors
+            )
+        )
+
+    @staticmethod
+    def _deferred_record(resp, stage):
+        mapping = {
+            str(item.get("ref")): str(item.get("node_id"))
+            for item in resp.get("context", {}).get("ref_mapping", [])
+            if isinstance(item, dict)
+        }
+        local_proposal = resp["final_local"]
+        resolved_proposal = copy.deepcopy(local_proposal)
+        for decision in resolved_proposal.get("decisions", []):
+            decision["source_id"] = mapping[decision.pop("source_ref")]
+            decision["target_id"] = mapping[decision.pop("target_ref")]
+            for item in decision.get("child_plan", []):
+                item["child_id"] = mapping[item.pop("child_ref")]
+                item["target_parent_id"] = mapping[
+                    item.pop("target_parent_ref")
+                ]
+        return deferred_restructure_record(
+            stage,
+            logical_call_id=resp["logical_call_id"],
+            local_proposal=local_proposal,
+            resolved_proposal=resolved_proposal,
+        )
 
     def _execute_decision(
         self, decision, node_a_id, node_b_id, case, call_audit=None

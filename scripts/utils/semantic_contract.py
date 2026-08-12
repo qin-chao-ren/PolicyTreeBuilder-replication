@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import re
 import time
 from collections import Counter
@@ -902,6 +903,8 @@ def _validation_report(violations: Sequence[Mapping[str, Any]]) -> Dict[str, Any
 def rejected_parse_record(
     stage: str,
     errors: Sequence[Mapping[str, Any]],
+    *,
+    logical_call_id: Optional[str] = None,
 ) -> Dict[str, Any]:
     violations = [
         {
@@ -912,7 +915,7 @@ def rejected_parse_record(
         }
         for item in errors
     ]
-    return {
+    record = {
         "ts": int(time.time()),
         "step": stage,
         "type": "semantic_decision",
@@ -920,6 +923,36 @@ def rejected_parse_record(
         "action": None,
         "status": "rejected",
         "message": "semantic response rejected before execution",
+        "semantic_contract": _validation_report(violations),
+    }
+    if logical_call_id is not None:
+        record["logical_call_id"] = logical_call_id
+    return record
+
+
+def deferred_restructure_record(
+    stage: str,
+    *,
+    logical_call_id: str,
+    local_proposal: Mapping[str, Any],
+    resolved_proposal: Mapping[str, Any],
+) -> Dict[str, Any]:
+    violations = [{
+        "severity": "critical",
+        "code": "DECISION_SCOPE_INEXPRESSIBLE",
+        "message": "merge with a pair-external child target is not expressible in this stage",
+    }]
+    return {
+        "ts": int(time.time()),
+        "step": stage,
+        "type": "semantic_decision",
+        "relation": None,
+        "action": None,
+        "status": "deferred",
+        "message": "semantic restructure deferred before execution",
+        "logical_call_id": logical_call_id,
+        "local_proposal": copy.deepcopy(dict(local_proposal)),
+        "resolved_proposal": copy.deepcopy(dict(resolved_proposal)),
         "semantic_contract": _validation_report(violations),
     }
 
@@ -1190,6 +1223,7 @@ __all__ = [
     "RELATIONS",
     "SemanticContractError",
     "build_semantic_context",
+    "deferred_restructure_record",
     "execute_semantic_decision",
     "membership_counts_from_level_maps",
     "membership_counts_from_rows",

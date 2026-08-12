@@ -1,0 +1,81 @@
+{
+  "schema_version": "c13rf6-inexpressible-cases-v1",
+  "case_id": "c13rf5-r1-call-85",
+  "pair": {
+    "parent_id": "L1_Ne04d7cfa",
+    "child_id": "L2_Nd16c2854",
+    "external_target_id": "L1_N40f698d4",
+    "misplaced_child_id": "L3_Nf8bb4ea7"
+  },
+  "tree": {
+    "node_id": "ROOT",
+    "label": "ROOT",
+    "level": "ROOT",
+    "children": [
+      {"node_id": "L1_N762e6689", "label": "战略规划与治理", "level": "L1", "children": []},
+      {"node_id": "L1_Na2c51463", "label": "政策扶持与资源保障", "level": "L1", "children": []},
+      {"node_id": "L1_N32b4d1be", "label": "基础设施与枢纽建设", "level": "L1", "children": []},
+      {"node_id": "L1_N40f698d4", "label": "航线网络与集疏运", "level": "L1", "children": []},
+      {
+        "node_id": "L1_Ne04d7cfa",
+        "label": "市场主体与服务培育",
+        "level": "L1",
+        "children": [
+          {"node_id": "L2_N466127b4", "label": "培育多元经营主体", "level": "L2", "children": []},
+          {"node_id": "L2_N1f3bd9b5", "label": "拓展增量市场业务", "level": "L2", "children": []},
+          {"node_id": "L2_N9afe10a9", "label": "培育市场主体", "level": "L2", "children": []},
+          {"node_id": "L2_Nbd50000d", "label": "持续提升服务保障能力", "level": "L2", "children": []},
+          {"node_id": "L2_N9ef25cc0", "label": "促进航空货量增长", "level": "L2", "children": []},
+          {"node_id": "L2_Ncb44b1ac", "label": "增强市场培育组织能力", "level": "L2", "children": []},
+          {"node_id": "L2_Nf64b0b03", "label": "提高物流服务保障效率", "level": "L2", "children": []},
+          {"node_id": "L2_N6a61e567", "label": "强化市场培育", "level": "L2", "children": []},
+          {"node_id": "L2_N0700f788", "label": "提升服务管理水平", "level": "L2", "children": []},
+          {"node_id": "L2_N172cd711", "label": "集聚优质市场主体", "level": "L2", "children": []},
+          {"node_id": "L2_N74b249c8", "label": "拓展增量市场业务", "level": "L2", "children": []},
+          {"node_id": "L2_N2f32c229", "label": "增强航空物流服务能力", "level": "L2", "children": []},
+          {"node_id": "L2_Nd39445b0", "label": "开拓航空物流新兴业态", "level": "L2", "children": []},
+          {"node_id": "L2_N3782a8fc", "label": "培育关键市场主体", "level": "L2", "children": []},
+          {"node_id": "L2_Naaad89dc", "label": "引入关键市场主体", "level": "L2", "children": []},
+          {"node_id": "L2_N68c2aa93", "label": "提升货源组织能力", "level": "L2", "children": []},
+          {
+            "node_id": "L2_Nd16c2854",
+            "label": "加强市场主体培育",
+            "level": "L2",
+            "children": [
+              {"node_id": "L3_N2d02331f", "label": "鼓励市场主体加强货运能力建设", "level": "L3", "children": []},
+              {"node_id": "L3_Nf8bb4ea7", "label": "加强集疏运体系建设", "level": "L3", "children": []},
+              {"node_id": "L3_Ncc6e46eb", "label": "加强市场推介和招商", "level": "L3", "children": []}
+            ]
+          },
+          {"node_id": "L2_N45ccbfbf", "label": "提升服务管理水平", "level": "L2", "children": []},
+          {"node_id": "L2_Nbec5a9c5", "label": "优化营商环境", "level": "L2", "children": []}
+        ]
+      },
+      {"node_id": "L1_N6749bde4", "label": "通关与口岸便利化", "level": "L1", "children": []},
+      {"node_id": "L1_N8e29a85d", "label": "产业融合与区域联动", "level": "L1", "children": []},
+      {"node_id": "L1_N05f93386", "label": "智慧物流与数字化", "level": "L1", "children": []},
+      {"node_id": "L1_Nb2e2f536", "label": "安全韧性与绿色发展", "level": "L1", "children": []}
+    ]
+  },
+  "bound_decision": {
+    "relation": "exact_duplicate",
+    "action": "merge",
+    "source_id": "L2_Nd16c2854",
+    "target_id": "L1_Ne04d7cfa",
+    "new_label": null,
+    "confidence": 0.95,
+    "evidence": {
+      "summary": "The child and parent express the same market-entity cultivation concept.",
+      "warnings": [],
+      "target_represents_all_source_members": true,
+      "membership_basis": "The direct member is represented by the parent.",
+      "pure_structural_redundancy": false,
+      "cross_l1_authorized": false
+    },
+    "child_plan": [
+      {"child_id": "L3_N2d02331f", "disposition": "move", "target_parent_id": "L1_Ne04d7cfa", "relation": "broader_narrower", "same_domain": true, "evidence": "Market entity cargo capacity remains under the survivor."},
+      {"child_id": "L3_Nf8bb4ea7", "disposition": "move", "target_parent_id": "L1_N40f698d4", "relation": "broader_narrower", "same_domain": true, "evidence": "The collection and distribution system belongs under the matching L1 branch."},
+      {"child_id": "L3_Ncc6e46eb", "disposition": "move", "target_parent_id": "L1_Ne04d7cfa", "relation": "broader_narrower", "same_domain": true, "evidence": "Market promotion remains under the survivor."}
+    ]
+  }
+}
