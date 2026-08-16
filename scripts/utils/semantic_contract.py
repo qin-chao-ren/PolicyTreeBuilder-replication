@@ -787,7 +787,14 @@ def validate_semantic_decision(
             add("RENAME_CHILD_PLAN_NOT_EMPTY", "rename must not include a child plan")
 
     elif action in {"keep", "reject_merge", "uncertain"}:
-        if child_plan:
+        # C13RF8 (D1 option 2): a non-mutating action may carry a child_plan
+        # only when every entry is itself a no-op. Any entry proposing an
+        # actual change still fails closed. execute_semantic_decision()
+        # returns for these three actions before any child_plan is consumed,
+        # so a tolerated all-keep plan can never be executed.
+        if child_plan and any(
+            item.get("disposition") != "keep" for item in child_plan
+        ):
             add("NON_MUTATING_CHILD_PLAN_NOT_EMPTY", "non-mutating action must not move children")
 
     return _validation_report(violations)
