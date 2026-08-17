@@ -23,6 +23,7 @@ from utils.tree_manager import normalize_label
 from utils.tree_integrity import atomic_write_bytes, atomic_write_json
 from utils.tree_integrity import merge_lineage_maps
 from utils.semantic_contract import (
+    deferred_restructure_record,
     execute_semantic_decision,
     membership_counts_from_level_maps,
     parse_semantic_decisions,
@@ -59,6 +60,9 @@ MAX_DEPTH = 4
 MAX_FANOUT = 7
 MAX_ROUNDS = 10
 BRIDGE_TARGET_PLACEHOLDER = "__NEW_BRIDGE__"
+BRIDGE_DEPTH_DEFERRED_MESSAGE = (
+    "create_bridge is not expressible at the structure-balancing depth ceiling"
+)
 AUDITED_DECISION_FIELDS = (
     "relation",
     "action",
@@ -138,6 +142,7 @@ class ShapingProcess:
         }
         self.membership_counts = membership_counts_from_level_maps(self.membership)
         self.prior_lineage = self._load_prior_lineage()
+        self.deferred_candidates = set()
 
     def _load_prior_lineage(self):
         path = self.env.outdir / "vertical_collapse_trace.json"
@@ -150,6 +155,17 @@ class ShapingProcess:
 
     def _current_lineage(self):
         return merge_lineage_maps(self.prior_lineage, self.trace_map)
+
+    def _deferred_candidate_keys(self):
+        if not hasattr(self, "deferred_candidates"):
+            self.deferred_candidates = set()
+        return self.deferred_candidates
+
+    def _was_deferred(self, pid, stage):
+        return (str(stage), str(pid)) in self._deferred_candidate_keys()
+
+    def _mark_deferred(self, pid, stage):
+        self._deferred_candidate_keys().add((str(stage), str(pid)))
 
     def run(self):
         print("[Step 4.2] Starting Jump Fix...")
@@ -232,6 +248,8 @@ class ShapingProcess:
 
     # 逻辑1：层级跳跃
     def _fix_jump(self, pid):
+        if self._was_deferred(pid, "jump"):
+            return False
         p = self.tm.get_node(pid)
         p_lvl = LEVEL_MAP.get(str(p.get("level")).upper(), 99)
         jumps = [c for c in self.tm.get_children(pid)
@@ -247,6 +265,8 @@ class ShapingProcess:
 
     # 逻辑2：扇出过大
     def _fix_fanout(self, pid):
+        if self._was_deferred(pid, "fanout"):
+            return False
         # ROOT 的子节点是步 5 定义的顶层分类（top_level_categories.json），
         # 其数量由分类法本身决定，不是「扇出过大」需要整形的对象。
         # 若对 ROOT 造桥，LLM 临时起名的分组会取代 l1-def 里的类目、真 L1 被降级，
@@ -264,6 +284,8 @@ class ShapingProcess:
 
     # 逻辑3：深度压平 (New)
     def _fix_depth(self, pid):
+        if self._was_deferred(pid, "depth"):
+            return False
         depth = calc_depth(self.tm, pid)
         if depth < MAX_DEPTH: return False
 
@@ -447,11 +469,22 @@ class ShapingProcess:
 
         scope_issue = None
         if scope_messages:
+            unique_messages = list(dict.fromkeys(scope_messages))
+            inexpressible = (
+                action == "create_bridge"
+                and unique_messages == ["bridge parent is too deep"]
+            )
             scope_issue = {
-                "code": "DECISION_SCOPE_VIOLATION",
-                "message": "; ".join(dict.fromkeys(scope_messages)),
+                "code": (
+                    "DECISION_SCOPE_INEXPRESSIBLE"
+                    if inexpressible else "DECISION_SCOPE_VIOLATION"
+                ),
+                "message": (
+                    BRIDGE_DEPTH_DEFERRED_MESSAGE
+                    if inexpressible else "; ".join(unique_messages)
+                ),
                 "mutable_ref_paths": list(dict.fromkeys(mutable_ref_paths)),
-                "repairable": not terminal,
+                "repairable": False if inexpressible else not terminal,
             }
         return decision, new_node_level, scope_issue
 
@@ -476,6 +509,97 @@ class ShapingProcess:
             })
         return issues
 
+    @staticmethod
+    def _is_deferrable_response(resp):
+        if not isinstance(resp, dict):
+            return False
+        scope_errors = resp.get("initial_scope_errors")
+        local_proposal = resp.get("final_local")
+        decisions = (
+            local_proposal.get("decisions")
+            if isinstance(local_proposal, dict) else None
+        )
+        # A scope-error list only describes rejected decisions.  Requiring it
+        # to cover every local proposal prevents a mixed batch (one legal
+        # decision plus one depth-conflicted bridge) from being deferred as a
+        # whole.  The deferred path is intentionally limited to homogeneous
+        # create_bridge batches whose only issue is the depth ceiling.
+        error_indexes = [
+            item.get("context", {}).get("decision_index")
+            for item in scope_errors
+            if isinstance(item, dict)
+            and isinstance(item.get("context"), dict)
+        ] if isinstance(scope_errors, list) else []
+        valid_error_indexes = all(
+            isinstance(index, int) and not isinstance(index, bool)
+            for index in error_indexes
+        )
+        all_decisions_are_depth_bridges = (
+            isinstance(decisions, list)
+            and bool(decisions)
+            and all(
+                isinstance(decision, dict)
+                and decision.get("action") == "create_bridge"
+                for decision in decisions
+            )
+            and valid_error_indexes
+            and sorted(error_indexes) == list(range(len(decisions)))
+            and len(set(error_indexes)) == len(error_indexes)
+        )
+        scope_errors_are_depth_only = (
+            isinstance(scope_errors, list)
+            and all(
+                isinstance(item, dict)
+                and item.get("code") == "DECISION_SCOPE_INEXPRESSIBLE"
+                and item.get("message") == BRIDGE_DEPTH_DEFERRED_MESSAGE
+                and isinstance(item.get("context"), dict)
+                and item["context"].get("mutable_ref_paths") == []
+                and item["context"].get("repairable") is False
+                for item in scope_errors
+            )
+        )
+        return (
+            resp.get("ok") is not True
+            and resp.get("final_disposition") == "scope_rejected"
+            and resp.get("error") == "BOUND_SCOPE_VALIDATION_FAILED"
+            and resp.get("mutation_before_validation") is False
+            and resp.get("final_bound") is None
+            and resp.get("repair_count") == 0
+            and isinstance(scope_errors, list)
+            and bool(scope_errors)
+            and all_decisions_are_depth_bridges
+            and scope_errors_are_depth_only
+        )
+
+    @staticmethod
+    def _deferred_record(resp, stage):
+        mapping = {
+            str(item.get("ref")): str(item.get("node_id"))
+            for item in resp.get("context", {}).get("ref_mapping", [])
+            if isinstance(item, dict)
+        }
+        local_proposal = resp["final_local"]
+        resolved_proposal = copy.deepcopy(local_proposal)
+        for decision in resolved_proposal.get("decisions", []):
+            decision["source_id"] = mapping[decision.pop("source_ref")]
+            decision["target_id"] = mapping[decision.pop("target_ref")]
+            for item in decision.get("child_plan", []):
+                item["child_id"] = mapping[item.pop("child_ref")]
+                item["target_parent_id"] = mapping[
+                    item.pop("target_parent_ref")
+                ]
+        record = deferred_restructure_record(
+            stage,
+            logical_call_id=resp["logical_call_id"],
+            local_proposal=local_proposal,
+            resolved_proposal=resolved_proposal,
+        )
+        record["message"] = "structure-balancing create_bridge deferred before execution"
+        record["semantic_contract"]["violations"][0][
+            "message"
+        ] = BRIDGE_DEPTH_DEFERRED_MESSAGE
+        return record
+
     def _apply(self, pid, payload, stage, call_audit=None):
         if isinstance(call_audit, dict) and call_audit.get("ok") is True:
             assert_call_audit_payload(call_audit, payload)
@@ -496,6 +620,15 @@ class ShapingProcess:
 
         decisions, errors = parse_semantic_decisions(payload)
         if errors:
+            if self._is_deferrable_response(call_audit):
+                append_jsonl(
+                    self.ops_log,
+                    self._deferred_record(
+                        call_audit, f"structure_balancing_{stage}"
+                    ),
+                )
+                self._mark_deferred(pid, stage)
+                return False
             append_jsonl(
                 self.ops_log,
                 rejected_parse_record(f"structure_balancing_{stage}", errors),
