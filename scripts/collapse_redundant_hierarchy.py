@@ -48,6 +48,24 @@ PAIR_EXTERNAL_CHILD_MESSAGE = "merge child target is outside the exact pair role
 INEXPRESSIBLE_SCOPE_MESSAGES = frozenset({PAIR_EXTERNAL_CHILD_MESSAGE})
 VOID_CHILD_PLAN_MESSAGE = "source has no children; child_plan must be empty"
 
+
+def _all_scope_errors_inexpressible(scope_errors):
+    """True when a scope-error channel is non-empty and wholly inexpressible.
+
+    Read by both defer channels in _is_deferrable_response (C13RF18).  An empty
+    channel is never deferrable: "no recorded error" must not be mistaken for
+    "every recorded error was benign".
+    """
+    return (
+        isinstance(scope_errors, list)
+        and bool(scope_errors)
+        and all(
+            isinstance(item, dict)
+            and item.get("code") == "DECISION_SCOPE_INEXPRESSIBLE"
+            for item in scope_errors
+        )
+    )
+
 # ==========================================
 # 1. 路径锚点 (Path Anchors) - 保留你的配置
 # ==========================================
@@ -442,21 +460,39 @@ class SkeletonRefiner:
     def _is_deferrable_response(resp):
         if not isinstance(resp, dict):
             return False
-        scope_errors = resp.get("initial_scope_errors")
-        return (
+        # Conditions shared by both channels: the call was refused, nothing was
+        # bound, and the tree did not move underneath the validator.
+        if not (
             resp.get("ok") is not True
-            and resp.get("final_disposition") == "scope_rejected"
-            and resp.get("error") == "BOUND_SCOPE_VALIDATION_FAILED"
             and resp.get("mutation_before_validation") is False
             and resp.get("final_bound") is None
+        ):
+            return False
+        # Channel 1 (C13RF6, unchanged): the initial answer was refused outright
+        # and every scope error it left behind is inexpressible.
+        if (
+            resp.get("final_disposition") == "scope_rejected"
+            and resp.get("error") == "BOUND_SCOPE_VALIDATION_FAILED"
             and resp.get("repair_count") == 0
-            and isinstance(scope_errors, list)
-            and bool(scope_errors)
-            and all(
-                isinstance(item, dict)
-                and item.get("code") == "DECISION_SCOPE_INEXPRESSIBLE"
-                for item in scope_errors
+            and _all_scope_errors_inexpressible(
+                resp.get("initial_scope_errors")
             )
+        ):
+            return True
+        # Channel 2 (C13RF18): a mixed answer whose repair round honestly fixed
+        # the repairable half, leaving a remainder that is entirely
+        # inexpressible.  The remainder is read from repair_scope_errors -- the
+        # parallel field the binder has always produced from the same rule as
+        # initial_scope_errors, and which no defer predicate used to read.  Any
+        # non-inexpressible residue keeps the run stopping, by design.
+        # repair_count is pinned to exactly 1 because the binder performs at
+        # most one repair round; a future multi-round repair must fail closed
+        # rather than silently inherit this allowance.
+        return (
+            resp.get("final_disposition") == "repair_scope_rejected"
+            and resp.get("error") == "REPAIR_SCOPE_VALIDATION_FAILED"
+            and resp.get("repair_count") == 1
+            and _all_scope_errors_inexpressible(resp.get("repair_scope_errors"))
         )
 
     @staticmethod

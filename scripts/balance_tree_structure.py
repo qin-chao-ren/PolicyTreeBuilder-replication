@@ -555,42 +555,53 @@ class ShapingProcess:
     def _is_deferrable_response(resp):
         if not isinstance(resp, dict):
             return False
-        scope_errors = resp.get("initial_scope_errors")
         local_proposal = resp.get("final_local")
         decisions = (
             local_proposal.get("decisions")
             if isinstance(local_proposal, dict) else None
         )
-        # A scope-error list only describes rejected decisions.  Requiring it
-        # to cover every local proposal prevents a mixed batch (one legal
-        # decision plus one depth-conflicted bridge) from being deferred as a
-        # whole.  The deferred path is intentionally limited to homogeneous
-        # create_bridge batches whose only issue is the depth ceiling.
-        error_indexes = [
-            item.get("context", {}).get("decision_index")
-            for item in scope_errors
-            if isinstance(item, dict)
-            and isinstance(item.get("context"), dict)
-        ] if isinstance(scope_errors, list) else []
-        valid_error_indexes = all(
-            isinstance(index, int) and not isinstance(index, bool)
-            for index in error_indexes
-        )
-        all_decisions_are_depth_bridges = (
-            isinstance(decisions, list)
-            and bool(decisions)
-            and all(
-                isinstance(decision, dict)
-                and decision.get("action") == "create_bridge"
-                for decision in decisions
+
+        def channel_is_depth_only(scope_errors):
+            """Whether one scope-error channel is a pure depth-ceiling batch.
+
+            Parameterised over the channel (C13RF18) so the initial and the
+            post-repair remainder are judged by exactly the same rule; the
+            balance-specific narrowness below is deliberately preserved for
+            both.  ``decisions`` is read from final_local, which on the repair
+            path is already the repaired proposal.
+            """
+            # A scope-error list only describes rejected decisions.  Requiring
+            # it to cover every local proposal prevents a mixed batch (one legal
+            # decision plus one depth-conflicted bridge) from being deferred as
+            # a whole.  The deferred path is intentionally limited to
+            # homogeneous create_bridge batches whose only issue is the depth
+            # ceiling -- C13RF18 widens *when* the channel may be read, never
+            # what counts as a deferrable batch.
+            if not isinstance(scope_errors, list) or not scope_errors:
+                return False
+            error_indexes = [
+                item.get("context", {}).get("decision_index")
+                for item in scope_errors
+                if isinstance(item, dict)
+                and isinstance(item.get("context"), dict)
+            ]
+            valid_error_indexes = all(
+                isinstance(index, int) and not isinstance(index, bool)
+                for index in error_indexes
             )
-            and valid_error_indexes
-            and sorted(error_indexes) == list(range(len(decisions)))
-            and len(set(error_indexes)) == len(error_indexes)
-        )
-        scope_errors_are_depth_only = (
-            isinstance(scope_errors, list)
-            and all(
+            all_decisions_are_depth_bridges = (
+                isinstance(decisions, list)
+                and bool(decisions)
+                and all(
+                    isinstance(decision, dict)
+                    and decision.get("action") == "create_bridge"
+                    for decision in decisions
+                )
+                and valid_error_indexes
+                and sorted(error_indexes) == list(range(len(decisions)))
+                and len(set(error_indexes)) == len(error_indexes)
+            )
+            scope_errors_are_depth_only = all(
                 isinstance(item, dict)
                 and item.get("code") == "DECISION_SCOPE_INEXPRESSIBLE"
                 and item.get("message") == BRIDGE_DEPTH_DEFERRED_MESSAGE
@@ -599,18 +610,38 @@ class ShapingProcess:
                 and item["context"].get("repairable") is False
                 for item in scope_errors
             )
-        )
-        return (
+            return all_decisions_are_depth_bridges and scope_errors_are_depth_only
+
+        # Conditions shared by both channels: the call was refused, nothing was
+        # bound, and the tree did not move underneath the validator.
+        if not (
             resp.get("ok") is not True
-            and resp.get("final_disposition") == "scope_rejected"
-            and resp.get("error") == "BOUND_SCOPE_VALIDATION_FAILED"
             and resp.get("mutation_before_validation") is False
             and resp.get("final_bound") is None
+        ):
+            return False
+        # Channel 1 (C13RF10, unchanged): the initial answer was refused
+        # outright and its only issue is the depth ceiling.
+        if (
+            resp.get("final_disposition") == "scope_rejected"
+            and resp.get("error") == "BOUND_SCOPE_VALIDATION_FAILED"
             and resp.get("repair_count") == 0
-            and isinstance(scope_errors, list)
-            and bool(scope_errors)
-            and all_decisions_are_depth_bridges
-            and scope_errors_are_depth_only
+            and channel_is_depth_only(resp.get("initial_scope_errors"))
+        ):
+            return True
+        # Channel 2 (C13RF18): the repair round honestly fixed the repairable
+        # half, leaving a remainder that is still nothing but depth-ceiling
+        # bridges.  Read from repair_scope_errors -- the parallel field the
+        # binder has always produced and no defer predicate used to read.  Any
+        # other residue keeps the run stopping, by design.  repair_count is
+        # pinned to exactly 1 because the binder performs at most one repair
+        # round; a future multi-round repair must fail closed rather than
+        # silently inherit this allowance.
+        return (
+            resp.get("final_disposition") == "repair_scope_rejected"
+            and resp.get("error") == "REPAIR_SCOPE_VALIDATION_FAILED"
+            and resp.get("repair_count") == 1
+            and channel_is_depth_only(resp.get("repair_scope_errors"))
         )
 
     @staticmethod
