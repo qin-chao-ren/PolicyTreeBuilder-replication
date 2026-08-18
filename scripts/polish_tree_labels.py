@@ -45,12 +45,22 @@ from utils.semantic_contract import (
     rejected_parse_record,
 )
 from utils.local_reference_binding import (
+    VOID_CHILD_PLAN_FLAG,
     assert_call_audit_payload,
     attach_operation_audit,
     canonical_payload_sha256,
     build_local_reference_context,
     call_local_reference_json,
 )
+
+# Scope messages that describe a legitimate restructure this stage cannot
+# express, as opposed to a factual misread the model must repair.  Membership is
+# per message, not per whole list: a decision carrying one of these plus an
+# ordinary violation must still report the deferrable half instead of dropping
+# it (C13RF16 fix ②).
+PAIR_EXTERNAL_CHILD_MESSAGE = "merge child target is outside the exact pair role"
+INEXPRESSIBLE_SCOPE_MESSAGES = frozenset({PAIR_EXTERNAL_CHILD_MESSAGE})
+VOID_CHILD_PLAN_MESSAGE = "source has no children; child_plan must be empty"
 
 # --- 1. 路径锚点 (Path Anchors) ---
 # 无论在哪里运行命令，__file__ 都能定位到 scripts/ 目录
@@ -317,6 +327,12 @@ class PolishingProcess:
             messages = []
             mutable = []
             repairable = True
+            # C13RF16 fix ②: the deferrable component is tracked separately so a
+            # mixed decision can report it instead of silently losing it, and so
+            # its refs can be withheld from the repair round.
+            inexpressible_children = []
+            inexpressible_mutable = []
+            void_child_plan = False
             if action not in allowed_actions:
                 messages.append("action is not allowed in label polishing")
                 repairable = False
@@ -345,7 +361,13 @@ class PolishingProcess:
                     str(item.get("node_id"))
                     for item in self.tm.get_children(source_id)
                 }
-                for child_index, item in enumerate(decision.get("child_plan", [])):
+                plan_items = decision.get("child_plan", [])
+                plan_items = plan_items if isinstance(plan_items, list) else []
+                # No children at all means no child_ref is nameable, so every
+                # item below is reported and no per-item repair exists.  Flag
+                # it: the empty plan is the correction (C13RF16 fix ①).
+                void_child_plan = bool(plan_items) and not source_children
+                for child_index, item in enumerate(plan_items):
                     if not isinstance(item, dict):
                         continue
                     if str(item.get("child_id") or "") not in source_children:
@@ -361,7 +383,11 @@ class PolishingProcess:
                             else target_id
                         )
                         if plan_target != expected_target:
-                            messages.append("merge child target is outside the exact pair role")
+                            messages.append(PAIR_EXTERNAL_CHILD_MESSAGE)
+                            inexpressible_children.append(child_index)
+                            inexpressible_mutable.append(
+                                f"decisions[{index}].child_plan[{child_index}].target_parent_ref"
+                            )
                             mutable.append(
                                 f"decisions[{index}].child_plan[{child_index}].target_parent_ref"
                             )
@@ -393,14 +419,43 @@ class PolishingProcess:
                                 f"decisions[{index}].child_plan[{child_index}].target_parent_ref"
                             )
             if messages:
+                if void_child_plan:
+                    messages.append(VOID_CHILD_PLAN_MESSAGE)
                 unique_messages = list(dict.fromkeys(messages))
+                inexpressible_messages = [
+                    message for message in unique_messages
+                    if message in INEXPRESSIBLE_SCOPE_MESSAGES
+                ]
+                other_messages = [
+                    message for message in unique_messages
+                    if message not in INEXPRESSIBLE_SCOPE_MESSAGES
+                ]
                 inexpressible = (
                     action == "merge"
                     and repairable
-                    and unique_messages == [
-                        "merge child target is outside the exact pair role"
-                    ]
+                    and bool(inexpressible_messages)
+                    and not other_messages
                 )
+                # Mixed decision: withhold the deferrable half's refs so the
+                # repair round cannot coerce a pair-external destination into a
+                # legal-but-wrong one, and record what was withheld.
+                withheld = (
+                    list(dict.fromkeys(inexpressible_mutable))
+                    if inexpressible_messages and other_messages else []
+                )
+                repair_paths = [
+                    path for path in dict.fromkeys(mutable)
+                    if path not in set(withheld)
+                ]
+                extra_context = {}
+                if withheld:
+                    extra_context["inexpressible_components"] = inexpressible_messages
+                    extra_context["inexpressible_child_indexes"] = list(
+                        dict.fromkeys(inexpressible_children)
+                    )
+                    extra_context["withheld_ref_paths"] = withheld
+                if void_child_plan:
+                    extra_context[VOID_CHILD_PLAN_FLAG] = True
                 issues.append({
                     "code": (
                         "DECISION_SCOPE_INEXPRESSIBLE"
@@ -429,8 +484,9 @@ class PolishingProcess:
                             "mutable_ref_paths": [],
                             "repairable": False,
                         } if inexpressible else {
-                            "mutable_ref_paths": list(dict.fromkeys(mutable)),
-                            "repairable": repairable,
+                            "mutable_ref_paths": repair_paths,
+                            "repairable": repairable and bool(repair_paths),
+                            **extra_context,
                         }),
                     },
                 })

@@ -93,6 +93,13 @@ CHILD_SEMANTIC_FIELDS = (
     "same_domain",
     "evidence",
 )
+# A stage sets this context flag when the decision's source node has no direct
+# children at all.  Every ``child_ref`` the model could name is then a
+# non-source child, so no per-item repair exists and the only correct plan is
+# the empty one -- which the ordinary drift guard reads as a semantic edit.
+# C13RF13 call 25 died in exactly that deadlock; the flag authorises the repair
+# round to truncate that decision's ``child_plan`` and nothing else.
+VOID_CHILD_PLAN_FLAG = "child_plan_must_be_empty"
 
 LOCAL_SCHEMA_PATH = (
     Path(__file__).resolve().parents[2]
@@ -894,6 +901,85 @@ def _stable_valid_refs(
     return stable
 
 
+def _void_child_plan_indexes(errors: Sequence[Mapping[str, Any]]) -> set[int]:
+    """Decision indexes whose only legal ``child_plan`` is the empty list.
+
+    Authorisation comes from the stage scope validator via
+    ``context[VOID_CHILD_PLAN_FLAG]``; see that constant for why it exists.
+    """
+    indexes: set[int] = set()
+    for item in errors:
+        details = item.get("context")
+        if not isinstance(details, Mapping):
+            continue
+        if details.get(VOID_CHILD_PLAN_FLAG) is not True:
+            continue
+        index = details.get("decision_index")
+        if isinstance(index, int) and not isinstance(index, bool) and index >= 0:
+            indexes.add(index)
+    return indexes
+
+
+def _void_child_plan_ref_paths(payload: Any, indexes: Iterable[int]) -> set[str]:
+    """Every child_plan ref path inside an authorised decision.
+
+    Those refs are about to be deleted wholesale, so they must not be carried
+    into ``stable_refs``: reading a deleted path yields ``None`` and would trip
+    ``REPAIR_VALID_REF_DRIFT`` on a legitimate truncation.
+    """
+    decisions = _candidate_decisions(payload) or []
+    authorised = {int(index) for index in indexes}
+    paths: set[str] = set()
+    for index, decision in enumerate(decisions):
+        if index not in authorised:
+            continue
+        plan = decision.get("child_plan")
+        if not isinstance(plan, list):
+            continue
+        for child_index, item in enumerate(plan):
+            if not isinstance(item, dict):
+                continue
+            for field in ("child_ref", "target_parent_ref"):
+                paths.add(f"decisions[{index}].child_plan[{child_index}].{field}")
+    return paths
+
+
+def _projection_preserved(
+    projection: Optional[List[Dict[str, Any]]],
+    repair_projection: Optional[List[Dict[str, Any]]],
+    *,
+    void_indexes: Iterable[int] = (),
+) -> bool:
+    """Frozen semantics survived the repair round.
+
+    Byte equality is the rule.  The single tolerated exception is an authorised
+    decision whose ``child_plan`` came back as exactly ``[]``; for that decision
+    every other frozen field must still match byte for byte, and a non-empty
+    repaired plan falls back to the strict comparison.
+    """
+    if _canonical_json(repair_projection) == _canonical_json(projection):
+        return True
+    authorised = {int(index) for index in void_indexes}
+    if not authorised or projection is None or repair_projection is None:
+        return False
+    if len(projection) != len(repair_projection):
+        return False
+    for index, (before, after) in enumerate(zip(projection, repair_projection)):
+        if _canonical_json(before) == _canonical_json(after):
+            continue
+        if index not in authorised or after.get("child_plan") != []:
+            return False
+        stripped_before = {
+            field: value for field, value in before.items() if field != "child_plan"
+        }
+        stripped_after = {
+            field: value for field, value in after.items() if field != "child_plan"
+        }
+        if _canonical_json(stripped_before) != _canonical_json(stripped_after):
+            return False
+    return True
+
+
 def _mutable_ref_paths(errors: Sequence[Mapping[str, Any]]) -> set[str]:
     paths: set[str] = set()
     for item in errors:
@@ -1105,6 +1191,8 @@ def _repair_user(
     projection: List[Dict[str, Any]],
     stable_refs: Mapping[str, str],
     errors: Sequence[Mapping[str, Any]],
+    *,
+    void_indexes: Iterable[int] = (),
 ) -> str:
     safe_errors = []
     for item in errors:
@@ -1113,6 +1201,16 @@ def _repair_user(
         if isinstance(context_payload, dict):
             context_payload.pop("ref", None)
         safe_errors.append(copied)
+    # Decision indexes only: no node ID or ref value enters this clause, so the
+    # repair-prompt ID scanners downstream stay unaffected.
+    authorised = sorted({int(index) for index in void_indexes})
+    void_clause = (
+        "The source node of each decision index listed here has no children at "
+        "all, so its corrected child_plan must be exactly []; emptying those "
+        "plans is the required correction, not a semantic change.\n"
+        f"child_plan_must_be_empty={_canonical_json(authorised)}\n"
+        if authorised else ""
+    )
     return (
         "# Schema/scope reference repair\n"
         f"context_token={context.context_token}\n"
@@ -1120,6 +1218,7 @@ def _repair_user(
         "projection exactly; do not add, delete, reorder, or change semantic fields. "
         "Preserve every already-valid ref listed below. Use only allowed refs from the "
         "original call context.\n"
+        f"{void_clause}"
         f"frozen_semantics={_canonical_json(projection)}\n"
         f"stable_valid_refs={_canonical_json(dict(stable_refs))}\n"
         f"schema_errors={_canonical_json(safe_errors)}\n\n"
@@ -1529,10 +1628,14 @@ def call_local_reference_json(
             events=events,
         )
 
+    void_indexes = _void_child_plan_indexes(initial_errors)
     stable_refs = _stable_valid_refs(
         initial_payload,
         context,
-        mutable_paths=_mutable_ref_paths(initial_errors),
+        mutable_paths=(
+            _mutable_ref_paths(initial_errors)
+            | _void_child_plan_ref_paths(initial_payload, void_indexes)
+        ),
     )
     projection_id_hits = sorted(set(
         _known_id_hits(projection, context.known_node_ids)
@@ -1553,7 +1656,9 @@ def call_local_reference_json(
             ok=False, disposition="repair_prompt_rejected",
             error="REPAIR_PROMPT_REAL_ID_RISK", events=events,
         )
-    repair_user = _repair_user(context, projection, stable_refs, initial_errors)
+    repair_user = _repair_user(
+        context, projection, stable_refs, initial_errors, void_indexes=void_indexes,
+    )
     repair_prompt_hits = sorted(set(
         _known_id_hits([system, repair_user], context.known_node_ids)
         + _real_id_shape_hits([system, repair_user])
@@ -1646,7 +1751,9 @@ def call_local_reference_json(
         )
 
     repair_projection = semantic_projection(repair_payload)
-    if _canonical_json(repair_projection) != _canonical_json(projection):
+    if not _projection_preserved(
+        projection, repair_projection, void_indexes=void_indexes,
+    ):
         return _base_result(
             context=context, attempts=attempts_used, attempt_history=all_history,
             repair_count=1, initial_result=initial_result, repair_result=repair_result,
@@ -1735,6 +1842,7 @@ __all__ = [
     "LocalReferenceContext",
     "LocalReferenceEntry",
     "PROTOCOL_VERSION",
+    "VOID_CHILD_PLAN_FLAG",
     "bind_local_reference_payload",
     "build_local_reference_context",
     "call_local_reference_json",

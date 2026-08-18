@@ -30,6 +30,7 @@ from utils.semantic_contract import (
     rejected_parse_record,
 )
 from utils.local_reference_binding import (
+    VOID_CHILD_PLAN_FLAG,
     assert_call_audit_payload,
     attach_operation_audit,
     canonical_payload_sha256,
@@ -63,6 +64,14 @@ BRIDGE_TARGET_PLACEHOLDER = "__NEW_BRIDGE__"
 BRIDGE_DEPTH_DEFERRED_MESSAGE = (
     "create_bridge is not expressible at the structure-balancing depth ceiling"
 )
+# Scope messages that describe a legitimate restructure this stage cannot
+# express, as opposed to a factual misread the model must repair.  Membership is
+# per message, not per whole list: a decision carrying one of these plus an
+# ordinary violation must still report the deferrable half instead of dropping
+# it (C13RF16 fix ②).
+BRIDGE_TOO_DEEP_MESSAGE = "bridge parent is too deep"
+INEXPRESSIBLE_SCOPE_MESSAGES = frozenset({BRIDGE_TOO_DEEP_MESSAGE})
+VOID_CHILD_PLAN_MESSAGE = "source has no children; child_plan must be empty"
 AUDITED_DECISION_FIELDS = (
     "relation",
     "action",
@@ -330,6 +339,7 @@ class ShapingProcess:
         mutable_ref_paths = []
         terminal = False
         new_node_level = None
+        void_child_plan = False
 
         if action not in allowed_actions:
             scope_messages.append("action is not allowed in structure balancing")
@@ -340,7 +350,7 @@ class ShapingProcess:
 
         if action == "create_bridge":
             if calc_depth(self.tm, pid) >= MAX_DEPTH - 1:
-                scope_messages.append("bridge parent is too deep")
+                scope_messages.append(BRIDGE_TOO_DEEP_MESSAGE)
                 terminal = True
             if target_id != BRIDGE_TARGET_PLACEHOLDER:
                 scope_messages.append("create_bridge target must be NEW_BRIDGE")
@@ -448,7 +458,17 @@ class ShapingProcess:
             source_children = {
                 str(child.get("node_id")) for child in self.tm.get_children(source_id)
             }
-            for child_index, item in enumerate(decision.get("child_plan", [])):
+            plan_items = decision.get("child_plan", [])
+            plan_items = plan_items if isinstance(plan_items, list) else []
+            # No children at all means no child_ref is nameable, so every item
+            # below is reported and no per-item repair exists.  A move whose
+            # source is childless legitimately relocates nothing, so the empty
+            # plan is the correction (C13RF16 fix ①).  Only merge and move earn
+            # this flag: create_bridge, flatten and split_reparent require at
+            # least one child by contract, so for them an empty plan is never
+            # legal and the proposal is void as a whole.
+            void_child_plan = bool(plan_items) and not source_children
+            for child_index, item in enumerate(plan_items):
                 if not isinstance(item, dict):
                     continue
                 if str(item.get("child_id") or "") not in source_children:
@@ -469,11 +489,31 @@ class ShapingProcess:
 
         scope_issue = None
         if scope_messages:
+            if void_child_plan:
+                scope_messages.append(VOID_CHILD_PLAN_MESSAGE)
             unique_messages = list(dict.fromkeys(scope_messages))
+            inexpressible_messages = [
+                message for message in unique_messages
+                if message in INEXPRESSIBLE_SCOPE_MESSAGES
+            ]
+            other_messages = [
+                message for message in unique_messages
+                if message not in INEXPRESSIBLE_SCOPE_MESSAGES
+            ]
             inexpressible = (
                 action == "create_bridge"
-                and unique_messages == ["bridge parent is too deep"]
+                and bool(inexpressible_messages)
+                and not other_messages
             )
+            extra_context = {}
+            # Mixed decision: the depth ceiling carries no mutable ref path of
+            # its own, so nothing has to be withheld here -- ``terminal`` already
+            # blocks the repair round.  Recording the deferrable component is
+            # what changes: it used to vanish silently (C13RF16 fix ②).
+            if inexpressible_messages and other_messages:
+                extra_context["inexpressible_components"] = inexpressible_messages
+            if void_child_plan:
+                extra_context[VOID_CHILD_PLAN_FLAG] = True
             scope_issue = {
                 "code": (
                     "DECISION_SCOPE_INEXPRESSIBLE"
@@ -485,6 +525,7 @@ class ShapingProcess:
                 ),
                 "mutable_ref_paths": list(dict.fromkeys(mutable_ref_paths)),
                 "repairable": False if inexpressible else not terminal,
+                "extra_context": extra_context,
             }
         return decision, new_node_level, scope_issue
 
@@ -505,6 +546,7 @@ class ShapingProcess:
                         for path in issue["mutable_ref_paths"]
                     ],
                     "repairable": issue["repairable"],
+                    **issue.get("extra_context", {}),
                 },
             })
         return issues

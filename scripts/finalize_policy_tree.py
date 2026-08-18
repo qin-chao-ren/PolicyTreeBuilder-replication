@@ -49,12 +49,18 @@ from utils.semantic_contract import (
     validate_semantic_history,
 )
 from utils.local_reference_binding import (
+    VOID_CHILD_PLAN_FLAG,
     assert_call_audit_payload,
     attach_operation_audit,
     canonical_payload_sha256,
     build_local_reference_context,
     call_local_reference_json,
 )
+
+# This stage has no defer channel (DECISION_SCOPE_INEXPRESSIBLE is never
+# produced here), so a childless source's child_plan must be repairable or the
+# run stops; see VOID_CHILD_PLAN_FLAG.
+VOID_CHILD_PLAN_MESSAGE = "source has no children; child_plan must be empty"
 
 # --- 1. 路径锚点 (Path Anchors) ---
 HERE = Path(__file__).resolve().parent
@@ -655,6 +661,7 @@ class OverallStructureAudit:
             messages: List[str] = []
             mutable: List[str] = []
             terminal = False
+            void_child_plan = False
             if action not in allowed_actions:
                 messages.append("action is not allowed in finalization")
                 terminal = True
@@ -696,7 +703,22 @@ class OverallStructureAudit:
                         str(item.get("node_id"))
                         for item in self.tm.get_children(source_id)
                     }
-                    for child_index, item in enumerate(op.get("child_plan", [])):
+                    plan_items = op.get("child_plan", [])
+                    plan_items = plan_items if isinstance(plan_items, list) else []
+                    # No children at all means no child_ref is nameable, so every
+                    # item below is reported and no per-item repair exists; the
+                    # empty plan is the correction (C13RF16 fix ①).  Restricted to
+                    # merge and move: flatten and split_reparent require at least
+                    # one child by contract (FLATTEN_SOURCE_HAS_NO_CHILDREN,
+                    # SPLIT_HAS_NO_MOVES), so for them an empty plan is never
+                    # legal and the proposal is void as a whole.  This stage has
+                    # no defer channel, which is why the repair path must work.
+                    void_child_plan = (
+                        action in {"merge", "move"}
+                        and bool(plan_items)
+                        and not source_children
+                    )
+                    for child_index, item in enumerate(plan_items):
                         if not isinstance(item, dict):
                             continue
                         if str(item.get("child_id") or "") not in source_children:
@@ -746,6 +768,8 @@ class OverallStructureAudit:
                                 f"decisions[{index}].child_plan[{child_index}].target_parent_ref"
                             )
             if messages:
+                if void_child_plan:
+                    messages.append(VOID_CHILD_PLAN_MESSAGE)
                 issues.append({
                     "code": (
                         "ACTION_NOT_ALLOWED_IN_STAGE"
@@ -756,6 +780,7 @@ class OverallStructureAudit:
                         "decision_index": index,
                         "mutable_ref_paths": list(dict.fromkeys(mutable)),
                         "repairable": not terminal,
+                        **({VOID_CHILD_PLAN_FLAG: True} if void_child_plan else {}),
                     },
                 })
         return issues
