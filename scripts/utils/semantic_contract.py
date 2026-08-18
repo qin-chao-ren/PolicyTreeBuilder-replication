@@ -128,6 +128,164 @@ WARNING_PATTERNS = tuple(re.compile(pattern, re.IGNORECASE) for pattern in (
     r"错位",
 ))
 
+SEVERITY_CRITICAL = "critical"
+SEVERITY_ADVISORY = "advisory"
+
+# --- merge warning grading (C13RF17) ---------------------------------------
+# Before RF17 a merge was rejected whenever ``evidence.warnings`` was non-empty,
+# regardless of what the warning said.  Measured consequence over the C13M2
+# corpus: 13 of 20 merge proposals carried a warning and all 13 were rejected
+# solely by that rule, while every one of them had already passed the
+# destructive-merge whitelist.  Admission therefore tracked whether the model
+# volunteered a caveat, not whether the merge was sound -- a model that says
+# nothing scores better than one that discloses.  Grading replaces the
+# presence test with a content test.
+#
+# Three invariants shape the tables below:
+#   1. ALLOWLIST, NOT BLOCKLIST.  Anything unrecognised stays critical, so a
+#      future model's new phrasing fails closed rather than slipping through.
+#   2. MACHINE WARNINGS ARE NEVER GRADED.  collapse_redundant_hierarchy.py
+#      delivers an unsafe-promotion refusal by appending "promote_safety:..."
+#      to this same list; it is a safety verdict, not a self-disclosure.
+#   3. THE CONFLICT SCREEN RUNS FIRST, so a warning that looks benign but
+#      also admits a conflict stays critical.
+
+# Hypernym / partial-overlap vocabulary.  The shipped WARNING_PATTERNS table
+# matches "broader than" but not "slightly broader (...)", and hypernym merging
+# is exactly the failure mode the C13F audit froze 143 nodes over.
+#
+# Applied to the warnings LIST ONLY, deliberately.  Measured: adding these to
+# the summary prose channel newly condemns 5 of 20 real merges, because a
+# summary legitimately uses "broader" to explain why a merge is safe, whereas a
+# warning uses it as a flag.  The two channels see different genres of text.
+HYPERNYM_WARNING_PATTERNS = tuple(re.compile(p, re.IGNORECASE) for p in (
+    r"\b(?:slightly\s+)?(?:broader|narrower)\b",
+    r"\boverlapping\b",
+    r"\bpartial(?:ly)?\s+overlap\b",
+    r"\bsubset\b",
+    r"\bsuperset\b",
+    r"更(?:宽|窄|上位|下位)",
+    r"包含关系",
+    r"部分重叠",
+))
+
+# The one exemption inside the hypernym screen.  "the dropped qualifier is
+# subsumed by the surviving label" asserts containment of a MODIFIER, not that
+# two different instruments are the same: merging 培育关键市场主体 into
+# 培育市场主体 loses the word 关键, not a policy instrument.  Containment is
+# recoverable; partial overlap is not, which is why "overlapping" is absent
+# here and stays critical.
+SUBSUMPTION_EXEMPT_PATTERNS = tuple(re.compile(p, re.IGNORECASE) for p in (
+    r"\bsubsumed\b",
+    r"\bsubsumes\b",
+    r"\bencompassed\s+by\b",
+    r"被.{0,6}涵盖",
+    r"已涵盖",
+    r"上位标签涵盖",
+))
+
+# Benign family 1: the label strings differ, the referent does not.
+BENIGN_LEXICAL_WARNING_PATTERNS = tuple(re.compile(p, re.IGNORECASE) for p in (
+    r"^minor_[a-z_]+$",
+    r"^slight_[a-z_]+",
+    r"^labels_not_identical[a-z_]*$",
+    # Prose form of the same disclosure as labels_not_identical_strings.
+    # Found by replaying RF9's eight criticals: the token form was already
+    # allowlisted while this wording fell through to the fail-closed default,
+    # so the same statement was graded differently depending on phrasing.
+    # "not lexically identical" is a statement about SPELLING, unlike
+    # "not equivalent"/"not synonymous", which stay critical.
+    r"\bnot\s+lexically\s+identical\b",
+    r"\bminor\s+\w+\s+(?:difference|nuance|variation)\b",
+    r"\bminor\s+(?:verb|lexical|wording|scope)\b",
+    r"\bfunctionally\s+equivalent\b",
+    r"\binterchangeable\b",
+    r"\burgency\s+nuance\b",
+    r"\bnuance\s+not\s+present\b",
+    r"\bsubsumed\b",
+    r"\bqualifier\b.*\bdropped\b",
+    r"措辞(?:微差|差异)",
+    r"用词不同",
+    r"可互换",
+    r"近义",
+))
+
+# Benign family 2: factual topology notes.  Their real enforcement lives in
+# dedicated codes (CHILD_PLAN_INCOMPLETE, SOURCE_MEMBERSHIP_NOT_REPRESENTED,
+# membership conservation), so repeating them here as a rejection reason
+# punishes the disclosure while the actual guard is elsewhere.
+BENIGN_STRUCTURAL_WARNING_PATTERNS = tuple(re.compile(p, re.IGNORECASE) for p in (
+    r"^parent_has_other_children(_not_affected)?$",
+    # Both the single and the combined token form: RF9's record 4 wrote
+    # "child_has_membership_and_children" while the two halves were separately
+    # allowlisted, so the conjunction was graded stricter than either part.
+    r"^child_has_(children|membership)(_and_(children|membership))?$",
+    r"^child_has_one_child_[A-Za-z0-9_]+$",
+    r"^single_child_chain_merge$",
+    r"\bhas\s+\d+\s+(?:other\s+)?(?:children|direct\s+member)",
+    r"\bchildren\b.*\bmust\s+be\s+reparented\b",
+    r"\bremain\s+unaffected\b",
+    r"\bmust\s+be\s+accounted\s+for\b",
+    r"\bdirect\s+members\b",
+))
+
+MACHINE_WARNING_PREFIXES = ("promote_safety:",)
+
+
+def _pattern_hit(patterns: Sequence[Any], text: str) -> Optional[str]:
+    """Search ``text`` and an underscore-normalised copy of it.
+
+    Warnings arrive both as prose and as tokens such as
+    ``labels_not_identical_but_semantically_overlapping``.  ``_`` is a word
+    character, so ``\\boverlapping\\b`` never matches inside a token: without
+    normalisation the conflict screen would miss every token-form conflict and
+    the benign allowlist would then claim it.
+    """
+    normalised = text.replace("_", " ")
+    for pattern in patterns:
+        if pattern.search(text) or pattern.search(normalised):
+            return pattern.pattern
+    return None
+
+
+def classify_merge_warning(warning: str) -> Tuple[str, str]:
+    """Grade one merge warning string.  Returns ``(severity, reason)``."""
+    text = str(warning)
+    if text.startswith(MACHINE_WARNING_PREFIXES):
+        return SEVERITY_CRITICAL, "machine_safety_refusal"
+
+    shipped = _pattern_hit(WARNING_PATTERNS, text)
+    if shipped:
+        return SEVERITY_CRITICAL, "semantic_conflict"
+
+    hypernym = _pattern_hit(HYPERNYM_WARNING_PATTERNS, text)
+    if hypernym and not _pattern_hit(SUBSUMPTION_EXEMPT_PATTERNS, text):
+        return SEVERITY_CRITICAL, "hypernym_or_partial_overlap"
+
+    if _pattern_hit(BENIGN_LEXICAL_WARNING_PATTERNS, text):
+        return SEVERITY_ADVISORY, "benign_lexical_variance"
+    if _pattern_hit(BENIGN_STRUCTURAL_WARNING_PATTERNS, text):
+        return SEVERITY_ADVISORY, "benign_structural_disclosure"
+
+    return SEVERITY_CRITICAL, "unrecognised_fail_closed"
+
+
+def grade_merge_warnings(
+    warnings: Sequence[str],
+) -> Tuple[List[str], List[str], Dict[str, str]]:
+    """Split a warnings list into (critical, advisory, reason-by-warning)."""
+    critical: List[str] = []
+    advisory: List[str] = []
+    reasons: Dict[str, str] = {}
+    for warning in warnings:
+        severity, reason = classify_merge_warning(warning)
+        reasons[str(warning)] = reason
+        if severity == SEVERITY_CRITICAL:
+            critical.append(str(warning))
+        else:
+            advisory.append(str(warning))
+    return critical, advisory, reasons
+
 
 class SemanticContractError(RuntimeError):
     """Raised when a candidate fails the semantic publication gate."""
@@ -370,9 +528,16 @@ def validate_semantic_decision(
 ) -> Dict[str, Any]:
     violations: List[Dict[str, Any]] = []
 
-    def add(code: str, message: str, **details: Any) -> None:
+    def add(
+        code: str,
+        message: str,
+        _severity: str = SEVERITY_CRITICAL,
+        **details: Any,
+    ) -> None:
+        # Severity defaults to critical so every existing call site keeps its
+        # meaning; only the graded merge-warning path passes anything else.
         item: Dict[str, Any] = {
-            "severity": "critical",
+            "severity": _severity,
             "code": code,
             "message": message,
         }
@@ -573,17 +738,44 @@ def validate_semantic_decision(
         if source_l1 != target_l1:
             add("CROSS_L1_MERGE_FORBIDDEN", "destructive merge may not cross L1")
         if warnings:
-            add(
-                "MERGE_WARNING_CONFLICT",
-                "merge evidence contains warning flags",
-                warnings=list(warnings),
+            # C13RF17: graded by content instead of by presence.  The code name
+            # MERGE_WARNING_CONFLICT is deliberately unchanged so historical
+            # reports stay directly comparable; what changed is that it now
+            # fires only for warnings that actually assert a conflict.
+            critical_warnings, advisory_warnings, warning_reasons = (
+                grade_merge_warnings(warnings)
             )
+            if critical_warnings:
+                add(
+                    "MERGE_WARNING_CONFLICT",
+                    "merge evidence contains conflicting warning flags",
+                    warnings=list(critical_warnings),
+                    advisory_warnings=list(advisory_warnings),
+                    all_warnings=list(warnings),
+                    warning_reasons=dict(warning_reasons),
+                )
+            else:
+                add(
+                    "MERGE_WARNING_ADVISORY",
+                    "merge evidence discloses non-conflicting caveats",
+                    _severity=SEVERITY_ADVISORY,
+                    warnings=list(advisory_warnings),
+                    warning_reasons=dict(warning_reasons),
+                )
+        # Parallel prose channel.  Its trigger vocabulary is deliberately left
+        # as shipped: RF17 measured that extending the hypernym patterns to
+        # summaries newly condemns 5 of 20 real merges, because a summary uses
+        # "broader" to explain why a merge is safe while a warning uses it as a
+        # flag.  Both channels now route through classify_merge_warning so they
+        # agree on what the shipped vocabulary means, and both are exercised by
+        # the same four-quadrant tests.
         warning_text = _warning_in_summary(summary)
         if warning_text:
             add(
                 "MERGE_WARNING_TEXT_CONFLICT",
                 "merge evidence text contains a semantic warning",
                 matched=warning_text,
+                severity_reason=classify_merge_warning(warning_text)[1],
             )
         member_count = context.get("source_direct_membership_count")
         if not context.get("membership_known") or not isinstance(member_count, int):
@@ -898,12 +1090,28 @@ def _validate_child_items(
 
 def _validation_report(violations: Sequence[Mapping[str, Any]]) -> Dict[str, Any]:
     counts = Counter(str(item.get("code", "UNKNOWN")) for item in violations)
+    # C13RF17: a decision fails on CRITICAL violations only.  Advisories are
+    # recorded in full (so the model's caveat stays auditable and countable)
+    # but do not reject the decision -- structurally the same move D2b made for
+    # deferred records.  `violations` keeps carrying both so that consumers
+    # filtering on `severity == "critical"` (harness/verify_stage_v2.py:147)
+    # need no change at all.
+    criticals = [
+        item for item in violations
+        if str(item.get("severity")) == SEVERITY_CRITICAL
+    ]
+    advisories = [
+        item for item in violations
+        if str(item.get("severity")) == SEVERITY_ADVISORY
+    ]
     return {
         "schema_version": DECISION_SCHEMA_VERSION,
-        "passed": not violations,
-        "critical_count": len(violations),
+        "passed": not criticals,
+        "critical_count": len(criticals),
+        "advisory_count": len(advisories),
         "violation_counts": dict(sorted(counts.items())),
         "violations": [dict(item) for item in violations],
+        "advisories": [dict(item) for item in advisories],
     }
 
 
@@ -1228,7 +1436,11 @@ __all__ = [
     "MERGE_RELATIONS",
     "PUBLICATION_SCHEMA_VERSION",
     "RELATIONS",
+    "SEVERITY_ADVISORY",
+    "SEVERITY_CRITICAL",
     "SemanticContractError",
+    "classify_merge_warning",
+    "grade_merge_warnings",
     "build_semantic_context",
     "deferred_restructure_record",
     "execute_semantic_decision",
