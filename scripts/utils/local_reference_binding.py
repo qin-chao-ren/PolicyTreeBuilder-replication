@@ -23,19 +23,52 @@ ACTIONS = {
     "split_reparent", "uncertain", "rename", "flatten", "create_bridge",
 }
 CHILD_DISPOSITIONS = {"move", "keep", "retain_under_source"}
-REAL_NODE_ID_PATTERN = re.compile(
-    r"^(?:ROOT|L[1-4]_[A-Za-z0-9][A-Za-z0-9_.:-]{1,126}[A-Za-z0-9])$"
+# --- Real node-ID grammar (C13RF21) -----------------------------------------
+# The generators are the authority on this shape, not intuition:
+#   * base IDs      ``scripts/common_id.py:make_node_id`` -> ``L{1-4}_N{md5[:8]}``
+#   * bridge IDs    ``balance_tree_structure.py:generate_bridge_id``
+#                   -> ``{parent}_BR_{md5[:6]}``, appendable more than once
+# A byte-level census of every reachable tree (353 frozen, 268, 250-node
+# scaffold; 445 distinct identifiers) found exactly one further shape not
+# produced by today's generators but present in the still-live frozen 353
+# baseline: a 4-hex group appended bare after a bridge segment, e.g.
+# ``L1_N6be998d8_BR_8df89b_f5a4``.  It predates this repository and must stay
+# covered -- narrowing past it would convert a false-positive fix into a
+# missed detection.  See ``experiments/2026-08-19_c13rf21_raw_id_shape``.
+_REAL_NODE_ID_BODY = (
+    r"(?:ROOT|L[1-4]_N[0-9a-f]{8})"          # base identity
+    r"(?:(?:_BR_[0-9a-f]{6})+(?:_[0-9a-f]{4})?)?"
+    # Bridge segments chain, and the census found the bare 4-hex tail only ever
+    # after at least one ``_BR_`` segment -- never directly on a base ID.  The
+    # tail is therefore bound to the bridge chain rather than left dangling, so
+    # the grammar stays exactly as wide as the observed identifier population.
 )
+REAL_NODE_ID_PATTERN = re.compile(rf"^{_REAL_NODE_ID_BODY}$")
+
+# Tokenization-only grammar: intentionally the wide pre-RF21 shape.  Used to
+# split prompt text into complete identifier tokens, never to decide whether a
+# value leaked.  See ``_token_matches`` for why widening is the safe direction
+# here and the narrow direction is safe for detection.
+_REAL_NODE_ID_WIDE_BODY = (
+    r"(?:ROOT|L[1-4]_[A-Za-z0-9][A-Za-z0-9_.:-]{1,126}[A-Za-z0-9])"
+)
+REAL_NODE_ID_TOKENIZATION_PATTERN = re.compile(rf"^{_REAL_NODE_ID_WIDE_BODY}$")
 REAL_NODE_ID_TOKEN_PATTERN = re.compile(
-    r"(?<![A-Za-z0-9_])(?:ROOT|L[1-4]_[A-Za-z0-9][A-Za-z0-9_.:-]{1,126}[A-Za-z0-9])(?![A-Za-z0-9_])"
+    rf"(?<![A-Za-z0-9_]){_REAL_NODE_ID_WIDE_BODY}(?![A-Za-z0-9_])"
 )
 # Model-response and prompt safety is deliberately stricter than ref
 # tokenization.  A model must not hide an otherwise valid node-ID shape by
-# gluing ordinary characters around it (for example ``xL4_OUTSIDE99y``).
+# gluing ordinary characters around it (for example ``xL1_N762e6689y``).
 # Exact context discovery continues to use REAL_NODE_ID_TOKEN_PATTERN above.
-REAL_NODE_ID_EMBEDDED_PATTERN = re.compile(
-    r"(?:ROOT|L[1-4]_[A-Za-z0-9][A-Za-z0-9_.:-]{1,126}[A-Za-z0-9])"
-)
+REAL_NODE_ID_EMBEDDED_PATTERN = re.compile(_REAL_NODE_ID_BODY)
+
+# The pre-RF21 grammar treated ``L{1-4}_`` followed by any ordinary characters
+# as an identifier, so natural-language phrases such as
+# ``different_parent_L1_domains`` were hard-rejected as leaked IDs -- that
+# false positive stopped the RF20 online run at 14c call 97.  The legacy shape
+# is retained purely as a non-blocking telemetry signal so that narrowing
+# remains observable in production rather than silent.
+REAL_NODE_ID_LEGACY_WIDE_PATTERN = re.compile(_REAL_NODE_ID_WIDE_BODY)
 _LOGICAL_CALL_SEQUENCE = itertools.count(1)
 
 LOCAL_DECISION_FIELDS = {
@@ -151,7 +184,16 @@ def _token_matches(text: str, value: str) -> List[re.Match[str]]:
     ordinary exact-token rule.
     """
 
-    if REAL_NODE_ID_PATTERN.fullmatch(value):
+    # Tokenization and leak detection pull in OPPOSITE directions, so they use
+    # different grammars on purpose (C13RF21).  Leak detection must be narrow:
+    # a grammar wider than the real identifier population hard-rejects ordinary
+    # prose (``different_parent_L1_domains`` stopped the RF20 run).  Context
+    # discovery must stay wide: tokenizing greedily is what stops a short
+    # candidate from being inferred as "displayed" out of the middle of a longer
+    # identifier that uses the contract's ``.:-`` continuation characters.
+    # Narrowing this call site too would silently reopen that prefix-inference
+    # hole, so it keeps the pre-RF21 wide shape.
+    if REAL_NODE_ID_TOKENIZATION_PATTERN.fullmatch(value):
         return [
             match
             for match in REAL_NODE_ID_TOKEN_PATTERN.finditer(text)
@@ -349,6 +391,8 @@ def _known_id_hits(value: Any, known_node_ids: Iterable[str]) -> List[str]:
 
 
 def _real_id_shape_hits(value: Any) -> List[str]:
+    """Blocking tier: substrings matching the authoritative node-ID grammar."""
+
     hits: set[str] = set()
 
     def visit(item: Any) -> None:
@@ -367,6 +411,40 @@ def _real_id_shape_hits(value: Any) -> List[str]:
 
     visit(value)
     return sorted(hits)
+
+
+def _legacy_wide_shape_paths(value: Any) -> List[str]:
+    """Non-blocking tier: field paths that only the pre-RF21 wide shape matched.
+
+    Returned entries are *paths and counts only* -- never the matched text.
+    A production response that trips this tier is allowed through; the signal
+    exists so that narrowing the grammar stays observable instead of silent.
+    """
+
+    paths: Dict[str, int] = {}
+
+    def visit(item: Any, path: str) -> None:
+        if isinstance(item, str):
+            wide = {m.group(0) for m in REAL_NODE_ID_LEGACY_WIDE_PATTERN.finditer(item)}
+            if not wide:
+                return
+            narrow = {m.group(0) for m in REAL_NODE_ID_EMBEDDED_PATTERN.finditer(item)}
+            residual = {
+                token for token in wide
+                if not any(token in exact or exact in token for exact in narrow)
+            }
+            if residual:
+                paths[path] = paths.get(path, 0) + len(residual)
+        elif isinstance(item, Mapping):
+            for key, nested in item.items():
+                visit(key, f"{path}.<key>" if path else "<key>")
+                visit(nested, f"{path}.{key}" if path else str(key))
+        elif isinstance(item, (list, tuple)):
+            for index, nested in enumerate(item):
+                visit(nested, f"{path}[{index}]")
+
+    visit(value, "")
+    return sorted(f"{key}:{count}" for key, count in paths.items())
 
 
 def build_local_reference_context(
@@ -1175,15 +1253,73 @@ def _raw_response_id_hits(
     history: Sequence[Mapping[str, Any]],
     context: LocalReferenceContext,
 ) -> List[str]:
-    raw_values = [
-        item.get("raw")
-        for item in history
-        if isinstance(item, Mapping) and isinstance(item.get("raw"), str)
-    ]
+    """Scan every untrusted attempt for real node IDs, raw *and* decoded.
+
+    Scanning only the raw transport text is not sufficient: JSON string escapes
+    mean ``L1_\u004E762e6689`` contains no literal identifier byte-for-byte in
+    the raw payload while decoding to a real ID.  C13RF21 therefore feeds both
+    the raw text and the parsed structure (keys included) through the same
+    detectors, so an escaped identifier cannot slip past the gate that a plain
+    one would trip.
+    """
+
+    scanned: List[Any] = []
+    for item in history:
+        if not isinstance(item, Mapping):
+            continue
+        raw_text = item.get("raw")
+        if isinstance(raw_text, str):
+            scanned.append(raw_text)
+            decoded = _decoded_json_payload(raw_text)
+            if decoded is not None:
+                scanned.append(decoded)
+        parsed = item.get("json")
+        if parsed is not None:
+            scanned.append(parsed)
     return sorted(set(
-        _known_id_hits(raw_values, context.known_node_ids)
-        + _real_id_shape_hits(raw_values)
+        _known_id_hits(scanned, context.known_node_ids)
+        + _real_id_shape_hits(scanned)
     ))
+
+
+def _redact_real_ids(value: Any, known_node_ids: Sequence[str]) -> Any:
+    """Replace real identifiers with HMAC-style fingerprints inside evidence.
+
+    A response rejected for leaking a node ID must not be archived verbatim --
+    otherwise the very identifier the gate exists to contain is written into the
+    evidence bundle.  Only shape/known-ID matches are replaced; every other byte
+    of the untrusted response is preserved so the audit trail stays faithful.
+    """
+
+    def fingerprint(token: str) -> str:
+        digest = hashlib.sha256(token.encode("utf-8")).hexdigest()[:12]
+        return f"<REDACTED_NODE_ID:{digest}>"
+
+    def scrub(text: str) -> str:
+        for node_id in sorted(set(known_node_ids), key=len, reverse=True):
+            if node_id and node_id in text:
+                text = text.replace(node_id, fingerprint(node_id))
+        return REAL_NODE_ID_EMBEDDED_PATTERN.sub(
+            lambda match: fingerprint(match.group(0)), text
+        )
+
+    if isinstance(value, str):
+        return scrub(value)
+    if isinstance(value, Mapping):
+        return {scrub(str(k)): _redact_real_ids(v, known_node_ids)
+                for k, v in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_redact_real_ids(v, known_node_ids) for v in value]
+    return value
+
+
+def _decoded_json_payload(text: str) -> Optional[Any]:
+    """Best-effort JSON decode used purely to widen ID scanning coverage."""
+
+    try:
+        return json.loads(text)
+    except (ValueError, TypeError):
+        return None
 
 
 def _repair_user(
@@ -1245,6 +1381,18 @@ def _base_result(
     events: Sequence[Mapping[str, Any]],
     mutation_detected: bool = False,
 ) -> Dict[str, Any]:
+    # C13RF21 item 4: when the call is rejected *because* it carried a real
+    # identifier, the untrusted text must not be archived verbatim.  Redaction
+    # is scoped to exactly that disposition so every other call keeps a
+    # byte-faithful audit trail.
+    if error == "REAL_NODE_ID_IN_RAW_RESPONSE":
+        known = context.known_node_ids
+        attempt_history = [
+            _redact_real_ids(dict(item), known) for item in attempt_history
+        ]
+        initial_result = _redact_real_ids(initial_result, known)
+        repair_result = _redact_real_ids(repair_result, known)
+        final_local = _redact_real_ids(final_local, known)
     final_transport = repair_result if repair_result is not None else initial_result
     final_transport = final_transport if isinstance(final_transport, dict) else {}
     logical_call_id = (
@@ -1311,6 +1459,10 @@ def _base_result(
             initial_payload,
             context,
         ) if isinstance(initial_payload, dict) else [],
+        # Non-blocking C13RF21 signal: field paths whose text matched only the
+        # pre-narrowing wide shape.  Paths and counts, never matched text.
+        "legacy_wide_shape_paths": _legacy_wide_shape_paths(initial_payload)
+        if isinstance(initial_payload, dict) else [],
         "frozen_semantics": copy.deepcopy(projection),
         "frozen_semantics_sha256": _sha256(projection) if projection is not None else None,
         "final_local": copy.deepcopy(final_local),

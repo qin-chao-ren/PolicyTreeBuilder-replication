@@ -696,7 +696,7 @@ class LocalReferenceBindingTests(unittest.TestCase):
                 self.assertEqual(shaped_fake.calls, [])
 
         embedded_unknown = local_decision()
-        embedded_unknown["new_label"] = "xL4_OUTSIDE99y"
+        embedded_unknown["new_label"] = "xL4_N99999999y"
         embedded_unknown_fake = FakeTransport(
             transport_result(envelope(self.context, [embedded_unknown]))
         )
@@ -723,7 +723,7 @@ class LocalReferenceBindingTests(unittest.TestCase):
         clean = envelope(self.context, [local_decision()])
         initial_fake = FakeTransport(transport_result(
             clean,
-            phase_raw="Leaked L4_OUTSIDE99 before the clean JSON envelope.",
+            phase_raw="Leaked L4_N99999999 before the clean JSON envelope.",
         ))
         initial_result = call_local_reference_json(
             transport=initial_fake,
@@ -748,7 +748,7 @@ class LocalReferenceBindingTests(unittest.TestCase):
             transport_result(initial_bad, phase_raw="clean-initial"),
             transport_result(
                 clean,
-                phase_raw="Repair leaked xL4_OUTSIDE99y before clean JSON.",
+                phase_raw="Repair leaked xL4_N99999999y before clean JSON.",
             ),
         )
         repair_result = call_local_reference_json(

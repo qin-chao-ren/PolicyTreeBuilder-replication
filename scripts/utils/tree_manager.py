@@ -1,12 +1,51 @@
 from __future__ import annotations
 
 import copy
+import re
 import unicodedata
 from typing import Any, Callable, Dict, List, Optional, Set
 
 
 class TreeInvariantError(ValueError):
     """Raised when the raw tree and its derived indexes disagree."""
+
+
+# --- Node-ID grammar invariant at the load boundary (C13RF21) ----------------
+# Base identities come from ``scripts/common_id.py`` and bridge identities from
+# ``balance_tree_structure.generate_bridge_id``; the trailing bare 4-hex group
+# appears only in the frozen 353 baseline.  The invariant cannot be enforced at
+# the *generator* because the base IDs originate upstream in PolicyTreeBuilder,
+# which this repository only consumes -- so the entry boundary is the only place
+# a shape contract can actually hold.
+#
+# Deliberately advisory rather than fail-closed: the existing regression suites
+# use synthetic identifiers (``A``, ``L1_A``, ``L2_FOREIGN``) that are not
+# production shapes, and every real tree (353/268/250 scaffold, RF13 and RF20
+# intermediates -- measured) already conforms.  Turning this into a hard reject
+# would therefore break the test suite without catching anything real; the
+# report is exposed so a stage or audit can escalate if it chooses.
+REAL_NODE_ID_GRAMMAR = re.compile(
+    r"^(?:ROOT|L[1-4]_N[0-9a-f]{8})(?:(?:_BR_[0-9a-f]{6})+(?:_[0-9a-f]{4})?)?$"
+)
+
+
+def node_id_grammar_violations(root: Dict[str, Any]) -> List[str]:
+    """Return node IDs in ``root`` that do not match the production grammar."""
+
+    offenders: List[str] = []
+
+    def visit(node: Any) -> None:
+        if isinstance(node, dict):
+            value = node.get("node_id")
+            if isinstance(value, str) and value and not REAL_NODE_ID_GRAMMAR.fullmatch(value):
+                offenders.append(value)
+            visit(node.get("children"))
+        elif isinstance(node, list):
+            for item in node:
+                visit(item)
+
+    visit(root)
+    return sorted(set(offenders))
 
 
 def normalize_label(value: Any) -> str:
@@ -31,6 +70,8 @@ class TreeManager:
         self.last_error: Optional[str] = None
         self._rebuild_index()
         self.assert_consistent()
+        # Advisory shape report, computed once at the entry boundary.
+        self.node_id_grammar_violations: List[str] = node_id_grammar_violations(root)
 
     # --- Index construction and validation ---
 
