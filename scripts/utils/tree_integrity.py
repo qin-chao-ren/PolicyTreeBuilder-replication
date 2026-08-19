@@ -71,6 +71,141 @@ def merge_lineage_maps(*mappings: Mapping[str, str]) -> Dict[str, str]:
     return close_lineage(direct)
 
 
+# --- C13RF22: upstream lineage ledger integrity -------------------------------
+#
+# Every refinement stage that redirects nodes writes a "ledger" file mapping
+# source -> target.  Downstream stages must consume every upstream ledger, or
+# they will see membership rows pointing at nodes that no longer exist.
+#
+# Both producers write their ledger unconditionally at the end of a successful
+# run (collapse_redundant_hierarchy.py and balance_tree_structure.py both call
+# atomic_write_json outside any conditional), so an *absent* ledger file can
+# only mean one of two things: the stage never ran, or its output was lost.
+# Neither is safe to paper over with an empty dict -- that is exactly how
+# C13RF21 died at export time with a diagnosis that pointed at the wrong layer.
+#
+# An *empty* ledger, by contrast, is perfectly legal: a stage may run and
+# redirect nothing (RF11's 14b did precisely that, 28 operations and zero
+# lineage targets).  The distinction that matters is "file missing" vs
+# "file present and empty", never "map is falsy".
+
+STAGE_LINEAGE_LEDGERS: Tuple[Tuple[str, str], ...] = (
+    ("vertical_collapse", "vertical_collapse_trace.json"),
+    ("structure_balancing", "structure_balancing_trace.json"),
+)
+
+# Operations records carry `step` values that identify the producing stage.
+# 14b emits two distinct step names, both belonging to the same ledger.
+_STEP_TO_LEDGER_STAGE: Dict[str, str] = {
+    "vertical_collapse": "vertical_collapse",
+    "structure_balancing": "structure_balancing",
+    "structure_balancing_depth": "structure_balancing",
+    "structure_balancing_fanout": "structure_balancing",
+}
+
+
+def stages_present_in_operations(records: Iterable[Mapping[str, Any]]) -> Set[str]:
+    """Which upstream ledger-producing stages left records in the ops log."""
+    seen: Set[str] = set()
+    for record in records:
+        if not isinstance(record, Mapping):
+            continue
+        stage = _STEP_TO_LEDGER_STAGE.get(str(record.get("step") or ""))
+        if stage is not None:
+            seen.add(stage)
+    return seen
+
+
+def load_stage_lineage_ledger(
+    outdir: str | Path,
+    stage: str,
+    filename: str,
+    *,
+    required: bool,
+) -> Dict[str, str]:
+    """Load one upstream ledger, failing closed when a required one is absent.
+
+    `required` must be decided from evidence that the stage actually ran (see
+    `stages_present_in_operations`), not from whether the file happens to be
+    there -- the latter is the fail-open bug this replaces.
+    """
+    path = Path(outdir) / filename
+    if not path.exists():
+        if required:
+            raise LineageError(
+                f"upstream stage {stage!r} left records in the operations log but its "
+                f"lineage ledger is missing: {path}. Its redirects cannot be recovered, "
+                f"so membership rows pointing at nodes it deleted would be unresolvable. "
+                f"Stage a copy of {filename} from that stage's run before continuing."
+            )
+        return {}
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8-sig"))
+    except (OSError, ValueError) as exc:
+        raise LineageError(f"lineage ledger {path} is unreadable: {exc}") from exc
+    if not isinstance(payload, dict):
+        raise LineageError(f"lineage ledger must be an object: {path}")
+    ledger: Dict[str, str] = {}
+    for raw_source, raw_target in payload.items():
+        source = str(raw_source).strip()
+        target = str(raw_target).strip()
+        if not source or not target:
+            raise LineageError(f"lineage ledger {path} has an empty source or target")
+        ledger[source] = target
+    return ledger
+
+
+def cross_validate_ledger_against_operations(
+    ledger: Mapping[str, str],
+    records: Iterable[Mapping[str, Any]],
+    stage: str,
+) -> Dict[str, Any]:
+    """Cross-check a ledger against the operations log's own redirect record.
+
+    Returns a verdict dict rather than raising: the operations schema only grew
+    a `lineage_target` field in the current contract, so archives predating it
+    carry applied redirects with no target recorded.  C13F's log is exactly
+    that shape -- 32 vertical_collapse records, zero lineage_target fields --
+    so treating "no targets in the log" as a mismatch would hard-reject every
+    historical archive.  Absence of the field is reported as `not_comparable`;
+    only a genuine disagreement between two populated sources is a mismatch.
+    """
+    stage_steps = {
+        step for step, mapped in _STEP_TO_LEDGER_STAGE.items() if mapped == stage
+    }
+    applied = [
+        record
+        for record in records
+        if isinstance(record, Mapping)
+        and str(record.get("step") or "") in stage_steps
+        and str(record.get("status") or "") == "applied"
+    ]
+    from_ops = {
+        str(record.get("source_id") or "").strip(): str(record.get("lineage_target") or "").strip()
+        for record in applied
+        if record.get("lineage_target")
+    }
+    if not from_ops:
+        return {
+            "stage": stage,
+            "comparable": False,
+            "reason": "operations log records no lineage_target (pre-contract schema)",
+            "applied_records": len(applied),
+            "ledger_entries": len(ledger),
+        }
+    normalized = {str(k).strip(): str(v).strip() for k, v in ledger.items()}
+    only_in_ops = {k: v for k, v in from_ops.items() if normalized.get(k) != v}
+    return {
+        "stage": stage,
+        "comparable": True,
+        "agrees": not only_in_ops,
+        "applied_records": len(applied),
+        "ledger_entries": len(normalized),
+        "operations_redirects": len(from_ops),
+        "disagreements": only_in_ops,
+    }
+
+
 def redirect_membership_rows(
     rows: Sequence[Mapping[str, Any]],
     lineage: Mapping[str, str],
@@ -719,10 +854,14 @@ __all__ = [
     "atomic_write_text",
     "canonical_exact_label",
     "close_lineage",
+    "cross_validate_ledger_against_operations",
+    "load_stage_lineage_ledger",
     "merge_lineage_maps",
     "publish_tree_if_valid",
     "read_jsonl",
     "read_membership_csv",
     "redirect_membership_rows",
+    "stages_present_in_operations",
+    "STAGE_LINEAGE_LEDGERS",
     "validate_tree_e0",
 ]

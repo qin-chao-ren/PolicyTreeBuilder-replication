@@ -21,7 +21,13 @@ from utils.step4_shared import (
 from utils.tree_manager import TreeManager
 from utils.tree_manager import normalize_label
 from utils.tree_integrity import atomic_write_bytes, atomic_write_json
-from utils.tree_integrity import merge_lineage_maps
+from utils.tree_integrity import (
+    STAGE_LINEAGE_LEDGERS,
+    load_stage_lineage_ledger,
+    merge_lineage_maps,
+    read_jsonl,
+    stages_present_in_operations,
+)
 from utils.semantic_contract import (
     deferred_restructure_record,
     execute_semantic_decision,
@@ -154,13 +160,27 @@ class ShapingProcess:
         self.deferred_candidates = set()
 
     def _load_prior_lineage(self):
-        path = self.env.outdir / "vertical_collapse_trace.json"
-        if not path.exists():
-            return {}
-        payload = json.loads(path.read_text(encoding="utf-8"))
-        if not isinstance(payload, dict):
-            raise ValueError(f"vertical collapse trace must be an object: {path}")
-        return {str(source): str(target) for source, target in payload.items()}
+        """Load 14a's ledger, failing closed when 14a ran but left none.
+
+        C13RF22: this used to `return {}` on a missing file, the same fail-open
+        as 14c had.  Silently proceeding with an empty ledger means this entire
+        stage decides against membership counts that omit every node 14a
+        deleted, and the damage only surfaces later in 14c -- harder to
+        diagnose than failing here.  14a writes its ledger unconditionally, so
+        "14a has operations records but no ledger file" is always an anomaly.
+        """
+        records = read_jsonl(self.ops_log) if self.ops_log.exists() else []
+        required = stages_present_in_operations(records)
+        merged = {}
+        for stage, filename in STAGE_LINEAGE_LEDGERS:
+            if stage != "vertical_collapse":
+                continue
+            merged.update(
+                load_stage_lineage_ledger(
+                    self.env.outdir, stage, filename, required=stage in required
+                )
+            )
+        return merged
 
     def _current_lineage(self):
         return merge_lineage_maps(self.prior_lineage, self.trace_map)

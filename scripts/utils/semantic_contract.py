@@ -6,7 +6,7 @@ import time
 from collections import Counter
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
 
-from .tree_integrity import close_lineage
+from .tree_integrity import LineageError, close_lineage
 
 
 DECISION_SCHEMA_VERSION = "semantic-tree-decision-v1"
@@ -420,15 +420,38 @@ def resolve_membership_counts(
     lineage: Optional[Mapping[str, str]],
     live_node_ids: Iterable[str],
 ) -> Dict[str, int]:
-    """Aggregate direct memberships through the current closed lineage."""
+    """Aggregate direct memberships through the current closed lineage.
+
+    C13RF22: a count whose node resolves to nothing live used to be dropped
+    silently, which quietly *loosened* two gates rather than tightening them --
+    `SOURCE_MEMBERSHIP_NOT_REPRESENTED` only fires when the count is > 0, and
+    `FLATTEN_SOURCE_HAS_MEMBERSHIP` requires it to be 0, so a count lost to a
+    lineage gap made both look satisfied.  An unresolvable count means the
+    lineage we were handed is incomplete, which is the caller's bug; refuse it
+    here instead of deciding merges against numbers we know are wrong.
+    """
     closed = close_lineage(lineage or {})
     live = {_clean_id(node_id) for node_id in live_node_ids}
     resolved: Counter[str] = Counter()
+    unresolved: Dict[str, str] = {}
     for raw_node_id, raw_count in counts.items():
         node_id = _clean_id(raw_node_id)
         target = closed.get(node_id, node_id)
         if target in live:
             resolved[target] += int(raw_count)
+        else:
+            unresolved[node_id] = target
+    if unresolved:
+        detail = ", ".join(
+            f"{source} -> {target}" if source != target else source
+            for source, target in sorted(unresolved.items())[:5]
+        )
+        raise LineageError(
+            f"{len(unresolved)} membership count(s) resolve to nodes that are not live: "
+            f"{detail}. The lineage passed in does not cover every deleted node, so "
+            f"membership-dependent gates would be evaluated against undercounted "
+            f"totals. Supply the complete upstream lineage instead of dropping rows."
+        )
     return dict(resolved)
 
 

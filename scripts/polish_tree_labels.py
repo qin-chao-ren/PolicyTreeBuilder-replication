@@ -14,7 +14,7 @@ import copy
 import time
 import json
 from pathlib import Path
-from typing import Dict, List
+from typing import Any, Dict, List, Optional, Set
 
 from common_utils import jaccard_overlap
 from llm_runtime import call_llm_json
@@ -29,13 +29,18 @@ from utils.step4_shared import (
 )
 from utils.tree_manager import TreeManager
 from utils.tree_integrity import (
+    STAGE_LINEAGE_LEDGERS,
     LineageError,
     atomic_write_bytes,
     atomic_write_csv,
     atomic_write_json,
+    cross_validate_ledger_against_operations,
+    load_stage_lineage_ledger,
     merge_lineage_maps,
+    read_jsonl,
     read_membership_csv,
     redirect_membership_rows,
+    stages_present_in_operations,
 )
 from utils.semantic_contract import (
     deferred_restructure_record,
@@ -115,6 +120,9 @@ class PolishingProcess:
 
         # 本步骤产生的 ID 变更记录 (Old ID -> New ID)
         self.local_trace_map: Dict[str, str] = {}
+        # C13RF22: 上游 ledger 必需性由 operations 账反推，缓存一次即可
+        self._required_stages: Optional[Set[str]] = None
+        self.ledger_audit: List[Dict[str, Any]] = []
 
     def run(self):
         # 1. 兄弟节点合并 (同父)
@@ -652,17 +660,29 @@ class PolishingProcess:
             f"Examples: {', '.join(titles)}"
         )
 
+    def _required_upstream_stages(self) -> Set[str]:
+        """Which upstream ledgers must exist, judged from the operations log.
+
+        C13RF22: deciding this from `path.exists()` is the fail-open bug.  The
+        operations log is the evidence that a stage ran -- 14a's records are in
+        it whether or not anyone remembered to stage its ledger file.
+        """
+        if self._required_stages is None:
+            records = read_jsonl(self.ops_log) if self.ops_log.exists() else []
+            self._required_stages = stages_present_in_operations(records)
+        return self._required_stages
+
+    def _load_upstream_ledgers(self) -> List[Dict[str, str]]:
+        required = self._required_upstream_stages()
+        return [
+            load_stage_lineage_ledger(
+                self.env.outdir, stage, filename, required=stage in required
+            )
+            for stage, filename in STAGE_LINEAGE_LEDGERS
+        ]
+
     def _current_lineage(self) -> Dict[str, str]:
-        maps = []
-        for path in (
-            self.env.outdir / "vertical_collapse_trace.json",
-            self.env.outdir / "structure_balancing_trace.json",
-        ):
-            if path.exists():
-                payload = json.loads(path.read_text(encoding="utf-8"))
-                if not isinstance(payload, dict):
-                    raise RuntimeError(f"lineage trace must be an object: {path}")
-                maps.append(payload)
+        maps = self._load_upstream_ledgers()
         maps.append(self.local_trace_map)
         return merge_lineage_maps(*maps)
 
@@ -680,21 +700,31 @@ class PolishingProcess:
         """
         maps = []
 
-        # 1. 加载历史 Trace
-        trace_files = [
-            ("vertical_collapse", self.env.outdir / "vertical_collapse_trace.json"),
-            ("structure_balancing", self.env.outdir / "structure_balancing_trace.json"),
-        ]
-        for step, p in trace_files:
-            if p.exists():
-                try:
-                    sub_map = json.loads(p.read_text(encoding="utf-8"))
-                    maps.append(sub_map)
-                    print(f"  + Loaded {len(sub_map)} redirects from {step}")
-                except Exception as exc:
-                    raise RuntimeError(
-                        f"Failed to load required {step} lineage trace {p}: {exc}"
-                    ) from exc
+        # 1. 加载历史 Trace（C13RF22：缺 ledger 时 fail-closed，见 _load_upstream_ledgers）
+        required = self._required_upstream_stages()
+        records = read_jsonl(self.ops_log) if self.ops_log.exists() else []
+        self.ledger_audit = []
+        for stage, filename in STAGE_LINEAGE_LEDGERS:
+            sub_map = load_stage_lineage_ledger(
+                self.env.outdir, stage, filename, required=stage in required
+            )
+            maps.append(sub_map)
+            state = (
+                "required" if stage in required
+                else "absent upstream (no operations records)"
+            )
+            print(f"  + Loaded {len(sub_map)} redirects from {stage} [{state}]")
+            verdict = cross_validate_ledger_against_operations(sub_map, records, stage)
+            self.ledger_audit.append(verdict)
+            if verdict["comparable"] and not verdict["agrees"]:
+                raise LineageError(
+                    f"lineage ledger for {stage} disagrees with the operations log: "
+                    f"{verdict['disagreements']}"
+                )
+            if not verdict["comparable"] and verdict["applied_records"]:
+                print(
+                    f"    (cross-check skipped for {stage}: {verdict['reason']})"
+                )
 
         # 2. 合并当前步骤 Trace
         maps.append(self.local_trace_map)
