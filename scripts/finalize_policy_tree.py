@@ -56,6 +56,7 @@ from utils.local_reference_binding import (
     canonical_payload_sha256,
     build_local_reference_context,
     call_local_reference_json,
+    is_fail_closed_stop_signal,
 )
 
 # Scope messages describing a restructure this stage cannot express, as opposed
@@ -629,6 +630,15 @@ class OverallStructureAudit:
                 "ts": int(time.time()), "l1_id": l1_id,
                 "error": str(e), "resp": None
             })
+            # C13RF27 (D11): the private harness guard raises its stop signal
+            # through this very call, so swallowing every exception here also
+            # swallowed "stop the run".  Log it (above, so the evidence trail is
+            # identical either way) and then let it propagate: this stage is the
+            # last one, and continuing past a non-deferrable failure spends
+            # budget on a run whose fail-closed report has already been written.
+            # Real stage errors keep the original locally-handled path.
+            if is_fail_closed_stop_signal(e):
+                raise
             return self._record_llm_rejection(
                 [{"code": "LLM_CALL_FAILED", "message": str(e)}]
             )
@@ -1205,6 +1215,15 @@ class OverallStructureAudit:
                 "decision_index": len(staged_records),
                 "exception_type": type(exc).__name__,
             }
+            # C13RF27 (D11, channel two): the semantic-decision guard raises its
+            # stop signal from inside this loop, and converting it into a plain
+            # batch-abort record swallowed the stop the same way channel one did.
+            # Re-raise *after* the abort records are written below, so the
+            # evidence trail is byte-identical to the pre-RF27 abort and only the
+            # "keep going" behaviour changes.
+            fail_closed_stop = exc if is_fail_closed_stop_signal(exc) else None
+        else:
+            fail_closed_stop = None
 
         if failure is not None:
             for index in range(len(ops)):
@@ -1222,13 +1241,16 @@ class OverallStructureAudit:
                 record["batch_index"] = index
                 record["batch_size"] = len(ops)
                 records.append(record)
-            return self._commit_operation_batch(
+            aborted_result = self._commit_operation_batch(
                 raw_ops=ops,
                 l1_id=l1_id,
                 records=records,
                 committed=False,
                 call_audit=call_audit,
             )
+            if fail_closed_stop is not None:
+                raise fail_closed_stop
+            return aborted_result
 
         for index, record in enumerate(staged_records):
             record["batch_status"] = "committed"

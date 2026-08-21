@@ -5,10 +5,11 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import random
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Tuple
+from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple
 
 import requests
 import yaml
@@ -265,6 +266,59 @@ def _now_ms() -> int:
     return int(time.time() * 1000)
 
 
+# C13RF27: transport-failure backoff.
+#
+# The pre-RF27 delay was ``backoff ** (attempt - 1)`` for every retry class.
+# With the shipped default ``backoff=1.5`` that is 1.0s / 1.5s / 2.25s, i.e.
+# ~4.75s of spacing in total.  For a *content* failure (the model returned
+# unparseable JSON) that is fine: the request itself came back promptly, and
+# retrying immediately is what we want.  For a *transport* failure it is not:
+# C13RF26's 14d run lost its only call touching the duplicate parent/child pair
+# because all four attempts were read timeouts of 120.1s each, so the whole
+# logical call was 4x120s of waiting plus 4.75s of "backoff" -- 1% of the
+# window.  Four attempts against one ~8-minute network stall is effectively one
+# attempt, and the model therefore never got to propose the merge that would
+# have cleared the E0 blocker.
+#
+# So transport failures get their own schedule: a real floor, exponential
+# growth, a cap so a single logical call cannot run away with the wall clock,
+# and jitter so parallel/consecutive calls do not re-synchronise onto the same
+# stall.  The attempts budget itself is untouched (still ``retries + 1``, still
+# every attempt counted) -- this changes *when* attempts happen, never how many.
+TRANSPORT_BACKOFF_BASE_S = 5.0
+TRANSPORT_BACKOFF_FACTOR = 3.0
+TRANSPORT_BACKOFF_CAP_S = 60.0
+TRANSPORT_BACKOFF_JITTER = 0.25
+
+
+def transport_retry_delay_seconds(
+    attempt: int,
+    *,
+    jitter_source: Callable[[], float] | None = None,
+) -> float:
+    """Seconds to wait before retrying after a *transport* failure.
+
+    ``attempt`` is 1-based and names the attempt that just failed.  The
+    schedule is ``base * factor ** (attempt - 1)``, clamped to
+    ``TRANSPORT_BACKOFF_CAP_S``, then spread by up to
+    ``TRANSPORT_BACKOFF_JITTER`` in *both* directions.  With the constants
+    above the nominal spacing for a 4-attempt call is 5s / 15s / 45s, so the
+    retries straddle roughly a minute of network trouble instead of a
+    rounding error of it.
+
+    Jitter is symmetric so the expected delay still equals the nominal one;
+    the floor keeps a pathological ``random()`` from collapsing the wait.
+    """
+    if attempt < 1:
+        raise ValueError("attempt must be >= 1")
+    nominal = TRANSPORT_BACKOFF_BASE_S * (TRANSPORT_BACKOFF_FACTOR ** (attempt - 1))
+    nominal = min(nominal, TRANSPORT_BACKOFF_CAP_S)
+    source = jitter_source if jitter_source is not None else random.random
+    # source() in [0, 1) -> spread in [-JITTER, +JITTER)
+    spread = 1.0 + TRANSPORT_BACKOFF_JITTER * (2.0 * float(source()) - 1.0)
+    return max(TRANSPORT_BACKOFF_BASE_S / 2.0, nominal * spread)
+
+
 def _prompt_hash(system: str, user: str) -> str:
     return hashlib.md5((system + "\n" + user).encode("utf-8")).hexdigest()[:10]
 
@@ -460,6 +514,14 @@ def call_llm_json(
     last_latency: Optional[int] = None
     attempt_history: List[Dict[str, Any]] = []
     attempts = max(1, cfg.retries + 1)
+    # C13RF27: two retry classes with deliberately different schedules.
+    #   content failures (HTTP 200 arrived, body unparseable) keep the original
+    #     `cfg.backoff ** (attempt - 1)` schedule -- the far side answered
+    #     promptly, so there is nothing to wait out and retrying fast is right;
+    #   transport failures (retryable status / network exception) use
+    #     transport_retry_delay_seconds -- see the loop tail.
+    # Do not collapse these onto one schedule: making content retries slow buys
+    # nothing, and making transport retries fast is the RF26 failure mode.
     for attempt in range(1, attempts + 1):
         started = _now_ms()
         try:
@@ -564,7 +626,14 @@ def call_llm_json(
                 "error": last_error,
             })
         if attempt < attempts:
-            time.sleep(cfg.backoff ** (attempt - 1))
+            # C13RF27: the transport tail -- reached by a retryable HTTP status
+            # (408/409/425/429/5xx, which fell through the break above) or by a
+            # network-level exception (ReadTimeout, connection reset, ...).
+            # Both mean "the far side did not answer", so space the retries out
+            # instead of re-hammering the same stall.  RF26's 14d loss was
+            # exactly this: 4 read timeouts of 120.1s with 4.75s of spacing
+            # between them.  See transport_retry_delay_seconds.
+            time.sleep(transport_retry_delay_seconds(attempt))
 
     actual_attempts = len(attempt_history)
     result = _result_dict(
@@ -698,7 +767,8 @@ def call_embedding(
         except Exception as exc:
             last_error = f"{type(exc).__name__}: {exc}"
         if attempt < attempts:
-            time.sleep(cfg.backoff ** (attempt - 1))
+            # C13RF27: transport-only loop (any non-200 or exception lands here).
+            time.sleep(transport_retry_delay_seconds(attempt))
     return {"ok": False, "vectors": [], "error": last_error or "embedding request failed", "attempts": attempts}
 
 
@@ -771,7 +841,8 @@ def call_rerank(
         except Exception as exc:
             last_error = f"{type(exc).__name__}: {exc}"
         if attempt < attempts:
-            time.sleep(cfg.backoff ** (attempt - 1))
+            # C13RF27: transport-only loop (any non-200 or exception lands here).
+            time.sleep(transport_retry_delay_seconds(attempt))
     return {"ok": False, "scores": [], "error": last_error or "rerank request failed", "attempts": attempts}
 
 
@@ -790,4 +861,5 @@ __all__ = [
     "parse_json_safe",
     "profiles_from_config",
     "resolve_profile",
+    "transport_retry_delay_seconds",
 ]

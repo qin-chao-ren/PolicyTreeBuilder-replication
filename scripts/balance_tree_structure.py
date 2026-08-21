@@ -42,6 +42,7 @@ from utils.local_reference_binding import (
     canonical_payload_sha256,
     build_local_reference_context,
     call_local_reference_json,
+    is_fail_closed_stop_signal,
 )
 
 # ==========================================
@@ -819,6 +820,18 @@ class ShapingProcess:
                 "decision_index": len(records),
                 "exception_type": type(exc).__name__,
             }
+            # C13RF27 (D11, channel two): the semantic-decision guard raises its
+            # stop signal from inside this loop.  Converting it into a plain
+            # batch-abort record swallowed the stop, exactly as 14d did -- so
+            # "stop at the first non-deferrable failure" was not true here
+            # either.  Re-raise *after* the abort records are written below, so
+            # the evidence trail stays byte-identical to the pre-RF27 abort and
+            # only the "keep going" behaviour changes.  D11 was filed against
+            # 14d alone; this stage was found to share the shape during the
+            # RF27 parallel-channel scan.
+            fail_closed_stop = exc if is_fail_closed_stop_signal(exc) else None
+        else:
+            fail_closed_stop = None
 
         if failure is not None:
             aborted_records = []
@@ -851,6 +864,8 @@ class ShapingProcess:
                 )
                 aborted_records.append(aborted)
             _atomic_append_jsonl_batch(self.ops_log, aborted_records)
+            if fail_closed_stop is not None:
+                raise fail_closed_stop
             return False
 
         changed = candidate_tm.root != original_root

@@ -1989,8 +1989,46 @@ def call_local_reference_json(
     )
 
 
+# --- Fail-closed stop signals (C13RF27, open debt D11) -----------------------
+# The stage guard lives in the private harness (``run_stage_fail_closed.py`` and
+# its v2 successor), which wraps ``call_local_reference_json`` and
+# ``execute_semantic_decision`` and raises ``FailClosedCallError`` to stop the
+# run at the first non-deferrable failure.  Production code cannot import that
+# type -- the harness is not on the public import path, and stages must keep
+# running unguarded -- so the signal is recognised by class name instead.  Both
+# guard versions name it identically (v1 ``run_stage_fail_closed.py:16``, v2
+# ``run_stage_fail_closed_v2.py:42``), and the contract is pinned by test.
+#
+# Why this is needed: 14b and 14d wrap their work in ``except Exception`` and
+# convert *any* exception into a locally-handled outcome (a batch-abort record,
+# or an empty decision list).  That is correct for real stage errors, but it
+# also swallows the guard's stop signal -- so "stop at the first non-deferrable
+# failure" silently became "log it and carry on".  C13RF26 measured the cost:
+# the 14d fail-closed report was written at 10:17:37 and the stage then issued
+# six more API calls (10:19:16 through 10:23:44) before E0 finally stopped it.
+# 14a and 14c already re-raise after rolling back, so they were never affected.
+#
+# This predicate only decides *whether an exception keeps propagating*.  It
+# changes no scope predicate, no defer criterion and no contract rule: a call
+# the guard lets through (ok, or deferrable) never reaches here.
+FAIL_CLOSED_SIGNAL_TYPE_NAMES = frozenset({"FailClosedCallError"})
+
+
+def is_fail_closed_stop_signal(exc: BaseException) -> bool:
+    """True when ``exc`` is the harness's fail-closed stop signal.
+
+    Matched across the exception's own MRO by class name, so a future guard may
+    subclass its error type without silently losing the stop semantics.
+    """
+    return any(
+        klass.__name__ in FAIL_CLOSED_SIGNAL_TYPE_NAMES
+        for klass in type(exc).__mro__
+    )
+
+
 __all__ = [
     "BindingResult",
+    "FAIL_CLOSED_SIGNAL_TYPE_NAMES",
     "LocalReferenceContext",
     "LocalReferenceEntry",
     "PROTOCOL_VERSION",
@@ -1998,5 +2036,6 @@ __all__ = [
     "bind_local_reference_payload",
     "build_local_reference_context",
     "call_local_reference_json",
+    "is_fail_closed_stop_signal",
     "semantic_projection",
 ]
