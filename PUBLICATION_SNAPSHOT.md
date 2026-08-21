@@ -29,3 +29,21 @@ Any future corrected tree is a separately versioned candidate. Before publicatio
 ## Non-public Material
 
 The public repository excludes local archives, real `.env` files, API keys, virtual environments, caches, scratch outputs, and the superseded 317-node package.
+
+## FILE_INDEX.tsv / SCRIPT_PROVENANCE.tsv Are Frozen Baseline Snapshots (C13RF25)
+
+`FILE_INDEX.tsv` and `SCRIPT_PROVENANCE.tsv` were generated once, at the `4066e6a` (2026-08-06) publication baseline, and are **not** regenerated on every commit. As of C13RF25 (2026-08-21), 9 of `FILE_INDEX.tsv`'s 212 rows no longer match the corresponding file's current SHA256 (hash is the 3rd column, headed `sha256` — the 2nd column is `bytes`, not a hash):
+
+```
+scripts/balance_tree_structure.py
+scripts/collapse_redundant_hierarchy.py
+scripts/finalize_policy_tree.py
+scripts/polish_tree_labels.py
+scripts/utils/local_reference_binding.py
+scripts/utils/semantic_contract.py
+scripts/utils/tree_integrity.py
+scripts/utils/tree_manager.py
+tests/test_local_reference_binding.py
+```
+
+This is expected: it is exactly the set of production files C13RF16 through C13RF22 (2026-08-18 through 2026-08-19) modified after the baseline snapshot was taken, and no others. Do not regenerate the file to make it match current `HEAD` — that would destroy its value as a point-in-time publication baseline. Instead, treat a `FILE_INDEX.tsv` mismatch as a **change-audit signal**: any row whose 3rd-column hash disagrees with the file's current SHA256 has been touched since 2026-08-06, and the list above is the complete such set as of 2026-08-21. `SCRIPT_PROVENANCE.tsv`'s hash column is named `public_sha256` (4th column); read it by that column name, not by position, since an earlier draft of this note compared the wrong column and reported the baseline as fully stale.

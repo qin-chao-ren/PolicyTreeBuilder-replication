@@ -229,6 +229,15 @@ BENIGN_STRUCTURAL_WARNING_PATTERNS = tuple(re.compile(p, re.IGNORECASE) for p in
     r"\bdirect\s+members\b",
 ))
 
+# C13RF25 (D7-1): context-conditional downgrade, deliberately narrow.
+# `source_has_direct_membership` is a factual topology note; its real guard is
+# SOURCE_MEMBERSHIP_NOT_REPRESENTED further down, which is untouched.  The plural
+# form `source_has_direct_members` is already benign above, so the singular being
+# critical is a word-form inconsistency (same defect class as RF9 record 4).
+# Exact equality only: `source_has_direct_membership_not_represented_by_target`
+# asserts a REAL conflict and must keep failing closed.
+CONDITIONAL_MEMBERSHIP_WARNING = "source_has_direct_membership"
+
 MACHINE_WARNING_PREFIXES = ("promote_safety:",)
 
 
@@ -285,6 +294,31 @@ def grade_merge_warnings(
         else:
             advisory.append(str(warning))
     return critical, advisory, reasons
+
+
+def downgrade_conditional_membership_warning(
+    critical: Sequence[str],
+    advisory: Sequence[str],
+    reasons: Dict[str, str],
+    relation: Any,
+    evidence: Dict[str, Any],
+) -> Tuple[List[str], List[str], Dict[str, str]]:
+    """C13RF25: move CONDITIONAL_MEMBERSHIP_WARNING critical->advisory, but only
+    when the decision context makes the disclosure harmless.  Both conditions are
+    required by the card face.  Exact equality means the
+    `..._not_represented_by_target` variant can never reach this path."""
+    critical_list = [str(w) for w in critical]
+    advisory_list = [str(w) for w in advisory]
+    if relation != "exact_duplicate":
+        return critical_list, advisory_list, reasons
+    if evidence.get("target_represents_all_source_members") is not True:
+        return critical_list, advisory_list, reasons
+    remaining = [w for w in critical_list if w != CONDITIONAL_MEMBERSHIP_WARNING]
+    if len(remaining) == len(critical_list):
+        return critical_list, advisory_list, reasons
+    new_reasons = dict(reasons)
+    new_reasons[CONDITIONAL_MEMBERSHIP_WARNING] = "conditional_membership_disclosure"
+    return remaining, advisory_list + [CONDITIONAL_MEMBERSHIP_WARNING], new_reasons
 
 
 class SemanticContractError(RuntimeError):
@@ -767,6 +801,12 @@ def validate_semantic_decision(
             # fires only for warnings that actually assert a conflict.
             critical_warnings, advisory_warnings, warning_reasons = (
                 grade_merge_warnings(warnings)
+            )
+            critical_warnings, advisory_warnings, warning_reasons = (
+                downgrade_conditional_membership_warning(
+                    critical_warnings, advisory_warnings, warning_reasons,
+                    relation, evidence,
+                )
             )
             if critical_warnings:
                 add(
