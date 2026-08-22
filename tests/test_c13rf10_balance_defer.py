@@ -173,11 +173,25 @@ class C13RF10BalanceDeferTests(unittest.TestCase):
             self.assertEqual(issue["context"]["decision_index"], index)
             self.assertEqual(issue["context"]["mutable_ref_paths"], [])
             self.assertIs(issue["context"]["repairable"], False)
+            # C13RF29: the issue reports the scope predicate's own message
+            # (BRIDGE_TOO_DEEP_MESSAGE) rather than the deferral sentence that
+            # used to be substituted for it.  The deferral sentence was written for
+            # a channel that only ever carried depth-ceiling bridges; now that any
+            # off-stage decision can defer, substituting one stage-specific
+            # sentence for every reason would misreport most of them.
             self.assertEqual(
-                issue["message"], self.balance.BRIDGE_DEPTH_DEFERRED_MESSAGE
+                issue["message"], self.balance.BRIDGE_TOO_DEEP_MESSAGE
             )
 
-    def test_mixed_scope_failures_remain_non_deferrable(self):
+    def test_mixed_scope_failures_are_refused_and_recorded_not_repaired(self):
+        """C13RF29 renamed what these two shapes get, not whether they are refused.
+
+        Both were DECISION_SCOPE_VIOLATION (repairable -> a repair round -> the run
+        stops if the repair fails the same predicate).  Both are now
+        DECISION_SCOPE_INEXPRESSIBLE with no repair round.  What the test defends is
+        unchanged and asserted below: exactly one issue each, non-repairable, no
+        mutable ref path, and neither shape becomes executable.
+        """
         with tempfile.TemporaryDirectory() as temporary_dir:
             process = self.process(temporary_dir)
             wrong_target = copy.deepcopy(self.bound_decisions()[0])
@@ -186,7 +200,9 @@ class C13RF10BalanceDeferTests(unittest.TestCase):
                 "L3_NCAND001", {"decisions": [wrong_target]}
             )
             self.assertEqual(len(issues), 1, issues)
-            self.assertEqual(issues[0]["code"], "DECISION_SCOPE_VIOLATION")
+            self.assertEqual(issues[0]["code"], "DECISION_SCOPE_INEXPRESSIBLE")
+            self.assertIs(issues[0]["context"]["repairable"], False)
+            self.assertEqual(issues[0]["context"]["mutable_ref_paths"], [])
 
             non_direct_child = copy.deepcopy(self.bound_decisions()[0])
             non_direct_child["child_plan"][0]["child_id"] = "L2_NPARENT1"
@@ -194,7 +210,9 @@ class C13RF10BalanceDeferTests(unittest.TestCase):
                 "L3_NCAND001", {"decisions": [non_direct_child]}
             )
             self.assertEqual(len(issues), 1, issues)
-            self.assertEqual(issues[0]["code"], "DECISION_SCOPE_VIOLATION")
+            self.assertEqual(issues[0]["code"], "DECISION_SCOPE_INEXPRESSIBLE")
+            self.assertIs(issues[0]["context"]["repairable"], False)
+            self.assertEqual(issues[0]["context"]["mutable_ref_paths"], [])
 
     def test_archived_shape_uses_one_attempt_and_no_repair(self):
         with tempfile.TemporaryDirectory() as temporary_dir:
@@ -240,10 +258,14 @@ class C13RF10BalanceDeferTests(unittest.TestCase):
             )
             self.assertNotIn("source_ref", resolved)
             self.assertNotIn("target_ref", resolved)
+        # C13RF29: the shared record takes its messages as a parameter now, so the
+        # violation states the reason the binder actually recorded instead of the
+        # sentence 14b used to overwrite it with.
         violation = record["semantic_contract"]["violations"][0]
         self.assertEqual(
-            violation["message"], self.balance.BRIDGE_DEPTH_DEFERRED_MESSAGE
+            violation["message"], self.balance.BRIDGE_TOO_DEEP_MESSAGE
         )
+        self.assertEqual(violation["code"], "DECISION_SCOPE_INEXPRESSIBLE")
 
     def test_deferred_candidate_is_not_queried_again_in_the_same_stage(self):
         with tempfile.TemporaryDirectory() as temporary_dir:
@@ -280,9 +302,30 @@ class C13RF10BalanceDeferTests(unittest.TestCase):
         })
         self.assertFalse(process._is_deferrable_response(mixed))
 
-        wrong_message = copy.deepcopy(response)
-        wrong_message["initial_scope_errors"][0]["message"] = "other scope issue"
-        self.assertFalse(process._is_deferrable_response(wrong_message))
+        # C13RF29: the message text no longer decides deferrability -- the code,
+        # the repairable flag and the empty ref-path list do.  A different message
+        # carrying the same inexpressible verdict now defers, which is the point of
+        # the card (the open-ended list of message texts was what made every new
+        # off-stage shape cost another full-tree rerun).  What still must NOT defer
+        # is a channel entry that is not inexpressible, which `mixed` above pins.
+        other_message = copy.deepcopy(response)
+        other_message["initial_scope_errors"][0]["message"] = "other scope issue"
+        self.assertTrue(process._is_deferrable_response(other_message))
+
+        # Still refused: a repairable entry anywhere in the channel.  Deferring one
+        # would park a decision the binder is simultaneously asking the model to
+        # fix.
+        repairable_entry = copy.deepcopy(response)
+        repairable_entry["initial_scope_errors"][0]["context"]["repairable"] = True
+        repairable_entry["initial_scope_errors"][0]["context"][
+            "mutable_ref_paths"] = ["decisions[0].target_ref"]
+        self.assertFalse(process._is_deferrable_response(repairable_entry))
+
+        # Still refused: an empty channel.  "No recorded error" must never be read
+        # as "every recorded error was benign" (C13RF18's floor, kept by RF29).
+        empty_channel = copy.deepcopy(response)
+        empty_channel["initial_scope_errors"] = []
+        self.assertFalse(process._is_deferrable_response(empty_channel))
 
     def test_deferrable_whitelist_rejects_legal_decision_mixed_with_depth_error(self):
         with tempfile.TemporaryDirectory() as temporary_dir:

@@ -81,19 +81,47 @@ INEXPRESSIBLE_SCOPE_MESSAGES = frozenset({
     SPLIT_CHILD_OUTSIDE_L1_MESSAGE,
 })
 
-# Actions eligible for the defer channel.  `flatten` is deliberately excluded
-# even though it can raise CHILD_ROLE_MISMATCH_MESSAGE: dissolving a node into
-# its own parent while sending one of its children elsewhere is not a restructure
-# the contract merely fails to spell -- it is a different operation.  C13RF16
-# withheld flatten from its empty-plan authorisation for the same reason
-# (FLATTEN_SOURCE_HAS_NO_CHILDREN makes an empty plan permanently illegal), and
-# a control test pins this exclusion.  Non-mutating verbs are excluded because
-# there is no restructure to park.
+# C13RF19's defer-eligibility set.  C13RF29 no longer reads it: every failed
+# scope check defers regardless of verb, because the disposition question ("does
+# this stop the run?") turned out to be independent of the taxonomy question
+# ("is this unspellable, or merely wrong?").  Kept as a record of which three
+# verbs could defer before this card -- C13RF19's tests assert its contents, and
+# deleting it would erase the only in-code trace of the narrower channel.
 DEFERRABLE_ACTIONS = frozenset({"merge", "move", "split_reparent"})
 
 # A childless source's child_plan is corrected by emptying it, not deferred; the
 # repair path must work.  See VOID_CHILD_PLAN_FLAG (C13RF16 ①).
 VOID_CHILD_PLAN_MESSAGE = "source has no children; child_plan must be empty"
+
+
+def _deferred_scope_messages(resp):
+    """Every scope message the binder recorded for the channel that refused.
+
+    C13RF29; identical to the readers in 14a/14b/14c.  Reads repair_scope_errors
+    when a repair round ran, else initial_scope_errors -- the same channel choice
+    the defer predicate makes.  This is what replaced C13RF19's
+    `deferred_scope_errors`/`deferred_scope_channel` side fields.
+    """
+    if not isinstance(resp, dict):
+        return []
+    channel = (
+        "repair_scope_errors" if resp.get("repair_count")
+        else "initial_scope_errors"
+    )
+    messages = []
+    for item in resp.get(channel) or []:
+        if not isinstance(item, dict):
+            continue
+        context = item.get("context")
+        recorded = (
+            context.get("scope_messages")
+            if isinstance(context, dict) else None
+        )
+        if isinstance(recorded, list) and recorded:
+            messages.extend(str(message) for message in recorded)
+        elif item.get("message"):
+            messages.append(str(item["message"]))
+    return list(dict.fromkeys(messages))
 
 
 def _all_scope_errors_inexpressible(scope_errors):
@@ -110,6 +138,16 @@ def _all_scope_errors_inexpressible(scope_errors):
         and all(
             isinstance(item, dict)
             and item.get("code") == "DECISION_SCOPE_INEXPRESSIBLE"
+            # C13RF29: the verdict fields are checked too, not just the code.
+            # 14b's predicate always did this; these three checked the code alone,
+            # so an entry marked inexpressible AND repairable would have deferred
+            # here and stopped the run there.  No stage emits that combination
+            # today -- after this card nothing is repairable at all -- but the
+            # asymmetry is exactly the "parallel verdict channels" shape that put
+            # D2b into production, and a floor is worth having before it is needed.
+            and isinstance(item.get("context"), dict)
+            and item["context"].get("repairable") is False
+            and item["context"].get("mutable_ref_paths") == []
             for item in scope_errors
         )
     )
@@ -733,52 +771,34 @@ class OverallStructureAudit:
             source_id = str(op.get("source_id") or "")
             target_id = str(op.get("target_id") or "")
             messages: List[str] = []
-            mutable: List[str] = []
             terminal = False
             void_child_plan = False
-            # C13RF19: the deferrable component is tracked separately so a mixed
-            # decision can report it instead of silently losing it, and so its
-            # refs can be withheld from the repair round.
+            # C13RF29: `mutable`/`inexpressible_mutable` are gone with the repair
+            # round they existed to steer.  `inexpressible_children` stays: it
+            # names off-stage child_plan items in the record, which is reporting.
             inexpressible_children: List[int] = []
-            inexpressible_mutable: List[str] = []
             if action not in allowed_actions:
                 messages.append("action is not allowed in finalization")
                 terminal = True
             else:
                 if source_id == str(l1_id) or get_l1_ancestor(self.tm, source_id) != str(l1_id):
                     messages.append("operation source must be a displayed non-L1 node in the audited L1")
-                    mutable.append(f"decisions[{index}].source_ref")
                 if get_l1_ancestor(self.tm, target_id) != str(l1_id):
                     messages.append(TARGET_OUTSIDE_L1_MESSAGE)
-                    mutable.append(f"decisions[{index}].target_ref")
-                    inexpressible_mutable.append(
-                        f"decisions[{index}].target_ref"
-                    )
 
                 if action == "rename" and source_id != target_id:
                     messages.append("rename source and target must be the same displayed node")
-                    mutable.extend([
-                        f"decisions[{index}].source_ref",
-                        f"decisions[{index}].target_ref",
-                    ])
                 elif action == "split_reparent" and source_id != target_id:
                     messages.append("split_reparent source and target must be the same displayed node")
-                    mutable.extend([
-                        f"decisions[{index}].source_ref",
-                        f"decisions[{index}].target_ref",
-                    ])
                 elif action == "flatten" and target_id != str(self.tm.get_parent_id(source_id) or ""):
                     messages.append("flatten target must be the displayed source parent")
-                    mutable.append(f"decisions[{index}].target_ref")
                 elif action in {"merge", "move"} and source_id == target_id:
                     messages.append(f"{action} source and target must differ")
-                    mutable.append(f"decisions[{index}].target_ref")
                 elif action == "move" and (
                     target_id == str(self.tm.get_parent_id(source_id) or "")
                     or self.tm.is_descendant(target_id, source_id)
                 ):
                     messages.append("move target must change parent without entering the source subtree")
-                    mutable.append(f"decisions[{index}].target_ref")
 
                 if action in {"merge", "move", "split_reparent", "flatten"}:
                     source_children = {
@@ -805,9 +825,6 @@ class OverallStructureAudit:
                             continue
                         if str(item.get("child_id") or "") not in source_children:
                             messages.append("child plan contains a non-source child")
-                            mutable.append(
-                                f"decisions[{index}].child_plan[{child_index}].child_ref"
-                            )
                         plan_target = str(item.get("target_parent_id") or "")
                         expected_target = None
                         if action == "merge":
@@ -833,95 +850,62 @@ class OverallStructureAudit:
                             )
                         ):
                             messages.append("split move target cannot be source, child, or child descendant")
-                            mutable.append(
-                                f"decisions[{index}].child_plan[{child_index}].target_parent_ref"
-                            )
                         if expected_target is not None and plan_target != expected_target:
                             messages.append(CHILD_ROLE_MISMATCH_MESSAGE)
-                            mutable.append(
-                                f"decisions[{index}].child_plan[{child_index}].target_parent_ref"
-                            )
                             inexpressible_children.append(child_index)
-                            inexpressible_mutable.append(
-                                f"decisions[{index}].child_plan[{child_index}].target_parent_ref"
-                            )
                         elif (
                             expected_target is None
                             and get_l1_ancestor(self.tm, plan_target) != str(l1_id)
                         ):
                             messages.append(SPLIT_CHILD_OUTSIDE_L1_MESSAGE)
-                            mutable.append(
-                                f"decisions[{index}].child_plan[{child_index}].target_parent_ref"
-                            )
                             inexpressible_children.append(child_index)
-                            inexpressible_mutable.append(
-                                f"decisions[{index}].child_plan[{child_index}].target_parent_ref"
-                            )
             if messages:
                 if void_child_plan:
                     messages.append(VOID_CHILD_PLAN_MESSAGE)
                 unique_messages = list(dict.fromkeys(messages))
-                # Eligibility is decided by the action before any message is
-                # weighed, so an excluded verb (flatten, or anything terminal)
-                # keeps its pre-C13RF19 behaviour byte for byte: no defer, and
-                # no ref path withheld from its repair round either.
-                eligible = action in DEFERRABLE_ACTIONS and not terminal
-                inexpressible_messages = [
-                    message for message in unique_messages
-                    if eligible and message in INEXPRESSIBLE_SCOPE_MESSAGES
-                ]
-                other_messages = [
-                    message for message in unique_messages
-                    if message not in inexpressible_messages
-                ]
-                inexpressible = (
-                    bool(inexpressible_messages) and not other_messages
-                )
-                # Mixed decision: withhold the deferrable half's refs so the
-                # repair round cannot coerce an out-of-scope destination into a
-                # legal-but-wrong one, and record what was withheld.  The
-                # remainder that survives an honest repair is what C13RF18's
-                # channel 2 reads back out of repair_scope_errors.
-                withheld = (
-                    list(dict.fromkeys(inexpressible_mutable))
-                    if inexpressible_messages and other_messages else []
-                )
-                repair_paths = [
-                    path for path in dict.fromkeys(mutable)
-                    if path not in set(withheld)
-                ]
+                # C13RF29: every failed check becomes DECISION_SCOPE_INEXPRESSIBLE
+                # with repairable=False and no mutable ref path -- see
+                # collapse_redundant_hierarchy.py's header for the full account.
+                #
+                # This replaces C13RF19's eligibility gate (3 of this stage's 14
+                # predicates could defer, and only for merge/move/split_reparent).
+                # Two of that gate's exclusions are worth naming because they were
+                # argued deliberately and are now gone:
+                #
+                #   * `flatten` was excluded because dissolving a node into its
+                #     parent while sending a child elsewhere is a different
+                #     operation, not an unspellable one.  True -- and irrelevant
+                #     to the disposition question: either way the stage does not
+                #     execute it.  The old treatment asked the model to repair it
+                #     and stopped the whole run if it could not.
+                #   * the "subject errors" (source outside the audited L1, source
+                #     is the L1 itself, child_plan naming a non-source child) were
+                #     excluded as factual misreads worth a repair round.  That
+                #     repair is what C13RF29 gives up on purpose: the accepted
+                #     cost is a mistyped reference that is no longer corrected, so
+                #     the tree changes less -- never wrongly.
+                #
+                # `terminal` no longer changes the disposition and is recorded
+                # instead, so a reader can still tell a verb this stage does not
+                # implement from one that was misaddressed.
                 extra_context = {}
-                if withheld:
-                    extra_context["inexpressible_components"] = inexpressible_messages
-                    extra_context["inexpressible_child_indexes"] = list(
+                if terminal:
+                    extra_context["terminal_action"] = True
+                if inexpressible_children:
+                    extra_context["child_indexes"] = list(
                         dict.fromkeys(inexpressible_children)
                     )
-                    extra_context["withheld_ref_paths"] = withheld
                 if void_child_plan:
                     extra_context[VOID_CHILD_PLAN_FLAG] = True
                 issues.append({
-                    "code": (
-                        "ACTION_NOT_ALLOWED_IN_STAGE" if terminal
-                        else "DECISION_SCOPE_INEXPRESSIBLE" if inexpressible
-                        else "DECISION_SCOPE_VIOLATION"
-                    ),
-                    "message": (
-                        "; ".join(inexpressible_messages) if inexpressible
-                        else "; ".join(unique_messages)
-                    ),
+                    "code": "DECISION_SCOPE_INEXPRESSIBLE",
+                    "message": "; ".join(unique_messages),
                     "context": {
                         "decision_index": index,
-                        **({
-                            "child_indexes": list(
-                                dict.fromkeys(inexpressible_children)
-                            ),
-                            "mutable_ref_paths": [],
-                            "repairable": False,
-                        } if inexpressible else {
-                            "mutable_ref_paths": repair_paths,
-                            "repairable": (not terminal) and bool(repair_paths),
-                            **extra_context,
-                        }),
+                        "mutable_ref_paths": [],
+                        "repairable": False,
+                        "scope_messages": unique_messages,
+                        **extra_context,
                     },
                 })
         return issues
@@ -985,27 +969,20 @@ class OverallStructureAudit:
                 item["target_parent_id"] = mapping[
                     item.pop("target_parent_ref")
                 ]
-        record = deferred_restructure_record(
+        # C13RF29 discharges C13RF19's note here: `deferred_restructure_record`
+        # takes the messages as a parameter now, so the two stopgap side fields
+        # RF19 attached -- `deferred_scope_errors` (a copy of the whole scope-error
+        # channel) and `deferred_scope_channel` (which channel it came from) --
+        # are removed.  Their content is not lost: the reasons are the record's
+        # own violations, one per message, and the channel choice is made by the
+        # shared reader below on the same rule the defer predicate uses.
+        return deferred_restructure_record(
             stage,
             logical_call_id=resp["logical_call_id"],
             local_proposal=local_proposal,
             resolved_proposal=resolved_proposal,
+            scope_messages=_deferred_scope_messages(resp),
         )
-        # deferred_restructure_record() hard-codes 14a/14c's single deferrable
-        # message ("merge with a pair-external child target ...").  That text is
-        # accurate for the two stages that have exactly one such message and
-        # wrong for this one, which has three.  semantic_contract.py is outside
-        # this card's change surface, so instead of rewording a shared record
-        # this stage attaches the scope errors it actually deferred.  Whoever is
-        # next authorised to touch semantic_contract.py should parameterise the
-        # message and drop this field.
-        channel = (
-            "repair_scope_errors"
-            if resp.get("repair_count") else "initial_scope_errors"
-        )
-        record["deferred_scope_errors"] = copy.deepcopy(resp.get(channel) or [])
-        record["deferred_scope_channel"] = channel
-        return record
 
     def _record_deferred_restructure(self, resp) -> List[Dict]:
         """Park an inexpressible restructure and let the tree keep running.
@@ -1140,6 +1117,18 @@ class OverallStructureAudit:
             membership_counts = {}
             membership_known = False
 
+        # C13RF29: this stage's second scope channel.  Like 14b's it already
+        # recorded and continued rather than stopping the run, so what changes is
+        # the verdict the records carry -- `_scope_issues` now returns
+        # DECISION_SCOPE_INEXPRESSIBLE for every failed check, including the
+        # unrecognised verbs that used to be ACTION_NOT_ALLOWED_IN_STAGE.
+        #
+        # Whole-batch abort is deliberately KEPT, for the same reason as 14b: one
+        # L1's decisions are proposed as a single plan, and executing the sound
+        # half of a plan whose sibling was refused would widen what this stage
+        # executes.  C13RF29 widens nothing.  The tree does not move, each decision
+        # is recorded with its own reason or as BATCH_SCOPE_ABORTED, and 14d
+        # proceeds to the next L1 instead of ending the run.
         scope_issues = self._scope_issues({"decisions": ops}, l1_id)
         if scope_issues:
             for index in range(len(ops)):

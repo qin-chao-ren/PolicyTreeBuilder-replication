@@ -163,11 +163,24 @@ class VoidChildPlanScopeTests(unittest.TestCase):
     # --- the flagged topology, stage by stage ---------------------------------
 
     def assert_void_flagged(self, issues, *, stage):
+        """C13RF16 fix ① after C13RF29: the flag is still raised, but nothing
+        repairs on it any more.
+
+        The flag says "this decision's only legal child_plan is the empty one".
+        C13RF16 raised it so the binder could authorise the model to truncate the
+        plan in a repair round.  C13RF29 makes every scope failure non-repairable,
+        so the binder returns before it ever reads the flag
+        (`_void_child_plan_indexes` is called after the `_repairable` early return
+        in `call_local_reference_json`).  The flag is kept because it describes the
+        proposal and lands in the record, but the truncation-authorisation path it
+        fed is now unreachable from these four stages -- recorded as a consequence
+        of this card, not a silent loss.
+        """
         self.assertEqual(len(issues), 1, f"{stage}: {issues}")
         details = issues[0]["context"]
         self.assertIs(details.get(VOID_CHILD_PLAN_FLAG), True, f"{stage}: {details}")
-        self.assertIs(details["repairable"], True, f"{stage}: {details}")
-        self.assertTrue(details["mutable_ref_paths"], f"{stage}: {details}")
+        self.assertIs(details["repairable"], False, f"{stage}: {details}")
+        self.assertEqual(details["mutable_ref_paths"], [], f"{stage}: {details}")
         self.assertIn(
             "source has no children", issues[0]["message"], f"{stage}: {issues}"
         )
@@ -181,7 +194,7 @@ class VoidChildPlanScopeTests(unittest.TestCase):
             )]),
             stage="14a",
         )
-        self.assertEqual(issue["code"], "DECISION_SCOPE_VIOLATION")
+        self.assertEqual(issue["code"], "DECISION_SCOPE_INEXPRESSIBLE")
 
     def test_polish_flags_childless_merge_source(self):
         issue = self.assert_void_flagged(
@@ -191,7 +204,7 @@ class VoidChildPlanScopeTests(unittest.TestCase):
             )]),
             stage="14c",
         )
-        self.assertEqual(issue["code"], "DECISION_SCOPE_VIOLATION")
+        self.assertEqual(issue["code"], "DECISION_SCOPE_INEXPRESSIBLE")
 
     def test_balance_flags_childless_move_source(self):
         issue = self.assert_void_flagged(
@@ -201,7 +214,7 @@ class VoidChildPlanScopeTests(unittest.TestCase):
             )]),
             stage="14b",
         )
-        self.assertEqual(issue["code"], "DECISION_SCOPE_VIOLATION")
+        self.assertEqual(issue["code"], "DECISION_SCOPE_INEXPRESSIBLE")
 
     def test_finalize_flags_childless_merge_source(self):
         issue = self.assert_void_flagged(
@@ -211,16 +224,25 @@ class VoidChildPlanScopeTests(unittest.TestCase):
             )]),
             stage="14d",
         )
-        self.assertEqual(issue["code"], "DECISION_SCOPE_VIOLATION")
+        self.assertEqual(issue["code"], "DECISION_SCOPE_INEXPRESSIBLE")
 
     # --- strictness: a source that has children keeps its subject error ------
 
     def assert_subject_error_unchanged(self, issues, *, stage):
+        """A source that HAS children keeps its subject error and gets no void flag.
+
+        That distinction is C13RF16 fix ①'s whole point and C13RF29 does not touch
+        it: the flag means "the empty plan is the only legal one", which is false
+        when the source owns children.  What C13RF29 changes is only the
+        disposition -- the subject error is no longer repairable, so it is recorded
+        and skipped instead of driving a repair round that could stop the run.
+        """
         self.assertEqual(len(issues), 1, f"{stage}: {issues}")
         details = issues[0]["context"]
-        self.assertEqual(issues[0]["code"], "DECISION_SCOPE_VIOLATION")
+        self.assertEqual(issues[0]["code"], "DECISION_SCOPE_INEXPRESSIBLE")
         self.assertNotIn(VOID_CHILD_PLAN_FLAG, details, f"{stage}: {details}")
-        self.assertIs(details["repairable"], True, f"{stage}: {details}")
+        self.assertIs(details["repairable"], False, f"{stage}: {details}")
+        self.assertEqual(details["mutable_ref_paths"], [], f"{stage}: {details}")
         self.assertIn("non-source child", issues[0]["message"], f"{stage}: {issues}")
 
     def test_collapse_keeps_rejecting_subject_error_with_children(self):
@@ -262,7 +284,7 @@ class VoidChildPlanScopeTests(unittest.TestCase):
             children=[child_plan("L3_NTC0001", "L2_NFULL001")],
         )])
         self.assertEqual(len(issues), 1, issues)
-        self.assertEqual(issues[0]["code"], "DECISION_SCOPE_VIOLATION")
+        self.assertEqual(issues[0]["code"], "DECISION_SCOPE_INEXPRESSIBLE")
         self.assertNotIn(VOID_CHILD_PLAN_FLAG, issues[0]["context"])
         self.assertIn("non-source child", issues[0]["message"])
 
@@ -355,7 +377,22 @@ class InexpressibleComponentTests(unittest.TestCase):
         self.assertEqual(len(issues), 1, issues)
         self.assertEqual(issues[0]["code"], "DECISION_SCOPE_INEXPRESSIBLE")
 
-    def test_mixed_decision_reports_and_withholds_the_deferrable_half(self):
+    def test_mixed_decision_reports_both_halves_and_withholds_nothing(self):
+        """C13RF16 fix ② after C13RF29: reporting kept, withholding obsolete.
+
+        Fix ② solved two problems with a mixed decision (one half deferrable, one
+        half repairable): the deferrable half used to vanish from the record, and
+        its ref path had to be withheld from the repair round so the model could not
+        re-aim an off-stage destination into a legal-but-wrong one.
+
+        The reporting half is preserved -- both reasons are in the record, and the
+        off-stage child is still named by index.  The withholding half is obsolete:
+        with no repair round there is nothing to withhold a path FROM, and the
+        protection it provided is now absolute rather than selective (no ref path is
+        offered for any reason).  `inexpressible_components` and `withheld_ref_paths`
+        are gone with the mechanism; `child_indexes` carries the surviving
+        information.
+        """
         issues = self.polish_issues([decision(
             "merge", "exact_duplicate", "L2_NFULL001", "L2_NTGT001",
             children=[
@@ -365,18 +402,22 @@ class InexpressibleComponentTests(unittest.TestCase):
         )])
         self.assertEqual(len(issues), 1, issues)
         details = issues[0]["context"]
-        self.assertEqual(issues[0]["code"], "DECISION_SCOPE_VIOLATION")
-        self.assertEqual(
-            details["inexpressible_components"],
-            ["merge child target is outside the exact pair role"],
-        )
-        self.assertEqual(details["inexpressible_child_indexes"], [0])
-        withheld = "decisions[0].child_plan[0].target_parent_ref"
-        self.assertEqual(details["withheld_ref_paths"], [withheld])
-        self.assertNotIn(withheld, details["mutable_ref_paths"])
+        self.assertEqual(issues[0]["code"], "DECISION_SCOPE_INEXPRESSIBLE")
+        # Both reasons survive in the record -- neither half is silently lost.
         self.assertIn(
-            "decisions[0].child_plan[1].child_ref", details["mutable_ref_paths"]
+            "merge child target is outside the exact pair role",
+            details["scope_messages"],
         )
+        self.assertIn("child plan contains a non-source child",
+                      details["scope_messages"])
+        # The off-stage child is still identified.
+        self.assertEqual(details["child_indexes"], [0])
+        # Nothing is repairable, so no ref path is offered at all -- the selective
+        # withholding fix ② needed is subsumed.
+        self.assertIs(details["repairable"], False)
+        self.assertEqual(details["mutable_ref_paths"], [])
+        self.assertNotIn("withheld_ref_paths", details)
+        self.assertNotIn("inexpressible_components", details)
 
     def test_pure_subject_error_gets_no_defer_path(self):
         """The §4 red line: a factual misread must never become deferrable."""
@@ -385,7 +426,7 @@ class InexpressibleComponentTests(unittest.TestCase):
             children=[child_plan("L3_NTC0001", "L2_NTGT001")],
         )])
         self.assertEqual(len(issues), 1, issues)
-        self.assertEqual(issues[0]["code"], "DECISION_SCOPE_VIOLATION")
+        self.assertEqual(issues[0]["code"], "DECISION_SCOPE_INEXPRESSIBLE")
         self.assertNotIn("inexpressible_components", issues[0]["context"])
 
 
@@ -422,36 +463,101 @@ class BalanceDeferMessageTests(unittest.TestCase):
             )
             return process._scope_issues("L3_NCAND001", {"decisions": decisions})
 
-    def test_depth_ceiling_message_literal_is_unchanged(self):
+    def test_depth_ceiling_reports_the_predicate_message(self):
+        """C13RF29: the issue carries the predicate's own reason.
+
+        14b used to substitute BRIDGE_DEPTH_DEFERRED_MESSAGE ("create_bridge is not
+        expressible at the structure-balancing depth ceiling") for the predicate's
+        BRIDGE_TOO_DEEP_MESSAGE ("bridge parent is too deep").  That substitution
+        only made sense while the depth ceiling was the single deferrable reason at
+        this stage; now that any off-stage decision defers, one stage-specific
+        sentence would misreport most of them.  The constant is kept and still names
+        the deferral in the stage's own vocabulary.
+        """
         issues = self.issues([self.bridge_decision()])
         self.assertEqual(len(issues), 1, issues)
         self.assertEqual(issues[0]["code"], "DECISION_SCOPE_INEXPRESSIBLE")
         self.assertEqual(
-            issues[0]["message"], self.balance.BRIDGE_DEPTH_DEFERRED_MESSAGE
+            issues[0]["message"], self.balance.BRIDGE_TOO_DEEP_MESSAGE
         )
         self.assertNotIn("inexpressible_components", issues[0]["context"])
 
-    def test_mixed_bridge_records_the_deferrable_component(self):
+    def test_mixed_bridge_records_every_reason(self):
+        """C13RF16 fix ② after C13RF29: same guarantee, simpler carrier.
+
+        Fix ② was that the deferrable component of a mixed decision must not vanish
+        from the record.  It still does not: both reasons appear, now in
+        ``scope_messages`` rather than in a separate ``inexpressible_components``
+        field that existed to distinguish the deferrable half from the repairable
+        one.  With nothing repairable, that distinction has no consumer.
+        """
         broken = self.bridge_decision()
         broken["child_plan"][0]["child_id"] = "L2_NPARENT1"
         issues = self.issues([broken])
         self.assertEqual(len(issues), 1, issues)
-        self.assertEqual(issues[0]["code"], "DECISION_SCOPE_VIOLATION")
-        self.assertEqual(
-            issues[0]["context"]["inexpressible_components"],
-            ["bridge parent is too deep"],
-        )
-        # ``terminal`` already blocks the repair round for the depth ceiling, so
-        # only the record changes here -- the disposition does not.
+        self.assertEqual(issues[0]["code"], "DECISION_SCOPE_INEXPRESSIBLE")
+        messages = issues[0]["context"]["scope_messages"]
+        self.assertIn("bridge parent is too deep", messages)
+        self.assertIn("bridge plan contains a non-direct child", messages)
         self.assertIs(issues[0]["context"]["repairable"], False)
+        self.assertEqual(issues[0]["context"]["mutable_ref_paths"], [])
 
 
 class RepairTruncationTests(unittest.TestCase):
-    """Fix ① end to end through the repair round, with its strictness intact."""
+    """Fix ① end to end through the repair round, with its strictness intact.
+
+    C13RF29 note on how these tests are wired.  They exercise machinery that lives
+    in the BINDER (`local_reference_binding`): when a scope error authorises it via
+    ``context[VOID_CHILD_PLAN_FLAG]``, the repair round may empty a child_plan, and
+    a battery of drift checks constrains what else that repair may change.  None of
+    that machinery is touched by C13RF29 and all of it still works -- but after this
+    card no stage validator returns a repairable error, so it can no longer be
+    reached by driving a real stage.  Rather than delete coverage of a live
+    mechanism, these tests now supply the authorising verdict directly through a
+    synthetic validator (`authorising_validator` below), which is exactly the
+    contract the binder documents for `bound_validator`.
+
+    Two things this preserves: the drift checks stay pinned for whatever repairable
+    class is introduced next, and the fact that these paths are currently
+    unreachable from 14a/14b/14c/14d is stated here rather than discovered later by
+    someone wondering why the code looks dead.
+    """
 
     @classmethod
     def setUpClass(cls):
         cls.polish = load_stage_module("polish_tree_labels")
+
+    @staticmethod
+    def authorising_validator(payload, *, void_indexes=(0,)):
+        """The pre-C13RF29 void-child-plan verdict, supplied directly.
+
+        Shape copied from what the stage validators emitted before this card: a
+        repairable scope error whose mutable path is the plan's target ref, plus the
+        VOID_CHILD_PLAN_FLAG authorisation that lets the repair empty the plan.
+        """
+        issues = []
+        decisions = payload.get("decisions") or []
+        for index, item in enumerate(decisions):
+            if index not in void_indexes:
+                continue
+            plan = item.get("child_plan") or []
+            if not plan:
+                continue
+            issues.append({
+                "code": "DECISION_SCOPE_VIOLATION",
+                "message": "source has no children; child_plan must be empty",
+                "context": {
+                    "decision_index": index,
+                    "mutable_ref_paths": [
+                        f"decisions[{index}].child_plan[{child_index}]"
+                        ".target_parent_ref"
+                        for child_index in range(len(plan))
+                    ],
+                    "repairable": True,
+                    VOID_CHILD_PLAN_FLAG: True,
+                },
+            })
+        return issues
 
     def setUp(self):
         self.system = "c13rf16 label-polishing fixture contract"
@@ -494,7 +600,7 @@ class RepairTruncationTests(unittest.TestCase):
             "decisions": [self.local_decision(children)],
         }
 
-    def run_call(self, *payloads):
+    def run_call(self, *payloads, validator=None):
         transport = ScriptedTransport(*payloads)
         with tempfile.TemporaryDirectory() as temporary_dir:
             process = stage_process(
@@ -508,9 +614,10 @@ class RepairTruncationTests(unittest.TestCase):
                 task="polish_tree_labels",
                 expected_count=None,
                 protected_manager=process.tm,
-                bound_validator=lambda value: process._scope_issues(
-                    value, "L2_NSRC001", "L2_NTGT001"
-                ),
+                # C13RF29: the authorising verdict is supplied directly -- see the
+                # class docstring.  No stage validator produces a repairable error
+                # any more, so driving one would never reach the repair round.
+                bound_validator=validator or self.authorising_validator,
             )
         return transport, response
 
@@ -557,6 +664,26 @@ class RepairTruncationTests(unittest.TestCase):
         repaired = copy.deepcopy(initial)
         repaired["decisions"][0]["child_plan"] = []
 
+        def unauthorising_validator(payload):
+            """Repairable, but WITHOUT the void-plan authorisation.
+
+            This is the control: the source has children, so emptying the plan is
+            not a correction the binder may accept.  C13RF29 changed which verdicts
+            stage validators emit, not this rule, so the verdict is supplied directly
+            here for the same reason as the rest of this class.
+            """
+            return [{
+                "code": "DECISION_SCOPE_VIOLATION",
+                "message": "child plan contains a non-source child",
+                "context": {
+                    "decision_index": 0,
+                    "mutable_ref_paths": [
+                        "decisions[0].child_plan[0].child_ref",
+                    ],
+                    "repairable": True,
+                },
+            }]
+
         transport = ScriptedTransport(initial, repaired)
         with tempfile.TemporaryDirectory() as temporary_dir:
             process = stage_process(
@@ -570,9 +697,7 @@ class RepairTruncationTests(unittest.TestCase):
                 task="polish_tree_labels",
                 expected_count=None,
                 protected_manager=process.tm,
-                bound_validator=lambda value: process._scope_issues(
-                    value, "L2_NFULL001", "L2_NTGT001"
-                ),
+                bound_validator=unauthorising_validator,
             )
         self.assertIs(response["ok"], False)
         self.assertEqual(response["error"], "REPAIR_SEMANTIC_DRIFT")

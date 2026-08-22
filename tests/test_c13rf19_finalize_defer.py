@@ -214,18 +214,30 @@ class DeferredPredicateTests(StageLoadingTestCase):
 
 class SubjectErrorNeverDefersTests(StageLoadingTestCase):
     """The 3 predicates C13RF15 classified as the model misreading its own call
-    context.  These are factual mistakes, and a parked factual mistake is just a
-    lost correction."""
+    context.
+
+    C13RF19's reasoning was: these are factual mistakes, and a parked factual
+    mistake is just a lost correction -- so give them a repair round, not a defer
+    channel.  C13RF29 accepts that reasoning and overrides the conclusion, on the
+    user's explicit decision: the repair round is what turned a lost correction into
+    a lost RUN (C13RF28 threw away 53 completed calls over one), and no correction is
+    worth that.  So these three are now recorded and skipped like everything else.
+
+    What the class still defends, and what these tests still assert: all three are
+    REFUSED.  None of them executes, before or after.  Only the disposition changed.
+    """
 
     def test_d2_source_in_another_l1(self):
         issue = self.only(op("merge", "L2_FOREIGN", "L2_TGT"))
-        self.assertEqual(issue["code"], VIOLATION)
-        self.assertIs(issue["context"]["repairable"], True)
+        self.assertEqual(issue["code"], INEXPRESSIBLE)
+        self.assertIs(issue["context"]["repairable"], False)
+        self.assertEqual(issue["context"]["mutable_ref_paths"], [])
 
     def test_d3_source_is_the_audited_l1_itself(self):
         issue = self.only(op("merge", "L1_A", "L2_TGT"))
-        self.assertEqual(issue["code"], VIOLATION)
-        self.assertIs(issue["context"]["repairable"], True)
+        self.assertEqual(issue["code"], INEXPRESSIBLE)
+        self.assertIs(issue["context"]["repairable"], False)
+        self.assertEqual(issue["context"]["mutable_ref_paths"], [])
 
     def test_d11_child_plan_names_a_non_source_child(self):
         issue = self.only(
@@ -233,18 +245,31 @@ class SubjectErrorNeverDefersTests(StageLoadingTestCase):
                child_plan=[child(f"L3_C{i}", "L2_TGT") for i in (1, 2, 3)]),
             tree=childless_source_tree(),
         )
-        self.assertEqual(issue["code"], VIOLATION)
-        self.assertIs(issue["context"]["repairable"], True)
-        # C13RF16 ① must survive untouched: emptying the plan is the correction.
+        self.assertEqual(issue["code"], INEXPRESSIBLE)
+        self.assertIs(issue["context"]["repairable"], False)
+        # C13RF16 ①'s flag is still raised -- it describes the proposal ("the empty
+        # plan is the only legal one") and still reaches the record.  What no longer
+        # happens is the repair round it used to authorise; see C13RF29's note in
+        # test_c13rf16_scope_defer_fix.RepairTruncationTests.
         self.assertIs(issue["context"][VOID_CHILD_PLAN_FLAG], True)
 
 
 class HardConstraintNeverDefersTests(StageLoadingTestCase):
-    """The 8 structural invariants.  Deferring one would park a proposal no
-    later stage could execute either -- the same reasoning RF9 recorded when
-    14b's depth ceiling was found to have no defer channel *correctly*."""
+    """The 8 structural invariants.
 
-    def test_all_eight_hard_constraints_stay_violations(self):
+    C13RF19's reasoning was that deferring one of these would park a proposal no
+    later stage could execute either, so parking it is pointless.  That remains true
+    -- and C13RF29 shows it was an argument about the VALUE of the record, not about
+    whether the run should stop.  Parking a proposal nothing can execute costs a log
+    line; stopping the run costs every completed call in the stage.  So these are now
+    recorded and skipped too, and the log line is accepted as the cheaper of the two.
+
+    Every one of the 8 is still REFUSED, which is what this class exists to defend.
+    Note the renamed method below: "stay violations" was a claim about the verdict
+    code, and the code changed; "are refused" is the claim that actually matters.
+    """
+
+    def test_all_eight_hard_constraints_are_refused(self):
         cases = {
             "D1_action_not_allowed": (
                 op("create_bridge", "L2_SRC", "L2_TGT"), None, NOT_ALLOWED),
@@ -267,53 +292,83 @@ class HardConstraintNeverDefersTests(StageLoadingTestCase):
         for name, (decision, tree, expected) in cases.items():
             with self.subTest(case=name):
                 issue = self.only(decision, tree=tree)
-                self.assertEqual(issue["code"], expected)
-                self.assertNotEqual(issue["code"], INEXPRESSIBLE)
+                # C13RF29: the per-case `expected` codes above (VIOLATION /
+                # NOT_ALLOWED) are kept in the table as a record of what each shape
+                # used to return; the live assertion is that each is refused, with
+                # no repair round and nothing executable.
+                self.assertEqual(issue["code"], INEXPRESSIBLE)
+                self.assertIs(issue["context"]["repairable"], False)
+                self.assertEqual(issue["context"]["mutable_ref_paths"], [])
+                self.assertIn(expected, {VIOLATION, NOT_ALLOWED})
 
     def test_action_not_allowed_stays_terminal(self):
-        issue = self.only(op("create_bridge", "L2_SRC", "L2_TGT"))
-        self.assertEqual(issue["code"], NOT_ALLOWED)
-        self.assertIs(issue["context"]["repairable"], False)
+        """A verb this stage does not implement is still refused outright.
 
-    def test_terminal_inventory_did_not_grow(self):
-        """Besides the new defer code -- which is non-repairable by design, not
-        by terminality -- ACTION_NOT_ALLOWED_IN_STAGE remains 14d's only
-        non-repairable verdict (C13RF15 case D16)."""
-        seen = set()
+        C13RF29 folded the ACTION_NOT_ALLOWED_IN_STAGE code into the uniform
+        inexpressible verdict, but kept the distinction visible: `terminal_action` is
+        recorded in the context so a reader can still tell "this stage has no such
+        verb" from "this verb was misaddressed".  Terminality no longer needs to
+        control the disposition, because nothing is repairable either way.
+        """
+        issue = self.only(op("create_bridge", "L2_SRC", "L2_TGT"))
+        self.assertEqual(issue["code"], INEXPRESSIBLE)
+        self.assertIs(issue["context"]["repairable"], False)
+        self.assertIs(issue["context"]["terminal_action"], True)
+
+    def test_every_verdict_is_now_non_repairable_and_uniform(self):
+        """The inversion, stated as an inventory.
+
+        This replaces C13RF19's `test_terminal_inventory_did_not_grow`, which pinned
+        that ACTION_NOT_ALLOWED_IN_STAGE was the only non-repairable verdict.  After
+        C13RF29 that inventory is the complement of what it was: every verdict is
+        non-repairable, and there is exactly one code.  Asserting the inventory (not
+        just individual cases) is what would catch a future edit that quietly
+        reintroduces a repairable branch at this stage.
+        """
+        codes, repairable_flags = set(), set()
         for decision in (
             op("create_bridge", "L2_SRC", "L2_TGT"),
             op("rename", "L2_SRC", "L2_TGT"),
             op("merge", "L2_FOREIGN", "L2_TGT"),
             op("move", "L3_S1", "L4_S1A"),
             op("merge", "L2_SRC", "L2_SRC"),
+            op("merge", "L2_SRC", "L2_FOREIGN"),
+            op("flatten", "L3_S1", "L2_SRC",
+               child_plan=[child("L4_S1A", "L2_FOREIGN")]),
         ):
             issue = self.only(decision)
-            if issue["context"]["repairable"] is False:
-                seen.add(issue["code"])
-        self.assertEqual(seen, {NOT_ALLOWED})
+            codes.add(issue["code"])
+            repairable_flags.add(issue["context"]["repairable"])
+            self.assertEqual(issue["context"]["mutable_ref_paths"], [])
+        self.assertEqual(codes, {INEXPRESSIBLE})
+        self.assertEqual(repairable_flags, {False})
 
 
 class FlattenExclusionTests(StageLoadingTestCase):
     """`flatten` is in 14d's whitelist and can raise the deferrable message, yet
     must never defer."""
 
-    def test_flatten_with_wrong_child_role_is_a_violation_not_a_defer(self):
+    def test_flatten_with_wrong_child_role_is_refused_and_recorded(self):
+        """C13RF29: flatten's exclusion from the defer channel is moot.
+
+        C13RF19 excluded flatten deliberately -- dissolving a node into its parent
+        while sending a child elsewhere is a DIFFERENT operation, not an unspellable
+        one, so it deserved a repair round rather than a parking slot.  The taxonomy
+        still holds; the consequence no longer follows.  Either way this stage does
+        not execute it, and C13RF29's position is that the choice between "ask for a
+        repair and stop the run if it fails" and "record it and move on" should not
+        depend on which of those two things the proposal is.
+        """
         issue = self.only(
             op("flatten", "L3_S1", "L2_SRC",
                child_plan=[child("L4_S1A", "L2_FOREIGN")])
         )
-        self.assertEqual(issue["code"], VIOLATION)
+        self.assertEqual(issue["code"], INEXPRESSIBLE)
         self.assertIn(
             self.finalize.CHILD_ROLE_MISMATCH_MESSAGE, issue["message"]
         )
-        self.assertIs(issue["context"]["repairable"], True)
-        # An excluded verb keeps its whole pre-C13RF19 repair surface: nothing
-        # was withheld, so the model can still be asked to fix it.
-        self.assertNotIn("withheld_ref_paths", issue["context"])
-        self.assertEqual(
-            issue["context"]["mutable_ref_paths"],
-            ["decisions[0].child_plan[0].target_parent_ref"],
-        )
+        self.assertIs(issue["context"]["repairable"], False)
+        self.assertEqual(issue["context"]["mutable_ref_paths"], [])
 
     def test_flatten_is_not_in_the_deferrable_action_set(self):
         self.assertEqual(
@@ -364,43 +419,43 @@ class FlattenExclusionTests(StageLoadingTestCase):
                child_plan=[child("L3_C1", "L1_A")]),
             tree=childless_source_tree(),
         )
-        self.assertEqual(issue["code"], VIOLATION)
+        # C13RF29: the code is uniform now; the assertion that matters is the one
+        # C13RF16 made -- flatten never receives the empty-plan authorisation, since
+        # an empty plan is permanently illegal for it.
+        self.assertEqual(issue["code"], INEXPRESSIBLE)
         self.assertNotIn(VOID_CHILD_PLAN_FLAG, issue["context"])
 
 
 class MixedDecisionTests(StageLoadingTestCase):
-    """A decision carrying both kinds of error must report both and withhold the
-    deferrable half's refs, so the repair round cannot coerce an out-of-scope
-    destination into a legal-but-wrong one (the harm C13RF16 measured)."""
+    """A decision carrying both kinds of error must report both.
 
-    def test_mixed_decision_is_a_violation_that_records_its_deferrable_half(self):
+    C13RF16 needed two things here: report the deferrable half (it used to vanish),
+    and withhold its ref path so the repair round could not coerce an out-of-scope
+    destination into a legal-but-wrong one.  C13RF29 keeps the first and subsumes the
+    second: with no repair round, no path is offered for any reason, so the
+    protection is absolute rather than selective.
+    """
+
+    def test_mixed_decision_records_both_halves(self):
         issue = self.only(
             op("merge", "L2_SRC", "L2_TGT", child_plan=[
-                child("L3_S1", "L2_FOREIGN"),   # inexpressible half
-                child("L3_T1", "L2_TGT"),       # subject error, repairable
+                child("L3_S1", "L2_FOREIGN"),   # was: the inexpressible half
+                child("L3_T1", "L2_TGT"),       # was: the repairable half
             ])
         )
-        self.assertEqual(issue["code"], VIOLATION)
+        self.assertEqual(issue["code"], INEXPRESSIBLE)
         context = issue["context"]
-        self.assertEqual(
-            context["inexpressible_components"],
-            [self.finalize.CHILD_ROLE_MISMATCH_MESSAGE],
-        )
-        self.assertEqual(context["inexpressible_child_indexes"], [0])
-        self.assertEqual(
-            context["withheld_ref_paths"],
-            ["decisions[0].child_plan[0].target_parent_ref"],
-        )
-        # The withheld path is gone from the repair surface; the subject error's
-        # own path is still there, so the repair round has real work to do.
-        self.assertNotIn(
-            "decisions[0].child_plan[0].target_parent_ref",
-            context["mutable_ref_paths"],
-        )
+        # Both reasons are stated; neither half is lost.
         self.assertIn(
-            "decisions[0].child_plan[1].child_ref", context["mutable_ref_paths"]
-        )
-        self.assertIs(context["repairable"], True)
+            self.finalize.CHILD_ROLE_MISMATCH_MESSAGE, context["scope_messages"])
+        self.assertIn(
+            "child plan contains a non-source child", context["scope_messages"])
+        # The off-stage child is still identified by index.
+        self.assertEqual(context["child_indexes"], [0])
+        # Nothing repairable, nothing offered, so nothing needs withholding.
+        self.assertIs(context["repairable"], False)
+        self.assertEqual(context["mutable_ref_paths"], [])
+        self.assertNotIn("withheld_ref_paths", context)
 
     def test_void_child_plan_message_blocks_the_defer_channel(self):
         """A childless source additionally raises the C13RF16 ① message, which
@@ -410,7 +465,9 @@ class MixedDecisionTests(StageLoadingTestCase):
                child_plan=[child("L3_C1", "L2_FOREIGN")]),
             tree=childless_source_tree(),
         )
-        self.assertEqual(issue["code"], VIOLATION)
+        # C13RF29: no message "blocks the channel" any more -- every reason defers.
+        # The flag is still raised, which is what C13RF16 ① is about.
+        self.assertEqual(issue["code"], INEXPRESSIBLE)
         self.assertIs(issue["context"][VOID_CHILD_PLAN_FLAG], True)
 
 
@@ -431,6 +488,22 @@ class LegalCallControlTests(StageLoadingTestCase):
 # The predicate is C13RF18's, not a second shape.
 # --------------------------------------------------------------------------
 
+# C13RF29: a complete inexpressible verdict, as the stages actually emit one.
+# The fixtures used to carry only `{"code": INEXPRESSIBLE}` because the predicates
+# inspected nothing else; they now also require `repairable is False` and an empty
+# `mutable_ref_paths` (14b always did, and C13RF29 aligned the other three so the
+# four cannot disagree about the same channel).  See inexpressible_entry() below.
+_INEXPRESSIBLE_ENTRY = {
+    "code": INEXPRESSIBLE,
+    "message": "an off-stage reason",
+    "context": {
+        "decision_index": 0,
+        "mutable_ref_paths": [],
+        "repairable": False,
+    },
+}
+
+
 def response(**overrides) -> dict:
     base = {
         "ok": False,
@@ -439,19 +512,42 @@ def response(**overrides) -> dict:
         "final_disposition": "scope_rejected",
         "error": "BOUND_SCOPE_VALIDATION_FAILED",
         "repair_count": 0,
-        "initial_scope_errors": [{"code": INEXPRESSIBLE}],
+        "initial_scope_errors": [copy.deepcopy(_INEXPRESSIBLE_ENTRY)],
         "repair_scope_errors": [],
     }
     base.update(overrides)
     return base
 
 
+def inexpressible_entry(index=0):
+    """A complete inexpressible verdict, as the stages actually emit one.
+
+    C13RF29 note: the battery below used to write `{"code": INEXPRESSIBLE}` and
+    nothing else, because the predicates only inspected the code.  They now also
+    require `repairable is False` and an empty `mutable_ref_paths` -- 14b always
+    did, and C13RF29 aligned the other three so a verdict marked inexpressible AND
+    repairable cannot defer at one stage while stopping the run at another.  The
+    fixtures therefore have to carry the whole shape; a bare code is no longer a
+    verdict any stage would produce.
+    """
+    return {
+        "code": INEXPRESSIBLE,
+        "message": "an off-stage reason",
+        "context": {
+            "decision_index": index,
+            "mutable_ref_paths": [],
+            "repairable": False,
+        },
+    }
+
+
 class DeferPredicateShapeTests(StageLoadingTestCase):
     """Card requirement ③: the new predicate must agree field for field with the
     one C13RF18 landed, and the agreement must be *checked*, not asserted in
     prose.  `balance` is excluded on purpose -- RF10 gave it an extra narrowness
-    (homogeneous depth-ceiling create_bridge batches only) that RF18 preserved on
-    both channels, so it is deliberately stricter than the two plain stages."""
+    (every proposed decision must be covered by its own error) that RF18 preserved
+    on both channels and C13RF29 kept, so it stays stricter than the plain stages.
+    """
 
     BATTERY = {
         # channel 1
@@ -462,7 +558,7 @@ class DeferPredicateShapeTests(StageLoadingTestCase):
             error="REPAIR_SCOPE_VALIDATION_FAILED",
             repair_count=1,
             initial_scope_errors=[{"code": VIOLATION}],
-            repair_scope_errors=[{"code": INEXPRESSIBLE}],
+            repair_scope_errors=[inexpressible_entry()],
         ), True),
         # shared preconditions
         "neg_ok_true": (response(ok=True), False),
@@ -474,7 +570,7 @@ class DeferPredicateShapeTests(StageLoadingTestCase):
         "neg_c1_wrong_error": (response(error="REPAIR_BINDING_FAILED"), False),
         "neg_c1_empty_channel": (response(initial_scope_errors=[]), False),
         "neg_c1_impure_channel": (response(
-            initial_scope_errors=[{"code": INEXPRESSIBLE}, {"code": VIOLATION}],
+            initial_scope_errors=[inexpressible_entry(), {"code": VIOLATION}],
         ), False),
         "neg_c1_repair_happened": (response(repair_count=1), False),
         # channel 2 negatives
@@ -488,24 +584,24 @@ class DeferPredicateShapeTests(StageLoadingTestCase):
             final_disposition="repair_scope_rejected",
             error="REPAIR_SCOPE_VALIDATION_FAILED",
             repair_count=1,
-            repair_scope_errors=[{"code": INEXPRESSIBLE}, {"code": VIOLATION}],
+            repair_scope_errors=[inexpressible_entry(), {"code": VIOLATION}],
         ), False),
         "neg_c2_multi_round_repair": (response(
             final_disposition="repair_scope_rejected",
             error="REPAIR_SCOPE_VALIDATION_FAILED",
             repair_count=2,
-            repair_scope_errors=[{"code": INEXPRESSIBLE}],
+            repair_scope_errors=[inexpressible_entry()],
         ), False),
         # cross-channel smearing, both directions
         "neg_initial_ledger_read_on_repair_path": (response(
             final_disposition="repair_scope_rejected",
             error="REPAIR_SCOPE_VALIDATION_FAILED",
             repair_count=1,
-            initial_scope_errors=[{"code": INEXPRESSIBLE}],
+            initial_scope_errors=[inexpressible_entry()],
             repair_scope_errors=[{"code": VIOLATION}],
         ), False),
         "neg_repair_ledger_read_on_initial_path": (response(
-            repair_scope_errors=[{"code": INEXPRESSIBLE}],
+            repair_scope_errors=[inexpressible_entry()],
             initial_scope_errors=[{"code": VIOLATION}],
         ), False),
     }
@@ -681,36 +777,48 @@ class EndToEndDeferTests(StageLoadingTestCase):
         )
 
     def test_deferred_record_names_the_scope_error_it_actually_deferred(self):
-        """deferred_restructure_record() hard-codes 14a/14c's single deferrable
-        message, which is wrong for this stage's three.  The stage attaches what
-        it really deferred rather than reword a shared record."""
+        """C13RF29 discharges C13RF19's stopgap: the message is a parameter now.
+
+        C13RF19 could not touch `semantic_contract.py`, so where the shared record
+        hard-coded 14a/14c's single message ("merge with a pair-external child
+        target ...") this stage attached two side fields instead --
+        `deferred_scope_errors` and `deferred_scope_channel` -- and left a note asking
+        whoever could touch that file to parameterise it.  C13RF29 did, and removed
+        both fields.  The guarantee this test defends is unchanged: the record states
+        the reason this call was actually deferred.  It now does so through its own
+        violations, one per message, which is where a reader looks anyway.
+        """
         response_obj, _audit, _transport = self.bind(
             [local_child("S1", "FOREIGN")]
         )
         _returned, written, _audit2 = self.record_for(response_obj)
         record = written[0]
-        self.assertEqual(record["deferred_scope_channel"], "initial_scope_errors")
+        self.assertNotIn("deferred_scope_channel", record)
+        self.assertNotIn("deferred_scope_errors", record)
+        violations = record["semantic_contract"]["violations"]
+        self.assertEqual([item["code"] for item in violations], [INEXPRESSIBLE])
         self.assertEqual(
-            [item["code"] for item in record["deferred_scope_errors"]],
-            [INEXPRESSIBLE],
-        )
-        self.assertEqual(
-            record["deferred_scope_errors"][0]["message"],
-            self.finalize.CHILD_ROLE_MISMATCH_MESSAGE,
-        )
+            violations[0]["message"], self.finalize.CHILD_ROLE_MISMATCH_MESSAGE)
+        # And never the sentence written for another stage.
+        self.assertNotIn("pair-external", violations[0]["message"])
 
-    def test_mixed_call_defers_only_after_an_honest_repair(self):
-        """Channel 2: the repair round fixes the subject error and cannot touch
-        the withheld half, so the remainder is wholly inexpressible."""
+    def test_mixed_call_defers_on_the_first_round_and_spends_one_attempt(self):
+        """C13RF29: no second round, and the saved attempt is the point.
+
+        This was C13RF18's channel-2 case at 14d: the repair round fixed the
+        repairable half, leaving an inexpressible remainder.  Now the whole decision
+        is inexpressible on the first round, so the binder never asks again --
+        `transport.calls` drops from 2 to 1.  That is the API saving the card
+        predicted, measured here rather than asserted in prose: one fewer request per
+        off-stage decision (49 of C13RF28's 53 calls were this family).
+        """
         response_obj, _audit, transport = self.bind(
             [local_child("S1", "FOREIGN"), local_child("T1", "TGT")],
             [local_child("S1", "FOREIGN"), local_child("S2", "TGT")],
         )
-        self.assertEqual(transport.calls, 2)
-        self.assertEqual(
-            response_obj["final_disposition"], "repair_scope_rejected"
-        )
-        self.assertEqual(response_obj["repair_count"], 1)
+        self.assertEqual(transport.calls, 1)
+        self.assertEqual(response_obj["final_disposition"], "scope_rejected")
+        self.assertEqual(response_obj["repair_count"], 0)
         self.assertIs(
             self.finalize.OverallStructureAudit._is_deferrable_response(
                 response_obj
@@ -718,41 +826,68 @@ class EndToEndDeferTests(StageLoadingTestCase):
             True,
         )
         _returned, written, _audit2 = self.record_for(response_obj)
-        self.assertEqual(
-            written[0]["deferred_scope_channel"], "repair_scope_errors"
-        )
+        self.assertEqual(written[0]["status"], "deferred")
 
-    def test_mixed_call_with_an_impure_remainder_still_fails(self):
-        """The pinned severity floor: one non-inexpressible residue and the call
-        stays a plain failure, which is what stops the run."""
+    def test_severity_floor_still_refuses_a_non_inexpressible_channel(self):
+        """The floor survives C13RF29; only its reachability from here changed.
+
+        The predicate still requires every entry in the scope channel to be
+        inexpressible and non-repairable, and still refuses an empty channel.  Since
+        this stage no longer emits anything else, the floor has to be exercised
+        synthetically -- which is worth keeping: it is what would catch a future
+        repairable class being deferred by accident.
+        """
         response_obj, _audit, _transport = self.bind(
             [local_child("S1", "FOREIGN"), local_child("T1", "TGT")],
-            [local_child("S1", "FOREIGN"), local_child("T1", "TGT")],
         )
-        self.assertEqual(
-            response_obj["error"], "REPAIR_SCOPE_VALIDATION_FAILED"
-        )
-        self.assertIs(
-            self.finalize.OverallStructureAudit._is_deferrable_response(
-                response_obj
-            ),
-            False,
-        )
+        predicate = self.finalize.OverallStructureAudit._is_deferrable_response
+        self.assertIs(predicate(response_obj), True)
 
-    def test_repaired_subject_error_is_accepted_and_never_deferred(self):
+        impure = copy.deepcopy(response_obj)
+        impure["initial_scope_errors"] = [{
+            "code": VIOLATION,
+            "message": "some repairable problem",
+            "context": {
+                "decision_index": 0,
+                "mutable_ref_paths": ["decisions[0].target_ref"],
+                "repairable": True,
+            },
+        }]
+        self.assertIs(predicate(impure), False)
+
+        empty = copy.deepcopy(response_obj)
+        empty["initial_scope_errors"] = []
+        self.assertIs(predicate(empty), False)
+
+    def test_subject_error_is_no_longer_repaired_but_recorded(self):
+        """The accepted cost, at 14d.
+
+        Before C13RF29 this shape (a child_plan naming a node that is not the
+        source's child) came back corrected from a repair round and executed.  Now it
+        is recorded and skipped.  The user accepted this on the record: the tree
+        changes less, never wrongly, and no run ends over it.
+        """
         response_obj, _audit, _transport = self.bind(
             [local_child("T1", "TGT")],
             [local_child("S1", "TGT")],
         )
-        self.assertIs(response_obj["ok"], True)
+        self.assertIs(response_obj["ok"], False)
+        self.assertEqual(response_obj["repair_count"], 0)
         self.assertIs(
             self.finalize.OverallStructureAudit._is_deferrable_response(
                 response_obj
             ),
-            False,
+            True,
         )
 
-    def test_flatten_call_never_reaches_the_defer_channel(self):
+    def test_flatten_call_now_defers_instead_of_stopping_the_run(self):
+        """C13RF19 excluded flatten from the channel; C13RF29 includes it.
+
+        The taxonomic reason for the exclusion still stands (a flatten that rehomes a
+        child elsewhere is a different operation, not an unspellable one) and is
+        recorded in FlattenExclusionTests.  What changed is that the reason no longer
+        decides whether the run survives.  Either way, this stage does not execute it.
+        """
         response_obj, _audit, _transport = self.bind(
             decisions=[local_decision(
                 "flatten", "S1", "SRC", [local_child("S1A", "FOREIGN")]
@@ -763,24 +898,33 @@ class EndToEndDeferTests(StageLoadingTestCase):
             self.finalize.OverallStructureAudit._is_deferrable_response(
                 response_obj
             ),
-            False,
+            True,
         )
 
-    def test_action_not_allowed_call_never_reaches_the_defer_channel(self):
+    def test_unimplemented_verb_now_defers_and_stays_marked_terminal(self):
+        """C13RF29: a verb this stage does not implement no longer ends the run.
+
+        `create_bridge` belongs to 14b; proposing it at 14d is nonsense the stage
+        cannot execute.  C13RF19 made it 14d's one terminal verdict -- refuse, no
+        repair, and the run stops.  The refusal is unchanged; only the stopping is
+        gone.  The distinction is preserved in the record via `terminal_action`, so
+        "no such verb here" is still distinguishable from "misaddressed" when someone
+        reads the deferred entries.
+        """
         response_obj, _audit, _transport = self.bind(
             decisions=[local_decision(
                 "create_bridge", "SRC", "TGT", [local_child("S1", "TGT")]
             )],
         )
-        self.assertEqual(
-            [item["code"] for item in response_obj["initial_scope_errors"]],
-            [NOT_ALLOWED],
-        )
+        errors = response_obj["initial_scope_errors"]
+        self.assertEqual([item["code"] for item in errors], [INEXPRESSIBLE])
+        self.assertIs(errors[0]["context"]["terminal_action"], True)
+        self.assertIs(errors[0]["context"]["repairable"], False)
         self.assertIs(
             self.finalize.OverallStructureAudit._is_deferrable_response(
                 response_obj
             ),
-            False,
+            True,
         )
 
     def test_a_deferred_batch_parks_its_legal_decisions_too(self):

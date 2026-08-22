@@ -1208,18 +1208,50 @@ def rejected_parse_record(
     return record
 
 
+DEFAULT_DEFERRED_SCOPE_MESSAGE = (
+    "the proposed restructure is not expressible in this stage"
+)
+
+
 def deferred_restructure_record(
     stage: str,
     *,
     logical_call_id: str,
     local_proposal: Mapping[str, Any],
     resolved_proposal: Mapping[str, Any],
+    scope_messages: Optional[Sequence[str]] = None,
 ) -> Dict[str, Any]:
-    violations = [{
-        "severity": "critical",
-        "code": "DECISION_SCOPE_INEXPRESSIBLE",
-        "message": "merge with a pair-external child target is not expressible in this stage",
-    }]
+    """Park an inexpressible restructure as a `deferred` operations record.
+
+    C13RF29: ``scope_messages`` replaces a hard-coded sentence.  Until this card
+    the record always said "merge with a pair-external child target ...", which
+    was 14a/14c's single deferrable message and simply false everywhere else --
+    14b defers a depth-ceiling bridge, 14d has three messages of its own, and
+    after C13RF29 every stage can also defer `keep`/`reject_merge`/`uncertain`
+    and unrecognised actions.  14b and 14d each worked around the wrong text
+    differently (14b overwrote ``violations[0]["message"]`` after the fact, 14d
+    attached ``deferred_scope_errors``/``deferred_scope_channel`` side fields and
+    left a note asking whoever could touch this file to parameterise it).  Both
+    workarounds are removed with this parameter.
+
+    One violation is emitted per message so the record states every reason the
+    proposal was parked, rather than collapsing them into one sentence.  Callers
+    that pass nothing keep a single violation carrying
+    ``DEFAULT_DEFERRED_SCOPE_MESSAGE``: an honest generic, not a specific claim
+    about a shape the caller may not have seen.
+    """
+    messages = [
+        str(message) for message in (scope_messages or ())
+        if str(message).strip()
+    ]
+    violations = [
+        {
+            "severity": "critical",
+            "code": "DECISION_SCOPE_INEXPRESSIBLE",
+            "message": message,
+        }
+        for message in (messages or [DEFAULT_DEFERRED_SCOPE_MESSAGE])
+    ]
     return {
         "ts": int(time.time()),
         "step": stage,
@@ -1502,6 +1534,7 @@ __all__ = [
     "SEVERITY_ADVISORY",
     "SEVERITY_CRITICAL",
     "SemanticContractError",
+    "DEFAULT_DEFERRED_SCOPE_MESSAGE",
     "classify_merge_warning",
     "grade_merge_warnings",
     "build_semantic_context",

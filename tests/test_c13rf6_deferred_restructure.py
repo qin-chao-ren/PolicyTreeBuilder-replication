@@ -402,9 +402,21 @@ class C13RF6DeferredRestructureTests(unittest.TestCase):
                         pair["parent_id"],
                         pair["child_id"],
                     )
+                    # C13RF29 renamed the verdict these three shapes get: the
+                    # refusal itself is what this test defends and it still holds
+                    # (issues is non-empty, nothing executes), but the code is now
+                    # DECISION_SCOPE_INEXPRESSIBLE because the disposition changed
+                    # from "repair, then stop the run" to "record and skip".
                     self.assertTrue(issues)
                     self.assertTrue(any(
-                        item["code"] == "DECISION_SCOPE_VIOLATION"
+                        item["code"] == "DECISION_SCOPE_INEXPRESSIBLE"
+                        for item in issues
+                    ))
+                    # And it must never become repairable: a repair round on any
+                    # of these would be asking the model to re-aim a decision this
+                    # stage cannot execute.
+                    self.assertTrue(all(
+                        item["context"]["repairable"] is False
                         for item in issues
                     ))
 

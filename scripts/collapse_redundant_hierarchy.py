@@ -24,6 +24,7 @@ from utils.step4_shared import (
 from utils.tree_manager import TreeManager
 from utils.tree_integrity import atomic_write_bytes, atomic_write_json, atomic_write_jsonl
 from utils.semantic_contract import (
+    DEFAULT_DEFERRED_SCOPE_MESSAGE,
     deferred_restructure_record,
     execute_semantic_decision,
     membership_counts_from_level_maps,
@@ -39,14 +40,95 @@ from utils.local_reference_binding import (
     call_local_reference_json,
 )
 
-# Scope messages that describe a legitimate restructure this stage cannot
-# express, as opposed to a factual misread the model must repair.  Membership is
-# per message, not per whole list: a decision carrying one of these plus an
-# ordinary violation must still report the deferrable half instead of dropping
-# it (C13RF16 fix ②).
+# C13RF29 inverts this stage's scope criterion.
+#
+# Until this card the rule was a blacklist: enumerate the shapes that are not
+# allowed, and treat everything that trips one as repairable -- ask the model to
+# fix it, and if the repair does not satisfy the same predicate, the private
+# harness guard stops the whole run.  Two named messages had a defer channel
+# (C13RF6/RF16/RF18); every other rejection kept the stop-the-run disposition.
+# C13RF28 died exactly there: call 54 of 53 successful calls proposed merging the
+# CHILD with its *sibling*, the repair round returned a semantically identical
+# answer, and 53 completed calls were thrown away with the run.  Since the list of
+# ways a decision can fall outside a stage's stage is open-ended, each new shape
+# bought another full-tree rerun.
+#
+# The inverted rule: EXECUTION is still gated on the same single positive shape
+# this stage always required -- ``action == "merge"`` acting on exactly the
+# displayed pair, plus a child_plan whose destinations follow from that merge --
+# and the *disposition* of everything else changes from "repair, then stop the
+# run" to "record it and move to the next pair".  Nothing new becomes
+# executable: a merge naming a node outside the pair is refused exactly as
+# before, it simply no longer takes the run down with it.  The cost, accepted on
+# the record by the user, is the case where the model merely mistyped a
+# reference and a repair round would have fixed it: that repair is no longer
+# requested, so the tree may change less than it could have -- never more.
+#
+# ``keep``/``reject_merge``/``uncertain`` are in scope for the same reason: they
+# were 49 of C13RF28's 53 calls, and a non-mutating verb pointing off-stage asks
+# the stage to execute nothing at all.  Stopping a run over one is pure loss.
 PAIR_EXTERNAL_CHILD_MESSAGE = "merge child target is outside the exact pair role"
+# The two messages that had a defer channel before C13RF29.  Kept as a named set
+# because the tests pin them and because they are the only ones whose text is
+# asserted elsewhere; after this card every scope message defers, so this set no
+# longer decides the disposition on its own.
 INEXPRESSIBLE_SCOPE_MESSAGES = frozenset({PAIR_EXTERNAL_CHILD_MESSAGE})
 VOID_CHILD_PLAN_MESSAGE = "source has no children; child_plan must be empty"
+
+
+# C13RF29 load-bearing gate, stated positively and independently of the scope
+# predicates below.  This stage mutates the tree for exactly one shape: a merge
+# whose source and target are the two nodes it displayed.  Executing a merge that
+# names anything else would have this stage absorb a node it was never shown --
+# no membership list, no similarity measurement -- which is strictly worse than
+# the stop-the-run behaviour C13RF29 removes.  So the gate is checked again at
+# execution time rather than trusted from the validator: if a future edit
+# loosens a predicate in _scope_issues, this still refuses.
+MERGE_EXECUTION_GATE_MESSAGE = (
+    "merge may only execute on the exact displayed parent-child pair"
+)
+
+
+def merge_execution_gate_error(decision, pair_ids):
+    """Return a message when `decision` must not be executed, else None."""
+    if not isinstance(decision, dict):
+        return "decision is not an object"
+    if decision.get("action") != "merge":
+        return None
+    ids = {
+        str(decision.get("source_id") or ""),
+        str(decision.get("target_id") or ""),
+    }
+    return None if ids == set(pair_ids) else MERGE_EXECUTION_GATE_MESSAGE
+
+
+def _deferred_scope_messages(resp):
+    """Every scope message the binder recorded for the channel that refused.
+
+    C13RF29.  Read from repair_scope_errors when a repair round ran, else from
+    initial_scope_errors -- the same channel choice the defer predicate makes.
+    Falls back to the shared generic rather than inventing a specific reason.
+    """
+    if not isinstance(resp, dict):
+        return []
+    channel = (
+        "repair_scope_errors" if resp.get("repair_count")
+        else "initial_scope_errors"
+    )
+    messages = []
+    for item in resp.get(channel) or []:
+        if not isinstance(item, dict):
+            continue
+        context = item.get("context")
+        recorded = (
+            context.get("scope_messages")
+            if isinstance(context, dict) else None
+        )
+        if isinstance(recorded, list) and recorded:
+            messages.extend(str(message) for message in recorded)
+        elif item.get("message"):
+            messages.append(str(item["message"]))
+    return list(dict.fromkeys(messages))
 
 
 def _all_scope_errors_inexpressible(scope_errors):
@@ -62,6 +144,16 @@ def _all_scope_errors_inexpressible(scope_errors):
         and all(
             isinstance(item, dict)
             and item.get("code") == "DECISION_SCOPE_INEXPRESSIBLE"
+            # C13RF29: the verdict fields are checked too, not just the code.
+            # 14b's predicate always did this; these three checked the code alone,
+            # so an entry marked inexpressible AND repairable would have deferred
+            # here and stopped the run there.  No stage emits that combination
+            # today -- after this card nothing is repairable at all -- but the
+            # asymmetry is exactly the "parallel verdict channels" shape that put
+            # D2b into production, and a floor is worth having before it is needed.
+            and isinstance(item.get("context"), dict)
+            and item["context"].get("repairable") is False
+            and item["context"].get("mutable_ref_paths") == []
             for item in scope_errors
         )
     )
@@ -296,34 +388,25 @@ class SkeletonRefiner:
             source_id = str(decision.get("source_id") or "")
             target_id = str(decision.get("target_id") or "")
             action = decision.get("action")
-            mutable = []
             messages = []
-            repairable = True
-            # C13RF16 fix ②: the deferrable component is tracked separately so a
-            # mixed decision can report it instead of silently losing it, and so
-            # its refs can be withheld from the repair round.
+            # C13RF29: `mutable`/`repairable`/`inexpressible_mutable` are gone
+            # with the repair round they existed to steer -- nothing that reaches
+            # this loop is repairable any more, so keeping a per-path ref list
+            # would only suggest to a later reader that a repair still happens.
+            # `inexpressible_children` stays: it names the off-stage child_plan
+            # items in the record, which is reporting, not repair.
             inexpressible_children = []
-            inexpressible_mutable = []
             void_child_plan = False
             if action not in allowed_actions:
                 messages.append("action is not allowed in vertical collapse")
-                repairable = False
             elif action in {"rename", "split_reparent"} and not (
                 source_id == target_id and source_id in pair_ids
             ):
                 messages.append(f"{action} must operate on one displayed node")
-                mutable.extend([
-                    f"decisions[{index}].source_ref",
-                    f"decisions[{index}].target_ref",
-                ])
             elif action in {"merge", "keep", "reject_merge", "uncertain"} and (
                 {source_id, target_id} != pair_ids
             ):
                 messages.append("decision must reference the displayed parent-child pair")
-                mutable.extend([
-                    f"decisions[{index}].source_ref",
-                    f"decisions[{index}].target_ref",
-                ])
 
             if action in {"merge", "split_reparent"}:
                 source_children = {
@@ -341,9 +424,6 @@ class SkeletonRefiner:
                         continue
                     if str(item.get("child_id") or "") not in source_children:
                         messages.append("child plan contains a non-source child")
-                        mutable.append(
-                            f"decisions[{index}].child_plan[{child_index}].child_ref"
-                        )
                     plan_target = str(item.get("target_parent_id") or "")
                     if action == "merge":
                         expected_target = (
@@ -354,17 +434,8 @@ class SkeletonRefiner:
                         if plan_target != expected_target:
                             messages.append(PAIR_EXTERNAL_CHILD_MESSAGE)
                             inexpressible_children.append(child_index)
-                            inexpressible_mutable.append(
-                                f"decisions[{index}].child_plan[{child_index}].target_parent_ref"
-                            )
-                            mutable.append(
-                                f"decisions[{index}].child_plan[{child_index}].target_parent_ref"
-                            )
                     elif plan_target not in displayed_ids:
                         messages.append("split target is outside the displayed call context")
-                        mutable.append(
-                            f"decisions[{index}].child_plan[{child_index}].target_parent_ref"
-                        )
                     if action == "split_reparent":
                         child_id = str(item.get("child_id") or "")
                         disposition = item.get("disposition")
@@ -379,79 +450,42 @@ class SkeletonRefiner:
                         )
                         if invalid_role:
                             messages.append("split child target does not match its disposition role")
-                            mutable.append(
-                                f"decisions[{index}].child_plan[{child_index}].target_parent_ref"
-                            )
             if messages:
                 if void_child_plan:
                     messages.append(VOID_CHILD_PLAN_MESSAGE)
                 unique_messages = list(dict.fromkeys(messages))
-                inexpressible_messages = [
-                    message for message in unique_messages
-                    if message in INEXPRESSIBLE_SCOPE_MESSAGES
-                ]
-                other_messages = [
-                    message for message in unique_messages
-                    if message not in INEXPRESSIBLE_SCOPE_MESSAGES
-                ]
-                inexpressible = (
-                    action == "merge"
-                    and repairable
-                    and bool(inexpressible_messages)
-                    and not other_messages
-                )
-                # Mixed decision: withhold the deferrable half's refs so the
-                # repair round cannot coerce a pair-external destination into a
-                # legal-but-wrong one, and record what was withheld.
-                withheld = (
-                    list(dict.fromkeys(inexpressible_mutable))
-                    if inexpressible_messages and other_messages else []
-                )
-                repair_paths = [
-                    path for path in dict.fromkeys(mutable)
-                    if path not in set(withheld)
-                ]
+                # C13RF29: reaching here means the decision failed the positive
+                # check above, so it is not executable and no repair round is
+                # requested for it.  Every such decision is recorded as
+                # DECISION_SCOPE_INEXPRESSIBLE with repairable=False and no
+                # mutable ref path, which is what makes the binder skip the
+                # repair attempt, the harness guard let the call through, and the
+                # loop continue with the next pair.
+                #
+                # `child_indexes` keeps naming the child_plan items whose
+                # destination did not follow from the merge, unchanged from
+                # C13RF16, so the deferred record still says which part was
+                # off-stage.  The pre-RF29 fields that only existed to steer a
+                # repair round -- withheld_ref_paths, inexpressible_components,
+                # repair_paths -- are gone with the round itself; VOID_CHILD_PLAN
+                # is still flagged because it describes the proposal, not a
+                # repair instruction.
                 extra_context = {}
-                if withheld:
-                    extra_context["inexpressible_components"] = inexpressible_messages
-                    extra_context["inexpressible_child_indexes"] = list(
+                if inexpressible_children:
+                    extra_context["child_indexes"] = list(
                         dict.fromkeys(inexpressible_children)
                     )
-                    extra_context["withheld_ref_paths"] = withheld
                 if void_child_plan:
                     extra_context[VOID_CHILD_PLAN_FLAG] = True
                 issues.append({
-                    "code": (
-                        "DECISION_SCOPE_INEXPRESSIBLE"
-                        if inexpressible else "DECISION_SCOPE_VIOLATION"
-                    ),
-                    "message": (
-                        "merge with a pair-external child target is not expressible in this stage"
-                        if inexpressible else "; ".join(unique_messages)
-                    ),
+                    "code": "DECISION_SCOPE_INEXPRESSIBLE",
+                    "message": "; ".join(unique_messages),
                     "context": {
                         "decision_index": index,
-                        **({
-                            "child_indexes": [
-                                child_index
-                                for child_index, item in enumerate(
-                                    decision.get("child_plan", [])
-                                )
-                                if isinstance(item, dict)
-                                and str(item.get("target_parent_id") or "")
-                                != (
-                                    str(self.tm.get_parent_id(source_id) or "")
-                                    if self.tm.is_descendant(target_id, source_id)
-                                    else target_id
-                                )
-                            ],
-                            "mutable_ref_paths": [],
-                            "repairable": False,
-                        } if inexpressible else {
-                            "mutable_ref_paths": repair_paths,
-                            "repairable": repairable and bool(repair_paths),
-                            **extra_context,
-                        }),
+                        "mutable_ref_paths": [],
+                        "repairable": False,
+                        "scope_messages": unique_messages,
+                        **extra_context,
                     },
                 })
         return issues
@@ -517,7 +551,42 @@ class SkeletonRefiner:
             logical_call_id=resp["logical_call_id"],
             local_proposal=local_proposal,
             resolved_proposal=resolved_proposal,
+            # C13RF29: the record states the reasons this call actually carried
+            # instead of the one hard-coded merge sentence it used to claim.
+            scope_messages=_deferred_scope_messages(resp),
         )
+
+    @staticmethod
+    def _deferred_execution_record(stage, decision, messages):
+        """Record an unexecutable decision at the execution channel and skip it.
+
+        C13RF29.  Status stays ``rejected`` rather than ``deferred`` on purpose:
+        a ``deferred`` record is contractually a parked *proposal* and the
+        offline auditor (``scan_deferred_records.py``) requires it to carry the
+        binder's ``logical_call_id`` and the local/resolved proposal pair.  This
+        channel sees a single already-bound decision, so it has no proposal to
+        park; what changes versus the pre-RF29 behaviour is the verdict it
+        carries -- ``DECISION_SCOPE_INEXPRESSIBLE`` plus every reason -- instead
+        of a bare parse rejection.  Either way the tree does not move, no repair
+        is requested, and the loop continues: `rejected` is not in the stage
+        verifier's applied set, so it is classified `presented_only` (the defence
+        working) and not as a stage-failing incident.
+        """
+        reasons = [str(message) for message in messages if str(message).strip()]
+        record = rejected_parse_record(
+            stage,
+            [
+                {
+                    "code": "DECISION_SCOPE_INEXPRESSIBLE",
+                    "message": "; ".join(reasons) or DEFAULT_DEFERRED_SCOPE_MESSAGE,
+                    "scope_messages": reasons,
+                    "mutable_ref_paths": [],
+                    "repairable": False,
+                }
+            ],
+        )
+        record["message"] = "semantic decision not expressible in this stage; skipped"
+        return record
 
     def _execute_decision(
         self, decision, parent_id, child_id, call_audit=None
@@ -526,17 +595,28 @@ class SkeletonRefiner:
             assert_call_audit_payload(
                 call_audit, {"decisions": [decision]}
             )
+        # C13RF29: the second of this stage's two scope channels.  It re-runs the
+        # same predicate at execution time (the "parallel verdict channels"
+        # lesson: a criterion changed in one channel and not the other is how
+        # C13RF11's D2b slipped through), and its disposition is inverted the
+        # same way -- record the reason and skip this pair instead of rejecting
+        # into the log.  The independent merge gate is checked first and on its
+        # own, so it holds even if _scope_issues is later loosened.
+        pair_ids = {str(parent_id), str(child_id)}
+        gate_error = merge_execution_gate_error(decision, pair_ids)
         scope_issues = self._scope_issues(
             {"decisions": [decision]},
             parent_id,
             child_id,
         )
-        if scope_issues:
+        if gate_error or scope_issues:
+            messages = ([gate_error] if gate_error else []) + [
+                str(issue.get("message") or "") for issue in scope_issues
+            ]
             append_jsonl(
                 self.ops_log,
-                rejected_parse_record(
-                    "vertical_collapse",
-                    scope_issues,
+                self._deferred_execution_record(
+                    "vertical_collapse", decision, messages
                 ),
             )
             return

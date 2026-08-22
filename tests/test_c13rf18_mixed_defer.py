@@ -250,14 +250,23 @@ class BalanceNarrownessTests(StageLoadingTestCase):
         )
         self.assertTrue(self.balance_predicate(resp))
 
-    def test_repaired_inexpressible_but_not_depth_is_refused(self):
-        """Right code, wrong reason -- balance's message literal still gates."""
+    def test_repaired_inexpressible_with_another_reason_now_defers(self):
+        """C13RF29: the message literal no longer gates -- the verdict does.
+
+        Before this card, 14b's predicate additionally required the message to be
+        its own depth-ceiling sentence, so an inexpressible remainder carrying any
+        other reason still stopped the run.  That literal check was the stage-level
+        expression of the blacklist this card inverts: it made every newly
+        encountered off-stage reason cost another full-tree rerun.  The verdict
+        fields (code, repairable=False, empty ref paths) still gate, and the
+        neighbouring tests pin that a non-inexpressible remainder is still refused.
+        """
         remainder = [self.depth_error(0)]
         remainder[0]["message"] = "merge child target is outside the exact pair role"
         resp = repaired_response(
             remainder=remainder, final_local=self.bridges(1)
         )
-        self.assertFalse(self.balance_predicate(resp))
+        self.assertTrue(self.balance_predicate(resp))
 
     def test_repaired_batch_with_a_non_bridge_decision_is_refused(self):
         resp = repaired_response(
@@ -426,18 +435,31 @@ class EndToEndMixedDeferTests(StageLoadingTestCase):
     def codes(self, items):
         return [item.get("code") for item in (items or []) if isinstance(item, dict)]
 
-    def test_mixed_answer_repaired_to_an_inexpressible_remainder_defers(self):
-        """The card's target case, end to end."""
+    def test_mixed_answer_now_defers_on_channel_one_without_a_repair(self):
+        """C13RF29 makes channel 2 unreachable for scope errors, by construction.
+
+        This was C13RF18's target case: a mixed answer whose repair round fixed the
+        repairable half, leaving an inexpressible remainder that channel 2 then read
+        out of ``repair_scope_errors``.  After C13RF29 no scope error is repairable,
+        so the binder never requests the repair round -- the call resolves on
+        channel 1 with ``repair_count == 0``, ``repair_scope_errors`` empty, and the
+        run continues just the same.  Channel 2 is left in place (it costs nothing
+        and a future repairable class would use it), but nothing this stage produces
+        can reach it.
+
+        The outcome this test defends is unchanged and asserted below: the call is
+        refused, the tree is untouched (checked in run_call), and the run continues.
+        The visible saving is the repair attempt that is no longer spent.
+        """
         resp = self.run_call(
             [child("SCHILD1", "OTHER"), child("TCHILD", "TGT")],
             [child("SCHILD1", "OTHER"), child("SCHILD2", "TGT")],
         )
         self.assertFalse(resp["ok"])
-        self.assertEqual(resp["error"], "REPAIR_SCOPE_VALIDATION_FAILED")
-        self.assertEqual(resp["repair_count"], 1)
-        # The ledger the predicate now reads, produced by the real classifier.
-        self.assertEqual(self.codes(resp["initial_scope_errors"]), [VIOLATION])
-        self.assertEqual(self.codes(resp["repair_scope_errors"]), [INEXPRESSIBLE])
+        self.assertEqual(resp["error"], "BOUND_SCOPE_VALIDATION_FAILED")
+        self.assertEqual(resp["repair_count"], 0)
+        self.assertEqual(self.codes(resp["initial_scope_errors"]), [INEXPRESSIBLE])
+        self.assertEqual(resp["repair_scope_errors"], [])
         self.assertTrue(
             self.polish.PolishingProcess._is_deferrable_response(resp)
         )
@@ -451,24 +473,76 @@ class EndToEndMixedDeferTests(StageLoadingTestCase):
         self.assertEqual(self.codes(resp["initial_scope_errors"]), [INEXPRESSIBLE])
         self.assertTrue(self.polish.PolishingProcess._is_deferrable_response(resp))
 
-    def test_repaired_subject_error_is_accepted_not_deferred(self):
+    def test_subject_error_is_no_longer_repaired_but_recorded(self):
+        """The accepted cost of C13RF29, stated as a test.
+
+        A "subject error" is the model misreading its own call context -- here a
+        child_plan naming a child that is not the source's.  Before this card the
+        binder asked for a repair and this shape came back corrected and executed.
+        After it, the shape is recorded and skipped instead: the user accepted, on
+        the record, losing the case where a repair would have fixed a mistyped
+        reference, in exchange for never again ending a whole run over one.  The
+        direction of the loss is the point -- the tree changes LESS, never wrongly.
+        """
         resp = self.run_call(
             [child("TCHILD", "TGT")], [child("SCHILD2", "TGT")]
         )
-        self.assertTrue(resp["ok"])
-        self.assertEqual(resp["final_disposition"], "bound_after_repair")
+        self.assertFalse(resp["ok"])
+        self.assertEqual(resp["final_disposition"], "scope_rejected")
+        self.assertEqual(resp["repair_count"], 0)
+        self.assertEqual(self.codes(resp["initial_scope_errors"]), [INEXPRESSIBLE])
         self.assertEqual(resp["repair_scope_errors"], [])
-        self.assertFalse(self.polish.PolishingProcess._is_deferrable_response(resp))
+        # Recorded and skipped: the run continues rather than stopping.
+        self.assertTrue(self.polish.PolishingProcess._is_deferrable_response(resp))
 
-    def test_repair_leaving_an_impurity_still_stops(self):
-        """Control for the strictness floor, end to end."""
+    def test_two_reasons_at_once_defer_together_and_the_floor_still_holds(self):
+        """C13RF29: what used to be the impurity case, plus the floor that remains.
+
+        This shape carries two reasons at once (one child sent off-stage, one child
+        that is not the source's).  Before this card the mixture was what made it
+        non-deferrable: one half looked repairable, so the binder asked for a repair,
+        and when the answer came back unchanged the run stopped.  Now both reasons
+        are recorded on one inexpressible verdict and the run continues -- this is
+        precisely the "list of shapes is open-ended" problem the card removes.
+
+        The strictness floor is NOT gone, and the second half of this test pins the
+        part of it that survives: the predicate still requires every entry in the
+        channel to be inexpressible, so a response carrying any other verdict is
+        still refused and still stops the run.  Nothing this stage now produces
+        looks like that, which is why the floor has to be checked synthetically.
+        """
         resp = self.run_call(
             [child("SCHILD1", "OTHER"), child("TCHILD", "TGT")],
             [child("SCHILD1", "OTHER"), child("TCHILD", "TGT")],
         )
-        self.assertEqual(resp["error"], "REPAIR_SCOPE_VALIDATION_FAILED")
-        self.assertEqual(self.codes(resp["repair_scope_errors"]), [VIOLATION])
-        self.assertFalse(self.polish.PolishingProcess._is_deferrable_response(resp))
+        self.assertEqual(resp["error"], "BOUND_SCOPE_VALIDATION_FAILED")
+        self.assertEqual(resp["repair_count"], 0)
+        self.assertEqual(self.codes(resp["initial_scope_errors"]), [INEXPRESSIBLE])
+        # Both reasons are stated in the one verdict rather than one being lost.
+        self.assertGreaterEqual(
+            len(resp["initial_scope_errors"][0]["context"]["scope_messages"]), 2)
+        self.assertTrue(self.polish.PolishingProcess._is_deferrable_response(resp))
+
+        # The floor: a channel that is not wholly inexpressible still stops the run.
+        impure = copy.deepcopy(resp)
+        impure["initial_scope_errors"] = [
+            {
+                "code": VIOLATION,
+                "message": "some repairable scope problem",
+                "context": {
+                    "decision_index": 0,
+                    "mutable_ref_paths": ["decisions[0].target_ref"],
+                    "repairable": True,
+                },
+            }
+        ]
+        self.assertFalse(
+            self.polish.PolishingProcess._is_deferrable_response(impure))
+        # And an empty channel is never deferrable.
+        empty = copy.deepcopy(resp)
+        empty["initial_scope_errors"] = []
+        self.assertFalse(
+            self.polish.PolishingProcess._is_deferrable_response(empty))
 
 
 if __name__ == "__main__":

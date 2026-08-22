@@ -91,6 +91,35 @@ AUDITED_DECISION_FIELDS = (
 )
 
 
+def _deferred_scope_messages(resp):
+    """Every scope message the binder recorded for the channel that refused.
+
+    C13RF29; identical to 14a's and 14c's readers.  Reads repair_scope_errors
+    when a repair round ran, else initial_scope_errors -- the same channel choice
+    the defer predicate makes.
+    """
+    if not isinstance(resp, dict):
+        return []
+    channel = (
+        "repair_scope_errors" if resp.get("repair_count")
+        else "initial_scope_errors"
+    )
+    messages = []
+    for item in resp.get(channel) or []:
+        if not isinstance(item, dict):
+            continue
+        context = item.get("context")
+        recorded = (
+            context.get("scope_messages")
+            if isinstance(context, dict) else None
+        )
+        if isinstance(recorded, list) and recorded:
+            messages.extend(str(message) for message in recorded)
+        elif item.get("message"):
+            messages.append(str(item["message"]))
+    return list(dict.fromkeys(messages))
+
+
 def _atomic_append_jsonl_batch(path: Path, records) -> None:
     """Append a complete logical-call batch with one atomic replacement."""
 
@@ -357,7 +386,9 @@ class ShapingProcess:
             "keep", "reject_merge", "uncertain",
         }
         scope_messages = []
-        mutable_ref_paths = []
+        # C13RF29: no `mutable_ref_paths` list any more -- every failed check
+        # is non-repairable now, so there is no repair round for ref paths to
+        # steer, and keeping the accumulation would imply one still happens.
         terminal = False
         new_node_level = None
         void_child_plan = False
@@ -367,7 +398,6 @@ class ShapingProcess:
             terminal = True
         elif action in {"create_bridge", "flatten", "split_reparent"} and source_id != pid:
             scope_messages.append(f"{action} source must be the current candidate")
-            mutable_ref_paths.append("source_ref")
 
         if action == "create_bridge":
             if calc_depth(self.tm, pid) >= MAX_DEPTH - 1:
@@ -375,7 +405,6 @@ class ShapingProcess:
                 terminal = True
             if target_id != BRIDGE_TARGET_PLACEHOLDER:
                 scope_messages.append("create_bridge target must be NEW_BRIDGE")
-                mutable_ref_paths.append("target_ref")
             direct_children = {
                 str(child.get("node_id")) for child in self.tm.get_children(pid)
             }
@@ -386,12 +415,8 @@ class ShapingProcess:
             for child_index, item in enumerate(plan_items):
                 if str(item.get("child_id") or "") not in direct_children:
                     scope_messages.append("bridge plan contains a non-direct child")
-                    mutable_ref_paths.append(f"child_plan[{child_index}].child_ref")
                 if str(item.get("target_parent_id") or "") != BRIDGE_TARGET_PLACEHOLDER:
                     scope_messages.append("bridge child target must be NEW_BRIDGE")
-                    mutable_ref_paths.append(
-                        f"child_plan[{child_index}].target_parent_ref"
-                    )
             label = decision.get("new_label")
             if not scope_messages and isinstance(label, str) and label.strip():
                 bridge_id = generate_bridge_id(pid, label)
@@ -407,7 +432,6 @@ class ShapingProcess:
         elif action == "flatten":
             if target_id != str(self.tm.get_parent_id(pid) or ""):
                 scope_messages.append("flatten target must be the current candidate parent")
-                mutable_ref_paths.append("target_ref")
             direct_children = {
                 str(child.get("node_id")) for child in self.tm.get_children(pid)
             }
@@ -416,18 +440,11 @@ class ShapingProcess:
                     continue
                 if str(item.get("child_id") or "") not in direct_children:
                     scope_messages.append("flatten plan contains a non-direct child")
-                    mutable_ref_paths.append(
-                        f"child_plan[{child_index}].child_ref"
-                    )
                 if str(item.get("target_parent_id") or "") != target_id:
                     scope_messages.append("flatten child target must equal the flatten target")
-                    mutable_ref_paths.append(
-                        f"child_plan[{child_index}].target_parent_ref"
-                    )
         elif action == "split_reparent":
             if target_id != pid:
                 scope_messages.append("split_reparent target must equal the current candidate")
-                mutable_ref_paths.append("target_ref")
             direct_children = {
                 str(child.get("node_id")) for child in self.tm.get_children(pid)
             }
@@ -441,14 +458,8 @@ class ShapingProcess:
                     continue
                 if str(item.get("child_id") or "") not in direct_children:
                     scope_messages.append("split plan contains a non-direct child")
-                    mutable_ref_paths.append(
-                        f"child_plan[{child_index}].child_ref"
-                    )
                 if str(item.get("target_parent_id") or "") not in allowed_targets:
                     scope_messages.append("split target is outside the candidate context")
-                    mutable_ref_paths.append(
-                        f"child_plan[{child_index}].target_parent_ref"
-                    )
                 child_id = str(item.get("child_id") or "")
                 plan_target = str(item.get("target_parent_id") or "")
                 disposition = item.get("disposition")
@@ -463,19 +474,14 @@ class ShapingProcess:
                 )
                 if invalid_role:
                     scope_messages.append("split child target does not match its disposition role")
-                    mutable_ref_paths.append(
-                        f"child_plan[{child_index}].target_parent_ref"
-                    )
         elif action == "move":
             current_children = {
                 str(child.get("node_id")) for child in self.tm.get_children(pid)
             }
             if source_id not in current_children:
                 scope_messages.append("move source must be a direct candidate child")
-                mutable_ref_paths.append("source_ref")
             if target_id != str(self.tm.get_parent_id(pid) or ""):
                 scope_messages.append("move target must be the candidate parent")
-                mutable_ref_paths.append("target_ref")
             source_children = {
                 str(child.get("node_id")) for child in self.tm.get_children(source_id)
             }
@@ -494,59 +500,46 @@ class ShapingProcess:
                     continue
                 if str(item.get("child_id") or "") not in source_children:
                     scope_messages.append("move plan contains a non-source child")
-                    mutable_ref_paths.append(
-                        f"child_plan[{child_index}].child_ref"
-                    )
                 if str(item.get("target_parent_id") or "") != source_id:
                     scope_messages.append("moved node children must remain under their source")
-                    mutable_ref_paths.append(
-                        f"child_plan[{child_index}].target_parent_ref"
-                    )
         elif action in {"keep", "reject_merge", "uncertain"} and not (
             source_id == target_id == pid
         ):
             scope_messages.append("non-mutating decision must reference only the candidate")
-            mutable_ref_paths.extend(["source_ref", "target_ref"])
 
         scope_issue = None
         if scope_messages:
             if void_child_plan:
                 scope_messages.append(VOID_CHILD_PLAN_MESSAGE)
             unique_messages = list(dict.fromkeys(scope_messages))
-            inexpressible_messages = [
-                message for message in unique_messages
-                if message in INEXPRESSIBLE_SCOPE_MESSAGES
-            ]
-            other_messages = [
-                message for message in unique_messages
-                if message not in INEXPRESSIBLE_SCOPE_MESSAGES
-            ]
-            inexpressible = (
-                action == "create_bridge"
-                and bool(inexpressible_messages)
-                and not other_messages
-            )
+            # C13RF29: every failed check becomes DECISION_SCOPE_INEXPRESSIBLE
+            # with repairable=False and no mutable ref path, so the binder skips
+            # the repair round and the harness guard lets the call through --
+            # this candidate is left alone and the balancing loop moves on.  See
+            # collapse_redundant_hierarchy.py's header for the full account.
+            #
+            # This stage has no `merge` verb at all (its verbs are create_bridge,
+            # flatten, split_reparent, move and the three non-mutating ones), so
+            # the card's "only a merge on this exact pair may execute" reads here
+            # as: each verb keeps exactly the positive shape it already required,
+            # and only the disposition of a failure changes.  `terminal` no longer
+            # affects the disposition -- everything is non-repairable now -- but is
+            # still recorded so a reader can tell an unimplemented verb from a
+            # misaddressed one.
             extra_context = {}
-            # Mixed decision: the depth ceiling carries no mutable ref path of
-            # its own, so nothing has to be withheld here -- ``terminal`` already
-            # blocks the repair round.  Recording the deferrable component is
-            # what changes: it used to vanish silently (C13RF16 fix ②).
-            if inexpressible_messages and other_messages:
-                extra_context["inexpressible_components"] = inexpressible_messages
+            if terminal:
+                extra_context["terminal_action"] = True
             if void_child_plan:
                 extra_context[VOID_CHILD_PLAN_FLAG] = True
             scope_issue = {
-                "code": (
-                    "DECISION_SCOPE_INEXPRESSIBLE"
-                    if inexpressible else "DECISION_SCOPE_VIOLATION"
-                ),
-                "message": (
-                    BRIDGE_DEPTH_DEFERRED_MESSAGE
-                    if inexpressible else "; ".join(unique_messages)
-                ),
-                "mutable_ref_paths": list(dict.fromkeys(mutable_ref_paths)),
-                "repairable": False if inexpressible else not terminal,
-                "extra_context": extra_context,
+                "code": "DECISION_SCOPE_INEXPRESSIBLE",
+                "message": "; ".join(unique_messages),
+                "mutable_ref_paths": [],
+                "repairable": False,
+                "extra_context": {
+                    "scope_messages": unique_messages,
+                    **extra_context,
+                },
             }
         return decision, new_node_level, scope_issue
 
@@ -562,10 +555,10 @@ class ShapingProcess:
                 "message": issue["message"],
                 "context": {
                     "decision_index": index,
-                    "mutable_ref_paths": [
-                        f"decisions[{index}].{path}"
-                        for path in issue["mutable_ref_paths"]
-                    ],
+                    # C13RF29: always empty and always non-repairable now; read
+                    # straight from the issue rather than re-deriving a prefixed
+                    # path list that can only be empty.
+                    "mutable_ref_paths": issue["mutable_ref_paths"],
                     "repairable": issue["repairable"],
                     **issue.get("extra_context", {}),
                 },
@@ -583,23 +576,32 @@ class ShapingProcess:
         )
 
         def channel_is_depth_only(scope_errors):
-            """Whether one scope-error channel is a pure depth-ceiling batch.
+            """Whether one scope-error channel is wholly inexpressible.
 
-            Parameterised over the channel (C13RF18) so the initial and the
-            post-repair remainder are judged by exactly the same rule; the
-            balance-specific narrowness below is deliberately preserved for
-            both.  ``decisions`` is read from final_local, which on the repair
-            path is already the repaired proposal.
+            C13RF29 widens this from "a homogeneous create_bridge batch whose
+            only issue is the depth ceiling" to "every recorded error is
+            DECISION_SCOPE_INEXPRESSIBLE, non-repairable, with no mutable ref
+            path", which is what _prepare_decision now emits for every failed
+            check.  The old narrowness would have defeated the inversion at this
+            stage: a batch mixing a depth-conflicted bridge with any other
+            off-stage decision would still have stopped the run, which is exactly
+            the failure mode this card removes.  What is NOT widened is the
+            requirement that the channel be non-empty and that every entry pass
+            the test -- an empty channel is still never deferrable, so "no
+            recorded error" can never be read as "every error was benign".
+
+            The function name is kept so the two call sites below read unchanged;
+            it is no longer depth-specific.  ``decisions`` is read from
+            final_local, which on the repair path is already the repaired
+            proposal.
             """
-            # A scope-error list only describes rejected decisions.  Requiring
-            # it to cover every local proposal prevents a mixed batch (one legal
-            # decision plus one depth-conflicted bridge) from being deferred as
-            # a whole.  The deferred path is intentionally limited to
-            # homogeneous create_bridge batches whose only issue is the depth
-            # ceiling -- C13RF18 widens *when* the channel may be read, never
-            # what counts as a deferrable batch.
             if not isinstance(scope_errors, list) or not scope_errors:
                 return False
+            # Every proposed decision must be accounted for by exactly one
+            # recorded error.  This is retained from C13RF10 and still matters
+            # after C13RF29: a batch where one decision was refused and another
+            # was not has a legal half that this path would silently drop, so it
+            # is not deferrable as a whole and keeps the pre-existing behaviour.
             error_indexes = [
                 item.get("context", {}).get("decision_index")
                 for item in scope_errors
@@ -610,28 +612,22 @@ class ShapingProcess:
                 isinstance(index, int) and not isinstance(index, bool)
                 for index in error_indexes
             )
-            all_decisions_are_depth_bridges = (
+            every_decision_refused = (
                 isinstance(decisions, list)
                 and bool(decisions)
-                and all(
-                    isinstance(decision, dict)
-                    and decision.get("action") == "create_bridge"
-                    for decision in decisions
-                )
                 and valid_error_indexes
                 and sorted(error_indexes) == list(range(len(decisions)))
                 and len(set(error_indexes)) == len(error_indexes)
             )
-            scope_errors_are_depth_only = all(
+            scope_errors_all_inexpressible = all(
                 isinstance(item, dict)
                 and item.get("code") == "DECISION_SCOPE_INEXPRESSIBLE"
-                and item.get("message") == BRIDGE_DEPTH_DEFERRED_MESSAGE
                 and isinstance(item.get("context"), dict)
                 and item["context"].get("mutable_ref_paths") == []
                 and item["context"].get("repairable") is False
                 for item in scope_errors
             )
-            return all_decisions_are_depth_bridges and scope_errors_are_depth_only
+            return every_decision_refused and scope_errors_all_inexpressible
 
         # Conditions shared by both channels: the call was refused, nothing was
         # bound, and the tree did not move underneath the validator.
@@ -682,16 +678,19 @@ class ShapingProcess:
                 item["target_parent_id"] = mapping[
                     item.pop("target_parent_ref")
                 ]
+        # C13RF29: the shared record takes the messages as a parameter now, so
+        # this stage no longer reaches into violations[0] to overwrite a sentence
+        # that was written for another stage.  The stage-level message stays
+        # generic because after this card the deferred batch is not necessarily a
+        # create_bridge.
         record = deferred_restructure_record(
             stage,
             logical_call_id=resp["logical_call_id"],
             local_proposal=local_proposal,
             resolved_proposal=resolved_proposal,
+            scope_messages=_deferred_scope_messages(resp),
         )
-        record["message"] = "structure-balancing create_bridge deferred before execution"
-        record["semantic_contract"]["violations"][0][
-            "message"
-        ] = BRIDGE_DEPTH_DEFERRED_MESSAGE
+        record["message"] = "structure-balancing decision deferred before execution"
         return record
 
     def _apply(self, pid, payload, stage, call_audit=None):
@@ -729,6 +728,21 @@ class ShapingProcess:
             )
             return False
 
+        # C13RF29: this stage's second scope channel.  It already recorded and
+        # continued rather than stopping the run (it returns False; the stop came
+        # from the binder channel above), so what changes here is the verdict the
+        # records carry: `_prepare_decision` now returns
+        # DECISION_SCOPE_INEXPRESSIBLE for every failed check, and that code is
+        # what lands in the log.
+        #
+        # Whole-batch abort is deliberately KEPT.  Executing the sound decisions
+        # of a batch whose sibling was refused would widen what this stage
+        # executes, and C13RF29 widens nothing -- its entire subject is the
+        # disposition of refusals.  A batch is proposed as one plan (a bridge plus
+        # the child moves that populate it); applying half of one is a shape no
+        # stage ever validated.  So the tree does not move, every decision in the
+        # batch is recorded with its own reason or as BATCH_SCOPE_ABORTED, and the
+        # balancing loop continues with the next candidate.
         prepared = [self._prepare_decision(pid, decision) for decision in decisions]
         scope_errors = [error for _, _, error in prepared if error]
         if scope_errors:

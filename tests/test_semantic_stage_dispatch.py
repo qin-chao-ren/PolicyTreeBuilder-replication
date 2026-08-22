@@ -201,11 +201,16 @@ class SemanticStageDispatchTests(unittest.TestCase):
             )
             process._execute_decision(unsafe, "A", "B", "cross_parent_unify")
 
+            # The substance is unchanged by C13RF29 and is what this test is for:
+            # the out-of-scope split target is refused, so C stays under A and
+            # nothing is applied.  Only the verdict code changed -- the execution
+            # channel now records DECISION_SCOPE_INEXPRESSIBLE and skips, instead
+            # of rejecting into a repair round that could stop the run.
             self.assertEqual(process.tm.get_parent_id("C"), "A")
             record = json.loads(process.ops_log.read_text(encoding="utf-8"))
             self.assertEqual(record["status"], "rejected")
             self.assertIn(
-                "DECISION_SCOPE_VIOLATION",
+                "DECISION_SCOPE_INEXPRESSIBLE",
                 record["semantic_contract"]["violation_counts"],
             )
 
