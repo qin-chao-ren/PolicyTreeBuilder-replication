@@ -134,3 +134,17 @@ The public evaluation module is in `evaluation/`. Its archived outputs evaluate 
 The legacy local directory name `policy_tree_eval` is intentionally not restored. The legacy input `v4_tree_final.json` maps to `data/final_tree/policy_tree_final.json`.
 
 See `PUBLICATION_SNAPSHOT.md` for the historical publication snapshot and `replication_package.md` for the package index.
+
+## Known Limitations
+
+`KNOWN_LIMITATIONS.md` records the known limitations of this package, each backed by offline
+measurement on committed artifacts. Read it before citing the refinement pipeline's output.
+
+The two that most often lead to overstatement:
+
+- The deterministic E0 gate checks exact-label duplicates only. `sibling_duplicate_groups: 0`
+  means no two sibling labels are byte-identical — it does **not** mean the tree is free of
+  semantic duplicates, and two families of near-synonyms are known to remain in the finished tree.
+- `split_reparent` has never been produced by a model in any run, so structural
+  split-and-reparent is **not** empirically validated, despite being present in the contract and
+  covered by tests.
